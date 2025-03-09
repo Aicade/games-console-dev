@@ -1,13 +1,13 @@
 {
     "title": "Fruit and Meat Slasher",
     "description": "A game where the player slices through various fruits and meats to earn points and progress through levels.",
-    "deviceOrientation": "landscape",
+    "deviceOrientation": "auto",
     "imageLoader": {
         "background": "background",
         "collectible": "collectible",
         "avoidable": "avoidable"
     },
-    "instructions": "Instructions: 1. Slice collectibles 2. Avoid enemies",
+    "instructions": "Instructions: 1. Slice collectibles 2. Avoid enemies 3. Collect Timers",
     "deviceOrientationSizes": {
         "landscape": {
             "height": 720,
@@ -24,5 +24,6 @@
         "background": "background",
         "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
         "slice": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/slice.flac"
-    }
+    },
+    "orientationFallback": true
 }
