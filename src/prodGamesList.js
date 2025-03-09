@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-const prodGamesList = [
-=======
 const prodGamesList = ["Missonman","HillClimbRacing",
     "Basketball", "CollectingWT_P", "Rogue",
     "SlidingPuzzle",
@@ -12,7 +9,6 @@ const prodGamesList = ["Missonman","HillClimbRacing",
     "TossTheCan",
     "Go-around", "CutTheRope", "CadburyGems(Memorydots)",
     "platformer-mickey-cheese", "Spaceshooter", "HappyB", "petGame", "WordDice",
->>>>>>> 2dc3652 (New Games and updates)
     "Airshipadventure",
     "AngryBirds",
     "Basketball",
@@ -44,32 +40,6 @@ const prodGamesList = ["Missonman","HillClimbRacing",
     "MathPuzzle",
     "MessidodgeCorona",
     "Missonman",
-<<<<<<< HEAD
-    "NinjaBlades",
-    "numberCollect",
-    "Platformer(infiniteverticaljumping)",
-    "platformer-mickey-cheese",
-    "Pong",
-    "Racing",
-    "RiseUp",
-    "Rogue",
-    "saveEarth",
-    "SlidingPuzzle",
-    "Snake",
-    "SpaceInvader",
-    "Spaceshooter",
-    "SpikeFlight",
-    "SpinMaster",
-    "SwingMania",
-    "TaptoSave",
-    "TossTheCan",
-    "TowerDefence(Arcade-shooting-health)",
-    "VillageGaurd",
-    "Volleyball",
-    "Whack-a-Mole",
-    "WordDice"
-];
-=======
     "Platformer(infiniteverticaljumping).js",
     "Pong.js",
     "Racing.js",
@@ -86,6 +56,5 @@ const prodGamesList = ["Missonman","HillClimbRacing",
 
     "NinjaBlades.js"
 ]
->>>>>>> 2dc3652 (New Games and updates)
 
 export default prodGamesList;
