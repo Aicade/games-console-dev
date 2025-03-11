@@ -42,6 +42,7 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.input.keyboard.disableGlobalCapture();
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
             this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
@@ -127,12 +128,12 @@ class GameScene extends Phaser.Scene {
             loop: true
         });
 
-        this.time.addEvent({
-            delay: 100,
-            callback: this.scorePoints,
-            callbackScope: this,
-            loop: true
-        });
+        // this.time.addEvent({
+        //     delay: 100,
+        //     callback: this.scorePoints,
+        //     callbackScope: this,
+        //     loop: true
+        // });
 
         this.physics.add.overlap(this.player, this.enemies, (player, enemy) => {
             player.destroy();
@@ -158,9 +159,10 @@ class GameScene extends Phaser.Scene {
     resetGame() {
         this.isGameOver = true;
         this.physics.pause();
-        this.score = 0;
+        
+        // this.score = 0;
         this.vfx.shakeCamera();
-
+    
         let gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'pixelfont', 'Game Over', 64)
             .setOrigin(0.5)
             .setVisible(false)
@@ -169,6 +171,7 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(500, () => {
             this.sounds.lose.setVolume(.2).setLoop(false).play();
             gameOverText.setVisible(true);
+            
             this.tweens.add({
                 targets: gameOverText,
                 y: '+=200',
@@ -195,13 +198,15 @@ class GameScene extends Phaser.Scene {
 
     jump() {
         const jumpDistance = 200;
-
-        if (this.playerDistance == 255) {
+    
+        if (this.playerDistance == 255 && !this.isJumping) {  // Add isJumping flag
+            this.isJumping = true;  // Prevent further jumps
             this.sounds.jump.setVolume(.6).setLoop(false).play();
+            
             this.tweens.add({
                 targets: this,
                 playerDistance: this.circle.radius - jumpDistance,
-                duration: 500,
+                duration: 500,  // Animation duration
                 yoyo: true,
                 ease: 'Sine.easeInOut',
                 onUpdate: () => {
@@ -210,11 +215,16 @@ class GameScene extends Phaser.Scene {
                 },
                 onComplete: () => {
                     this.vfx.shakeCamera(200);
+                    this.score += 1; // Increment score by 1 on jump completion
+                    this.updateScoreText(); // Update the score display
+                    this.updateScore;
+                    this.time.delayedCall(100, () => {
+                        this.isJumping = false;
+                    }, [], this);
                 }
             });
         }
     }
-
     spawnEnemy() {
         if (!this.isGameOver) {
             const randomAngle = Phaser.Math.FloatBetween(0.7, 1.3);
@@ -237,10 +247,9 @@ class GameScene extends Phaser.Scene {
     }
     scorePoints() {
         if (!this.isGameOver) {
-            this.score++;
-            this.gameScore = this.score;
-            this.updateScore(1);
-            if (this.score % 100 === 0) {
+            this.score += 1;
+            this.updateScoreText();
+            if (this.score % 10 === 0) {
                 this.levelUp();
                 this.timerDelay = this.enemySpawnDelay - 100;
                 this.enemySpawnDelay = this.timerDelay;
@@ -252,21 +261,28 @@ class GameScene extends Phaser.Scene {
 
     updateScore(points) {
         this.score += points;
-        this.updateScoreText();
+        this.score
     }
 
     updateScoreText() {
-        this.scoreText.setText(this.score);
+        this.scoreText.setText(this.score); // Ensure score is a string for bitmap text
     }
 
     gameOver() {
         initiateGameOver.bind(this)({
-            score: this.gameScore + 1
+            score: this.score
         });
     }
 
     pauseGame() {
         handlePauseGame.bind(this)();
+        restartButton.on('pointerdown', () => {
+            this.sound.stopAll();
+            if (this.spawnEnemyTimer) this.spawnEnemyTimer.remove();
+            if (this.scoreTimer) this.scoreTimer.remove();
+            this.isGameOver = false;
+            this.scene.restart();
+        });
     }
 }
 

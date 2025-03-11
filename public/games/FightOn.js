@@ -16,11 +16,16 @@ const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-n
 
 // Game Scene
 class GameScene extends Phaser.Scene {
+    create(data) {
+        const message = data.playerWon ? 'You Win!' : 'You Lost!';
+        this.add.bitmapText(this.game.config.width / 2, this.game.config.height / 2, 'pixelfont', message, 48)
+            .setOrigin(0.5);
+    }
     constructor() {
         super({ key: 'GameScene' });
         this.lastThrowTime = 0;
-        this.score = 0;
-        this.playerLives = 5;
+        this.score = 5;
+        this.playerLives = 1;
         this.enemyLives = 5;
         this.playerWon = false;
         this.difficultyLevel = 'easy';
@@ -182,140 +187,67 @@ class GameScene extends Phaser.Scene {
 
     update(time) {
         this.updateHealthBars();
-
+    
         // Make sure to clamp the health values so they don't go below 0
         this.playerHealth = Phaser.Math.Clamp(this.playerHealth, 0, 100);
         this.enemyHealth = Phaser.Math.Clamp(this.enemyHealth, 0, 100);
-
-
-        // How to use joystick with keyboard
-
+    
+        // Player controls (unchanged)
         var joystickKeys = this.joyStick.createCursorKeys();
-        // var keyboardKeys = this.input.keyboard.createCursorKeys();
         if (joystickKeys.right.isDown && time > this.lastThrowTime + 700) {
             this.throw();
             this.lastThrowTime = time;
-            // console.log("right");
         }
         if (joystickKeys.up.isDown && this.player.body.touching.down) {
-            this.sounds.jump.setVolume(1).setLoop(false).play()
+            this.sounds.jump.setVolume(1).setLoop(false).play();
             this.player.setVelocityY(-400);
         }
-
         if (this.cursors.up.isDown && this.player.body.touching.down) {
-            this.sounds.jump.setVolume(1).setLoop(false).play()
-            this.player.setVelocityY(-400); // Adjust the jump velocity as needed
+            this.sounds.jump.setVolume(1).setLoop(false).play();
+            this.player.setVelocityY(-400);
         }
-
         if (this.cursors.right.isDown && time > this.lastThrowTime + 700) {
-            this.sounds.shoot.setVolume(1).setLoop(false).play()
+            this.sounds.shoot.setVolume(1).setLoop(false).play();
             this.throw();
-            this.lastThrowTime = time; // Update last throw time
+            this.lastThrowTime = time;
         }
-
-        // How to use button
-
-        // if (this.buttonA.button.isDown) {
-        //     console.log("button pressed");
-        // }
-
-
-        if (this.lives <= 3) {
-            this.difficultyLevel = 'hard';
-        } else if (this.lives <= 4) {
-            this.difficultyLevel = 'medium';
-        }
-
-        // React to player actions with higher intelligence
+    
+        // Enemy AI (unchanged)
         if (this.player.isShooting && this.difficultyLevel !== 'easy') {
-            this.maybeJump(9, time); // Increased chance to jump to avoid projectiles
+            this.maybeJump(9, time);
         } else {
-            this.maybeJump(10, time); // Default chance to jump
+            this.maybeJump(10, time);
         }
-
-        // Make decisions on when to shoot based on difficulty level and cooldown
         if (this.difficultyLevel === 'hard') {
-            this.maybeShoot(75, time); // More aggressive in shooting
+            this.maybeShoot(75, time);
         } else {
             this.maybeShoot(15, time);
         }
-
-        // Check for winner
+    
+        // Check for game over conditions
         if (this.playerHealth <= 0) {
-            // this.enemy.setTint(0xff0000);
-            this.playerWon = false;
-            this.gameOver();
-            if (this.sounds && this.sounds.lose) {
-                this.sounds.lose.setVolume(0.5).setLoop(false).play();
-            }
+            this.gameOver(false); // Player lost
         } else if (this.enemyHealth <= 0) {
-            // this.player.setTint(0xff0000);
-            this.playerWon = true;
-            // this.gameOver();
-            this.respawnEnemy();
-
+            this.gameOver(true); // Player won
         }
+    
+        // Shield logic (unchanged)
         if (Phaser.Input.Keyboard.JustDown(this.spaceKey) && time > this.lastCooldown + 3000) {
             this.spawnShield(true);
             this.lastCooldown = time;
         }
-
         if (this.shield && this.shield.active) {
-            this.shield.x = this.player.x + this.offset; // Maintain horizontal offset
-            this.shield.y = this.player.y; // Follow player's y position
+            this.shield.x = this.player.x + this.offset;
+            this.shield.y = this.player.y;
         }
         if (this.enemyShield && this.enemyShield.active) {
-            this.enemyShield.x = this.enemy.x - this.offset; // Maintain horizontal offset
-            this.enemyShield.y = this.enemy.y; // Follow player's y position
+            this.enemyShield.x = this.enemy.x - this.offset;
+            this.enemyShield.y = this.enemy.y;
         }
     }
-    respawnEnemy() {
-        this.sounds.upgrade.setVolume(1).setLoop(false).play()
-
-        this.text = this.add.bitmapText(this.width / 2, this.height * 0.2, 'pixelfont', 'LEVEL UP!', 24);
-        this.text.setOrigin(0.5);
-        this.text.setScale(2.5);
-
-        this.tweens.add({
-            targets: this.text,
-            scaleX: 3, // Final scale on X axis
-            scaleY: 3, // Final scale on Y axis
-            duration: 2000, // Duration of the zoom-in tween in milliseconds
-            ease: 'Linear', // Easing function
-
-            // After zoom-in, fade out the text
-            onComplete: function () {
-                this.text.destroy();
-            },
-            callbackScope: this // Ensure the correct scope for callbacks
-        });
-
-        var startX = Phaser.Math.Between(this.game.config.width - 400, this.game.config.width - 200)
-        var startY = Phaser.Math.Between(100, 500)
-        this.enemy.setPosition(startX, startY);
-        this.enemy.setScale(0.3); // Start from a scale of 0
-        this.enemy.setAlpha(0); // Start fully transparent
-
-        // Reset enemy properties
-        this.enemyLives = 5;
-        this.playerLives = 5;
-        this.enemyHealth = 100;
-        this.playerHealth = this.playerHealth + 50;
-        this.playerWon = false;
-        this.enemy.clearTint();
-
-        // Create a tween for the respawn effect
-        this.tweens.add({
-            targets: this.enemy,
-            scale: 0.30, // Assuming 0.15 is the normal scale
-            alpha: 1, // Fade in to full visibility
-            ease: 'Power1',
-            duration: 1000, // Adjust duration according to the desired effect
-            onComplete: () => {
-                // Additional actions after the respawn animation, if needed
-            }
-        });
-    }
+    // respawnEnemy() {
+        
+    // }
 
     updateHealthBars() {
         this.drawHealthBar(this.playerHealthBar, this.player.x - 40, this.player.y - 80, this.playerHealth, 0x00ff00);
@@ -569,13 +501,13 @@ class GameScene extends Phaser.Scene {
     }
 
     updateScoreText() {
-        this.scoreText.setText(`Score: ${this.score}`);
+        this.scoreText.setText(`Scorexxdxdxdx: ${this.score}`);
     }
 
     gameOver() {
         this.sounds.background.stop();
         initiateGameOver.bind(this)({
-            score: this.score
+            playerWon: playerWon
         });
     }
 
