@@ -264,14 +264,20 @@ function gameSceneCreate(game) {
   game.sniperScope.setDepth(1);
 
   game.input.on("pointerup", release, game);
+  game.input.on("pointermove", updateCrosshair, game);
+  game.lastPointerPosition = { x: 0, y: 0 };
 
 
 }
 
 //UPDATE FUNCTION FOR THE GAME SCENE
 function gameSceneUpdate(game) {
-  let worldPoint = game.cameras.main.getWorldPoint(game.input.x, game.input.y);
-  drawSniperScope(game, worldPoint.x, worldPoint.y);
+  if (game.input.activePointer.isDown && game.lastPointerPosition) {
+    drawSniperScope(game, game.lastPointerPosition.x, game.lastPointerPosition.y);
+  } else {
+    let worldPoint = game.cameras.main.getWorldPoint(game.input.x, game.input.y);
+    drawSniperScope(game, worldPoint.x, worldPoint.y);
+  }
 
   game.boxes.forEach(box => {
     if (box.y > 2000) {
@@ -420,22 +426,97 @@ function moveplayer(game, velx, vely) {
   game.player.setVelocity(-velx / 100, -30);
 
 }
+function updateCrosshair(pointer) {
+  if (pointer.isDown) {
+    // Store the pointer position for use in gameSceneUpdate
+    this.lastPointerPosition.x = pointer.worldX;
+    this.lastPointerPosition.y = pointer.worldY;
+  } else {
+    // When not pressing, still track the position but don't update lastPointerPosition
+    // This allows the crosshair to follow without affecting the shot direction
+    let worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    drawSniperScope(this, worldPoint.x, worldPoint.y);
+  }
+}
 
 function drawSniperScope(game, x, y) {
   game.sniperScope.clear();
 
   const scopeRadius = 50;
-
+  const outerRadius = scopeRadius + 10;
+  
+  // Outer ring (semi-transparent)
+  game.sniperScope.lineStyle(1, 0x00ff00, 0.8); // Green tint
   game.sniperScope.beginPath();
-  game.sniperScope.fillStyle(0xffffff, .1);
+  game.sniperScope.arc(x, y, outerRadius, 0, Math.PI * 2);
+  game.sniperScope.strokePath();
+
+  // Inner scope background with subtle transparency
+  game.sniperScope.fillStyle(0x000000, 0.15); // Darker background
+  game.sniperScope.beginPath();
   game.sniperScope.fillCircle(x, y, scopeRadius);
   game.sniperScope.closePath();
 
-  game.sniperScope.lineStyle(2, 0xffffff, 1);
+  // Main crosshair
+  game.sniperScope.lineStyle(2, 0x00ff00, 1); // Bright green
   game.sniperScope.beginPath();
+  // Vertical line
   game.sniperScope.moveTo(x, y - scopeRadius);
+  game.sniperScope.lineTo(x, y - scopeRadius * 0.3);
+  game.sniperScope.moveTo(x, y + scopeRadius * 0.3);
   game.sniperScope.lineTo(x, y + scopeRadius);
+  // Horizontal line
   game.sniperScope.moveTo(x - scopeRadius, y);
+  game.sniperScope.lineTo(x - scopeRadius * 0.3, y);
+  game.sniperScope.moveTo(x + scopeRadius * 0.3, y);
   game.sniperScope.lineTo(x + scopeRadius, y);
+  game.sniperScope.strokePath();
+
+  // Center dot
+  game.sniperScope.fillStyle(0xff0000, 1); // Red dot
+  game.sniperScope.beginPath();
+  game.sniperScope.fillCircle(x, y, 2);
+  game.sniperScope.closePath();
+
+  // Small tick marks on crosshair
+  game.sniperScope.lineStyle(1, 0x00ff00, 0.8);
+  const tickLength = 5;
+  game.sniperScope.beginPath();
+  // Vertical ticks
+  for (let i = -scopeRadius + 10; i <= scopeRadius - 10; i += 10) {
+      if (Math.abs(i) > scopeRadius * 0.3) { // Avoid overlap with gap
+          game.sniperScope.moveTo(x - tickLength / 2, y + i);
+          game.sniperScope.lineTo(x + tickLength / 2, y + i);
+      }
+  }
+  // Horizontal ticks
+  for (let i = -scopeRadius + 10; i <= scopeRadius - 10; i += 10) {
+      if (Math.abs(i) > scopeRadius * 0.3) {
+          game.sniperScope.moveTo(x + i, y - tickLength / 2);
+          game.sniperScope.lineTo(x + i, y + tickLength / 2);
+      }
+  }
+  game.sniperScope.strokePath();
+
+  // Corner brackets
+  game.sniperScope.lineStyle(2, 0x00ff00, 0.6);
+  const bracketSize = 10;
+  game.sniperScope.beginPath();
+  // Top-left
+  game.sniperScope.moveTo(x - scopeRadius, y - scopeRadius + bracketSize);
+  game.sniperScope.lineTo(x - scopeRadius, y - scopeRadius);
+  game.sniperScope.lineTo(x - scopeRadius + bracketSize, y - scopeRadius);
+  // Top-right
+  game.sniperScope.moveTo(x + scopeRadius - bracketSize, y - scopeRadius);
+  game.sniperScope.lineTo(x + scopeRadius, y - scopeRadius);
+  game.sniperScope.lineTo(x + scopeRadius, y - scopeRadius + bracketSize);
+  // Bottom-left
+  game.sniperScope.moveTo(x - scopeRadius, y + scopeRadius - bracketSize);
+  game.sniperScope.lineTo(x - scopeRadius, y + scopeRadius);
+  game.sniperScope.lineTo(x - scopeRadius + bracketSize, y + scopeRadius);
+  // Bottom-right
+  game.sniperScope.moveTo(x + scopeRadius - bracketSize, y + scopeRadius);
+  game.sniperScope.lineTo(x + scopeRadius, y + scopeRadius);
+  game.sniperScope.lineTo(x + scopeRadius, y + scopeRadius - bracketSize);
   game.sniperScope.strokePath();
 }
