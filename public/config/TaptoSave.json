@@ -1,6 +1,6 @@
 {
     "description": "Reflex based game.",
-    "deviceOrientation": "landscape",
+    "deviceOrientation": "portrait",
     "imageLoader": {
         "background": "background",
         "collectible": "collectible"

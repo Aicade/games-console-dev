@@ -33,6 +33,8 @@ class GameScene extends Phaser.Scene {
         }
 
         this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        // Add this inside the preload() method
+        this.load.image("heart", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png");
 
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
@@ -111,10 +113,19 @@ class GameScene extends Phaser.Scene {
             this.buttonA.button.on('down', () => this.fireBullet(), this);
         }
 
+        this.playerLives = 3;
+        this.hearts = [];
+
         this.scoreText = this.add.bitmapText(this.width / 2, 100, 'pixelfont', gameScore, 64).setOrigin(0.5, 0.5);
         this.levelText = this.add.bitmapText(10, 30, 'pixelfont', `Level: ${gameLevel}`, 48).setOrigin(0, 0.5);
         this.scoreText.setDepth(10);
         this.levelText.setDepth(10);
+
+        for (let i = 0; i < this.playerLives; i++) {
+            const heart = this.add.image(10 + (i * 40), 80, 'heart').setOrigin(0, 0.5).setScale(0.03);
+            heart.setDepth(10);
+            this.hearts.push(heart);
+        }
 
         const centerX = this.game.config.width / 2;
         const centerY = this.game.config.height / 2;
@@ -130,9 +141,33 @@ class GameScene extends Phaser.Scene {
 
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.physics.add.collider(this.player, this.enemies, () => {
-            this.gameOver();
-        });
+        // Replace the current collision code with this
+        this.playerInvulnerable = false;
+        this.physics.add.overlap(this.player, this.enemies, (player, enemy) => {
+            if (!this.playerInvulnerable) {
+                this.sounds.destroy.play();
+                this.vfx.createEmitter('red', player.x, player.y, 1, 0, 500).explode(10);
+                this.playerLives--;
+                this.updateLivesDisplay();
+                
+                // Destroy the enemy that hit the player
+                enemy.destroy();
+                
+                // Make player briefly invulnerable
+                this.playerInvulnerable = true;
+                player.alpha = 0.5;
+                
+                this.time.delayedCall(1500, () => {
+                    player.alpha = 1;
+                    this.playerInvulnerable = false;
+                });
+                
+                // Check if game over
+                if (this.playerLives <= 0) {
+                    this.gameOver();
+                }
+            }
+        }, null, this);
 
         this.vfx.addCircleTexture('red', 0xFF0000, 1, 10);
         this.vfx.addCircleTexture('orange', 0xFFA500, 1, 10);
@@ -184,6 +219,12 @@ class GameScene extends Phaser.Scene {
             canFireBullet = false;
         } else if (this.cursors.space.isUp) {
             canFireBullet = true;
+        }
+    }
+
+    updateLivesDisplay() {
+        for (let i = 0; i < this.hearts.length; i++) {
+            this.hearts[i].visible = i < this.playerLives;
         }
     }
 
@@ -313,13 +354,13 @@ function displayProgressLoader() {
 // Configuration object
 const config = {
     type: Phaser.AUTO,
-    width: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width,
-    height: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].height,
+    width: _CONFIG.orientationSizes.portrait.width,
+    height: _CONFIG.orientationSizes.portrait.height,
     scene: [GameScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        orientation: Phaser.Scale.Orientation.LANDSCAPE
+        orientation: Phaser.Scale.Orientation.PORTRAIT
     },
     pixelArt: true,
     physics: {
@@ -329,13 +370,11 @@ const config = {
             debug: false,
         },
     },
-    
     dataObject: {
         name: _CONFIG.title,
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
-    },
-    deviceOrientation: _CONFIG.deviceOrientation==="landscape"
+    }
 };
 
 let gameScore = 0;

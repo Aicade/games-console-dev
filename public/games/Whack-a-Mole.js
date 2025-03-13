@@ -44,6 +44,119 @@ class GameScene extends Phaser.Scene {
         displayProgressLoader.call(this);
         addEventListenersPhaser.bind(this)();
     }
+    resize() {
+        // Get current game dimensions
+        const width = this.game.config.width;
+        const height = this.game.config.height;
+        
+        // Resize background
+        if (this.bg) {
+            this.bg.displayHeight = height;
+            this.bg.displayWidth = width;
+        }
+        
+        // Calculate scaling factors based on reference resolution
+        // Assuming original design was for 1080x1920 (portrait)
+        const referenceWidth = 1080;
+        const referenceHeight = 1920;
+        const scaleX = width / referenceWidth;
+        const scaleY = height / referenceHeight;
+        const scale = Math.min(scaleX, scaleY);
+        
+        // Recalculate game grid dimensions
+        this.rectWidth = 100 * scale;
+        this.rectHeight = 100 * scale;
+        this.spacing = 40 * scale;
+        
+        // Recalculate total dimensions
+        this.totalWidth = this.columns * this.rectWidth + ((this.columns - 1) * this.spacing);
+        this.totalHeight = this.rows * this.rectHeight + ((this.rows - 1) * this.spacing);
+        
+        // Recalculate starting positions
+        this.startPosX = ((width - this.totalWidth) / 2) + this.rectWidth / 2;
+        this.startPosY = ((height - this.totalHeight) / 2) + this.rectHeight / 2 + (50 * scale);
+        
+        // Resize UI elements
+        if (this.scoreText) {
+            this.scoreText.setPosition(width / 2, 50 * scale);
+            this.scoreText.setFontSize(64 * scale);
+        }
+        
+        if (this.timerText) {
+            this.timerText.setPosition(10 * scale, 30 * scale);
+            this.timerText.setFontSize(48 * scale);
+        }
+        
+        if (this.pauseButton) {
+            this.pauseButton.setPosition(width - (60 * scale), 60 * scale);
+            this.pauseButton.setScale(3 * scale);
+        }
+        
+        // Resize joystick if enabled
+        if (joystickEnabled && this.joyStick) {
+            const joyStickRadius = 50 * scale;
+            this.joyStick.base.setRadius(80 * scale);
+            this.joyStick.thumb.setRadius(40 * scale);
+            this.joyStick.setPosition(joyStickRadius * 2, height - (joyStickRadius * 2));
+        }
+        
+        // Resize button if enabled
+        if (buttonEnabled && this.buttonA) {
+            this.buttonA.setPosition(width - (80 * scale), height - (100 * scale));
+            this.buttonA.setSize(80 * scale, 80 * scale);
+        }
+        
+        // Update mole grid positions
+        this.randomPositions = [];
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.columns; j++) {
+                this.randomPositions.push({
+                    x: this.startPosX + (j * (this.rectWidth + this.spacing)),
+                    y: this.startPosY + (i * (this.rectHeight + this.spacing))
+                });
+            }
+        }
+        
+        // Resize grid rectangles if they exist
+        if (this.gridRects) {
+            this.gridRects.forEach((rect, index) => {
+                const pos = this.randomPositions[index];
+                rect.setPosition(pos.x, pos.y);
+                rect.setSize(this.rectWidth, this.rectHeight);
+            });
+        }
+        
+        // Resize moles
+        if (this.moleGroup) {
+            this.moleGroup.getChildren().forEach(mole => {
+                // Find the closest position in the grid
+                const closestPos = this.findClosestPosition(mole.x, mole.y);
+                if (closestPos) {
+                    mole.setPosition(closestPos.x, closestPos.y);
+                    mole.displayHeight = this.rectHeight;
+                    mole.displayWidth = this.rectWidth;
+                }
+            });
+        }
+    }
+
+    findClosestPosition(x, y) {
+        if (!this.randomPositions.length) return null;
+        
+        let closestPos = this.randomPositions[0];
+        let closestDist = Phaser.Math.Distance.Between(x, y, closestPos.x, closestPos.y);
+        
+        for (let i = 1; i < this.randomPositions.length; i++) {
+            const pos = this.randomPositions[i];
+            const dist = Phaser.Math.Distance.Between(x, y, pos.x, pos.y);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestPos = pos;
+            }
+        }
+        
+        return closestPos;
+    }
 
     create() {
         this.vfx = new VFXLibrary(this);
@@ -105,11 +218,12 @@ class GameScene extends Phaser.Scene {
             }
         };
         this.timerText = this.add.bitmapText(10, 30, 'pixelfont', `Time: ${this.timeLimit}`, 48).setOrigin(0, 0.5);;
-
+        this.gridRects = [];
         this.randomPositions.forEach((pos) => {
             let rect = this.add.rectangle(pos.x, pos.y, this.rectWidth, this.rectHeight, 0x000000, 0.5);
-            rect.setStrokeStyle(2, 0x222222)
-        })
+            rect.setStrokeStyle(2, 0x222222);
+            this.gridRects.push(rect);
+        });
 
         this.moleGroup = this.add.group();
 
@@ -152,6 +266,9 @@ class GameScene extends Phaser.Scene {
                 this.pointerTouched = false;
             });
         }
+
+        this.scale.on('resize', this.resize, this);
+        this.resize(); // Call once to set initial sizes
     }
 
     createSpawnerEvent(time) {
@@ -185,7 +302,7 @@ class GameScene extends Phaser.Scene {
         this.vfx.createEmitter('yellow', mole.x, mole.y, 1, 0, 500).explode(10);
         this.vfx.createEmitter('orange', mole.x, mole.y, 1, 0, 500).explode(10);
         this.vfx.shakeCamera(100, 0.02);
-        this.updateScore(10);
+        this.updateScore(5);
         mole.killed = true;
         this.tweens.add({
             targets: mole,
@@ -317,7 +434,9 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        orientation: Phaser.Scale.Orientation.LANDSCAPE
+        orientation: Phaser.Scale.Orientation.PORTRAIT,
+        width: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width,
+        height: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].height
     },
     scene: [GameScene],
     dataObject: {
@@ -325,5 +444,5 @@ const config = {
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
     },
-    deviceOrientation: _CONFIG.deviceOrientation==="landscape"
+    deviceOrientation: _CONFIG.deviceOrientation==="portrait"
 };

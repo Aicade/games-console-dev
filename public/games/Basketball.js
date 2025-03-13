@@ -6,10 +6,12 @@
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
-        this.score = 0; this.isGameOver = false;
+        this.score = 0;
+        this.isGameOver = false;
         this.bounceDirection = 1;
         this.socialButtonClicked = false;
-        this.isBasketballInScoreZone = false; this.timer = 60;
+        this.isBasketballInScoreZone = false;
+        this.timer = 60;
     }
 
     preload() {
@@ -41,9 +43,9 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-
         //for keyboard control
         this.input.keyboard.disableGlobalCapture();
+        this.physics.world.gravity.y = 1200; 
 
         this.width = this.game.config.width; this.height = this.game.config.height;
         this.vfx = new VFXLibrary(this);
@@ -102,7 +104,6 @@ class GameScene extends Phaser.Scene {
             if (this.basketball.body.velocity.y < -50) {
                 this.cameras.main.shake(100, 0.001);
                 this.basketballHitGround = true;
-                // this.hitSfx.play();
             }
         });
 
@@ -113,11 +114,9 @@ class GameScene extends Phaser.Scene {
                 if (body.blocked.left) {
                     this.bounceDirection = 1;
                     this.cameras.main.shake(100, 0.002);
-                    // this.hitSfx.play();
                 } else if (body.blocked.right) {
                     this.bounceDirection = -1;
                     this.cameras.main.shake(100, 0.002);
-                    // this.hitSfx.play();
                 }
             }
         }, this);
@@ -128,11 +127,6 @@ class GameScene extends Phaser.Scene {
         this.basket.visible = false;
         this.basketContainer.add(this.basket); // Add Basket to BasketContainer
 
-        // this.basketMask = this.add.image(0, 0, 'basket_mask').setScale(1);
-        // this.basketMask.setDepth(3);
-        // this.basketMask.visible = false;
-        // this.basketContainer.add(this.basketMask); // Add BasketMask to BasketContainer
-
         this.rim1 = this.physics.add.staticImage(this.basketContainer.x - 50, this.basketContainer.y - 20, 'player').setScale(0.007);
         this.rim1.setOrigin(0.5, 0.5);
         this.rim1.setVisible = false;
@@ -142,7 +136,6 @@ class GameScene extends Phaser.Scene {
         this.rim2.setVisible = false;
 
         this.physics.add.collider(this.basketball, [this.rim1, this.rim2], () => {
-            // this.rimHitSfx.play();
         });
 
         this.scoreZone = this.physics.add.image(this.basketContainer.x, this.basketContainer.y - 10, 'block').setScale(0.1, 0.1).setSize(this.basket.width, 10).setOrigin(0.5, 0.5);
@@ -172,8 +165,6 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-
-
         this.physics.add.collider(this.basketball, [this.rim1, this.rim2]);
 
         this.physics.add.overlap(this.basketball, this.scoreZone, () => {
@@ -184,12 +175,9 @@ class GameScene extends Phaser.Scene {
                 const newCoords = this.findNewBasketPosition();
                 this.basketContainer.x = newCoords.x;
                 this.basketContainer.y = newCoords.y;
-
-                // this.scoreSfx.play();
             }
         });
 
-        // this.scoreText = this.add.text(this.scale.width / 2, 40, '0', { fontSize: '64px', fill: '#000' }).setOrigin(0.5);
         this.scoreText.visible = false;
 
         let isFirstClick = true;
@@ -206,9 +194,7 @@ class GameScene extends Phaser.Scene {
                         onComplete: () => {
                             targets.forEach(target => target.visible = false);
                             this.basket.visible = true;
-                            // this.basketMask.visible = true;
                             this.scoreText.visible = true;
-                            // this.triggerEffects(pointer.x, pointer.y, 10);
                             this.timeElapsed = 0;
                             this.makeTimerMeter();
                             this.startClockTimer();
@@ -219,12 +205,25 @@ class GameScene extends Phaser.Scene {
                 } else {
                     this.triggerEffects(pointer.x, pointer.y, 10);
 
-                    this.basketball.setVelocityY(-300);
+                    this.basketball.setVelocityY(-600);
                     this.basketball.setVelocityX(100 * this.bounceDirection);
-                    // this.bounceSfx.play();
                 }
             }
         });
+
+        this.basketball.body.world.on('worldbounds', (body) => {
+            if (body.gameObject === this.basketball) {
+                this.triggerEffects(body.x, body.y, 50);
+        
+                if (body.blocked.left) {
+                    this.basketball.setVelocityX(Math.abs(this.basketball.body.velocity.x));  
+                    this.cameras.main.shake(100, 0.002);  
+                } else if (body.blocked.right) {
+                    this.basketball.setVelocityX(-Math.abs(this.basketball.body.velocity.x)); 
+                    this.cameras.main.shake(100, 0.002);  
+                }
+            }
+        }, this);
 
         this.tweens.add({
             targets: this.clickToPlayText,
@@ -234,9 +233,8 @@ class GameScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1
         });
-        // this.physics.world.debugGraphic.visible = true;
-
     }
+
     startClockTimer() {
         this.timerEvent = this.time.addEvent({
             delay: 1000,
@@ -245,6 +243,7 @@ class GameScene extends Phaser.Scene {
             loop: true
         });
     }
+
     makeTimerMeter(startAngle = -90, endAngle = 270, isUpdated = false) {
         this.cX = 50;
         this.cY = 70;
@@ -259,7 +258,6 @@ class GameScene extends Phaser.Scene {
             this.time.delayedCall(100, () => {
                 this.resetGame();
                 this.clockText.visible = false;
-                // this.fadeOut();
             })
         }
 
@@ -275,19 +273,25 @@ class GameScene extends Phaser.Scene {
             let newStartAngle = ((360 / this.timer) * this.timeElapsed) - 90;
             if (newStartAngle === 270) {
                 newStartAngle = 269;
-                this.timerEvent.destroy();
+                this.timerEvent.destroy(); 
             }
             this.clockGraphics.clear();
-            this.makeTimerMeter(newStartAngle, 270, true)
+            this.makeTimerMeter(newStartAngle, 270, true);
+
+            if (this.timer - this.timeElapsed <= 0) {
+                this.timeElapsed = 0;
+                this.timerEvent.remove(); 
+                this.resetGame(); 
+            }
         }
     }
 
     triggerEffects(x, y, bullet) {
-        // this.pointsEffect(x, y, this.cursorPoint); // Assume this.cursorPoint is defined elsewhere
         this.vfx.createEmitter('red', x, y - 5, 1, 0, 500).explode(bullet);
         this.vfx.createEmitter('yellow', x, y, 1, 0, 500).explode(bullet);
         this.vfx.createEmitter('orange', x, y + 5, 1, 0, 500).explode(bullet);
     }
+
     pointsEffect(x, y, score) {
         let scoreText = this.add.bitmapText(x - 50, y, 'pixelfont', `+${score}`, 50);
         this.tweens.add({
@@ -311,7 +315,7 @@ class GameScene extends Phaser.Scene {
         let x, y;
         do {
             x = Phaser.Math.Between(100, this.scale.width - 100);
-            y = Phaser.Math.Between(100, this.scale.height - 100);
+            y = Phaser.Math.Between(500, this.scale.height - 800);
         } while (Phaser.Math.Distance.Between(this.basketContainer.x, this.basketContainer.y, x, y) < 200);
         return { x, y };
     }
@@ -333,7 +337,6 @@ class GameScene extends Phaser.Scene {
         }
 
         this.updateBasketComponentsPosition();
-
     }
 
     updateBasketComponentsPosition() {
@@ -350,32 +353,31 @@ class GameScene extends Phaser.Scene {
     }
 
     resetGame() {
-        this.isGameOver = true; this.vfx.shakeCamera();
+        this.isGameOver = true;  
+        this.vfx.shakeCamera();  
+
         if (this.gameWin) {
-            let gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 250, 'pixelfont', 'Game Win', 64).setOrigin(0.5).setVisible(false).setAngle(-15).setDepth(10).setTint(0xffff00);
+            // no game wins rn!!
+        } else {
+            let gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 250, 'pixelfont', 'Game Over', 64)
+                .setOrigin(0.5)
+                .setVisible(false)
+                .setAngle(-15)
+                .setDepth(10)
+                .setTint(0xff0000);
+
             this.time.delayedCall(500, () => {
-                this.sounds.lose.setVolume(0.5).setLoop(false).play()
+                this.sounds.loose.setVolume(0.5).setLoop(false).play();
                 gameOverText.setVisible(true);
                 this.tweens.add({
-                    targets: gameOverText, y: '+=200',
-                    angle: 0, scale: { from: 0.5, to: 2 },
-                    alpha: { from: 0, to: 1 }, ease: 'Elastic.easeOut',
+                    targets: gameOverText,
+                    y: '+=200',
+                    angle: 0,
+                    scale: { from: 0.5, to: 2 },
+                    alpha: { from: 0, to: 1 },
+                    ease: 'Elastic.easeOut',
                     duration: 1500,
                     onComplete: () => {
-                        this.time.delayedCall(1000, this.gameOver, [], this);
-                    }
-                });
-            });
-        } else {
-            let gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 250, 'pixelfont', 'Game Over', 64).setOrigin(0.5).setVisible(false).setAngle(-15).setDepth(10).setTint(0xff0000);
-            this.time.delayedCall(500, () => {
-                this.sounds.lose.setVolume(0.5).setLoop(false).play()
-                gameOverText.setVisible(true);
-                this.tweens.add({
-                    targets: gameOverText, y: '+=200',
-                    angle: 0, scale: { from: 0.5, to: 2 },
-                    alpha: { from: 0, to: 1 }, ease: 'Elastic.easeOut',
-                    duration: 1500, onComplete: () => {
                         this.time.delayedCall(1000, this.gameOver, [], this);
                     }
                 });
@@ -383,8 +385,8 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-
     updateScore(points) {
+        this.sounds.shoot.setVolume(0.5).setLoop(false).play();
         this.score += points;
         this.updateScoreText();
     }
