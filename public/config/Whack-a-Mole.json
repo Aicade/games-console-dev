@@ -1,6 +1,6 @@
 {
     "description": "Reaction arcade game. Tap to kill.",
-    "deviceOrientation": "landscape",
+    "deviceOrientation": "portrait",
     "imageLoader": {
         "background": "background",
         "enemy": "enemy"
