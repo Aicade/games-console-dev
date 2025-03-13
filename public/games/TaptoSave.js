@@ -14,6 +14,7 @@ const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex
 const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
 
 let gameScore = 0;
+// this.score = 0;
 let gameLevel = 1;
 let levelThreshold = 10;
 let enemySpeed = 120; // Initial speed of enemies
@@ -26,12 +27,8 @@ function gameSceneCreate(game) {
     // Use updateScore(10) to increment score
     // Use gameOver() for game over
 
-    game.scoreText = game.add.bitmapText(game.game.config.width * 0.5, game.game.config.height * 0.1, 'pixelfont', '0', 35).setOrigin(0.5).setDepth(11);
-
-    // Create a text object for the level on the right side
-    game.levelText = game.add.bitmapText(game.game.config.width * 0.1, game.game.config.height * 0.07, 'pixelfont', `Level: ${gameLevel}`, '25').setOrigin(1, 0).setDepth(11);
-    game.scoreText.setDepth(1); // Bring to the front
-    game.levelText.setDepth(1);
+    game.scoreText = game.add.bitmapText(game.game.config.width * 0.5, game.game.config.height * 0.05, 'pixelfont', '0', 35).setOrigin(0.5).setDepth(11);
+    game.levelText = game.add.bitmapText(game.game.config.width * 0.2, game.game.config.height * 0.05, 'pixelfont', `Level: ${gameLevel}`, '25').setOrigin(0.5, 0.5).setDepth(11);
 
     // const centerX = game.game.config.width / 2;
     // const centerY = game.game.config.height / 2;
@@ -54,7 +51,7 @@ function gameSceneUpdate(game) {
         if (enemy.y > game.game.config.height * 0.5) {
             game.vfx.rotateGameObject(enemy);
         }
-        if (enemy.y > game.game.config.height - 50) {
+        if (enemy.y > game.game.config.height - 20) {
             game.vfx.shakeCamera();
             game.sounds.lose.setVolume(1).setLoop(false).play();
             game.time.delayedCall(400, () => {
@@ -75,6 +72,7 @@ function spawnEnemy(game) {
 
     enemy.setInteractive().on('pointerdown', () => {
         game.instructionText.setAlpha(0);
+        game.updateScore(1);
 
         enemy.destroy();
         game.sounds.collect.setVolume(0.05).setLoop(false).play()
@@ -181,11 +179,11 @@ class GameScene extends Phaser.Scene {
         this.sounds.background.setVolume(1).setLoop(true).play();
         // Add UI elements
         // this.scoreText = this.add.text(10, 10, 'Score: 0', { fontSize: '20px', fill: globalPrimaryFontColor });
-        this.instructionText = this.add.bitmapText(this.game.config.width * 0.5, this.game.config.height * 0.3, 'pixelfont', `Tap to play`, 25).setOrigin(0.5, 0.5);
+        this.instructionText = this.add.bitmapText(this.game.config.width * 0.5, this.game.config.height * 0.4, 'pixelfont', `Tap to destroy`, 25).setOrigin(0.5, 0.5);
         this.instructionText.setScrollFactor(0).setDepth(11).setTint(0x008000);
         // Add input listeners
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
-        const pauseButton = this.add.sprite(this.game.config.width * 0.9, this.game.config.height * 0.1, "pauseButton").setOrigin(0.5, 0.5).setScale(2);
+        const pauseButton = this.add.sprite(this.game.config.width * 0.8, this.game.config.height * 0.05, "pauseButton").setOrigin(0.5, 0.5).setScale(1.5);
         pauseButton.setInteractive({ cursor: 'pointer' });
         pauseButton.on('pointerdown', () => this.pauseGame());
 
@@ -231,11 +229,11 @@ class GameScene extends Phaser.Scene {
     }
 
     updateScoreText() {
-        this.scoreText.setText(`Score: ${this.score}`);
+        this.scoreText.setText(`Score:  ${this.score}`);
     }
 
     gameOver() {
-        initiateGameOver.bind(this)({ score: this.score });
+        initiateGameOver.bind(this)({ score: this.score});
     }
 
     pauseGame() {
@@ -285,15 +283,14 @@ function displayProgressLoader() {
 // Configuration object
 const config = {
     type: Phaser.AUTO,
-    width: _CONFIG.deviceOrientationSizes[_CONFIG.deviceOrientation].width,
-    height: _CONFIG.deviceOrientationSizes[_CONFIG.deviceOrientation].height,
+    width: _CONFIG.deviceOrientationSizes["portrait"].width,
+    height: _CONFIG.deviceOrientationSizes["portrait"].height,
     scene: [GameScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     pixelArt: true,
-    /* ADD CUSTOM CONFIG ELEMENTS HERE */
     physics: {
         default: "arcade",
         arcade: {
@@ -306,5 +303,5 @@ const config = {
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
     },
-    orientation: _CONFIG.deviceOrientation === "landscape"
+    orientation: "portrait"
 };
