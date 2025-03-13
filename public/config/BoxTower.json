@@ -19,9 +19,9 @@
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
     "soundsLoader": {
-        "background": "background",
-        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
-        "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_2.mp3"
+        "background": "https://files.catbox.moe/mnezf0.mp3",
+        "lose": "https://files.catbox.moe/xz1zbb.mp3",
+        "collect": "https://files.catbox.moe/15w4vv.mp3"
     },
     "title": "Stack Blocks"
 }
