@@ -19,8 +19,10 @@ class GameScene extends Phaser.Scene {
     preload() {
         this.score = 0;
         this.additionalLives = 0;
-        this.livesThreshold = 150;
+        this.livesThreshold = 200;
         this.isGameOver = false;
+        this.powerupThreshold = 100;  // New variable for powerup threshold
+        this.powerupAvailable = false;  // Flag to track if powerup is available
 
         addEventListenersPhaser.bind(this)();
 
@@ -66,7 +68,7 @@ class GameScene extends Phaser.Scene {
         if (this.sounds.background.isPlaying) {
             this.sounds.background.stop(); // Stop the previous instance
         }
-        this.sounds.background.setVolume(2.5).setLoop(true).play();
+        this.sounds.background.setVolume(0.2).setLoop(true).play();
 
         this.vfx = new VFXLibrary(this);
 
@@ -80,6 +82,11 @@ class GameScene extends Phaser.Scene {
         this.scoreText = this.add.bitmapText(this.width / 2, 100, 'pixelfont', '0', 128).setOrigin(0.5, 0.5);
         this.scoreText.setDepth(11)
 
+        this.powerupIndicator = this.add.rectangle(this.width - 60, 130, 80, 20, 0x888888).setOrigin(0.5);
+        this.powerupText = this.add.bitmapText(this.width - 60, 130, 'pixelfont', 'POWER', 24).setOrigin(0.5, 0.5);
+        this.powerupText.setDepth(11);
+        this.powerupIndicator.setDepth(10);
+
         // Add input listeners
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
 
@@ -87,6 +94,15 @@ class GameScene extends Phaser.Scene {
         this.pauseButton.setInteractive({ cursor: 'pointer' });
         this.pauseButton.setScale(3);
         this.pauseButton.on('pointerdown', () => this.pauseGame());
+
+        this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        // If using mobile, add a powerup button
+        if (isMobile) {
+            this.powerupButton = this.add.rectangle(this.width - 80, this.height - 180, 80, 80, 0xff0000, 0.5);
+            this.powerupButton.setInteractive();
+            this.powerupButton.on('pointerdown', () => this.activatePowerup());
+        }
 
         const joyStickRadius = 50;
 
@@ -192,6 +208,24 @@ class GameScene extends Phaser.Scene {
                 this.player.setVelocityY(0);
             }
 
+            // if (this.score >= this.powerupThreshold && !this.powerupAvailable) {
+            //     this.powerupAvailable = true;
+            //     this.powerupIndicator.fillColor = 0xff0000;
+            //     // Flash effect for the powerup indicator
+            //     this.tweens.add({
+            //         targets: this.powerupIndicator,
+            //         alpha: { from: 0.5, to: 1 },
+            //         duration: 500,
+            //         yoyo: true,
+            //         repeat: 3
+            //     });
+            // }
+            
+            // Check for powerup activation via spacebar
+            if (this.powerupAvailable && Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+                this.activatePowerup();
+            }
+
             const knifeCount = this.knives.getChildren().length;
             const radius = 100;
             const rotateSpeed = 0.002;
@@ -215,6 +249,103 @@ class GameScene extends Phaser.Scene {
             this.updateGameLevel();
         }
     }
+
+    activatePowerup() {
+        if (this.powerupAvailable) {
+            this.sounds.collect.setVolume(1).setLoop(false).play();
+            
+            // Create projectiles in 8 directions
+            const directions = [
+                { x: 1, y: 0 },    // right
+                { x: 1, y: 1 },    // down-right
+                { x: 0, y: 1 },    // down
+                { x: -1, y: 1 },   // down-left
+                { x: -1, y: 0 },   // left
+                { x: -1, y: -1 },  // up-left
+                { x: 0, y: -1 },   // up
+                { x: 1, y: -1 }    // up-right
+            ];
+            
+            // Create the projectiles
+            directions.forEach(dir => {
+                const projectile = this.physics.add.sprite(this.player.x, this.player.y, 'projectile').setScale(0.2);
+                projectile.setVelocity(dir.x * 300, dir.y * 300);
+                
+                // Add collision with enemies
+                this.physics.add.overlap(projectile, this.enemies, (proj, enemy) => {
+                    // Kill enemy instantly
+                    if (enemy.livesText) {
+                        enemy.livesText.destroy();
+                    }
+                    
+                    // Show points text
+                    let pointsText = this.add.bitmapText(enemy.x, enemy.y - 25, 'pixelfont', '+10', 45)
+                        .setOrigin(0.5, 0.5);
+                    
+                    this.tweens.add({
+                        targets: pointsText,
+                        y: enemy.y - 100,
+                        alpha: 0,
+                        ease: 'Linear',
+                        duration: 1000,
+                        onComplete: function () {
+                            pointsText.destroy();
+                        }
+                    });
+                    
+                    // Add score
+                    this.updateScore(10);
+                    
+                    // Destroy enemy and projectile
+                    enemy.destroy();
+                    proj.destroy();
+                    
+                    // Add visual effect
+                    // this.vfx.createExplosion(enemy.x, enemy.y);
+                });
+                
+                // Destroy projectile after 2 seconds
+                this.time.delayedCall(2000, () => {
+                    if (projectile && projectile.active) {
+                        projectile.destroy();
+                    }
+                });
+            });
+            
+            // Visual feedback
+            this.cameras.main.shake(200, 0.01);
+            // this.vfx.createExplosion(this.player.x, this.player.y, 150);
+            
+            // Reset powerup
+            this.powerupAvailable = false;
+            this.powerupIndicator.fillColor = 0x888888;
+            this.powerupThreshold += 100;
+        }
+    }
+
+    // createExplosion(x, y, radius = 50) {
+    //     const particles = this.scene.add.particles('projectile');
+    //     const emitter = particles.createEmitter({
+    //         x: x,
+    //         y: y,
+    //         speed: { min: 50, max: 200 },
+    //         angle: { min: 0, max: 360 },
+    //         scale: { start: 0.1, end: 0 },
+    //         blendMode: 'ADD',
+    //         lifespan: 800,
+    //         quantity: 20
+    //     });
+        
+    //     // Stop emitting after a short duration
+    //     this.scene.time.delayedCall(300, () => {
+    //         emitter.stop();
+    //         // Destroy particles after they fade out
+    //         this.scene.time.delayedCall(800, () => {
+    //             particles.destroy();
+    //         });
+    //     });
+    // }
+
     updateGameLevel() {
         gameScore = this.score;
         if (gameScore >= levelThreshold) {
@@ -222,14 +353,27 @@ class GameScene extends Phaser.Scene {
             console.log(gameScore + " : " + levelThreshold)
             this.spawnDelay = this.timeOfDelay - levelThreshold;
             this.spawnTimer.delay = this.spawnDelay;
-
         }
         if (gameScore >= this.livesThreshold) {
             this.additionalLives++;
             this.livesThreshold += 200;
         }
-
+        
+        // Check if player has reached the next power-up threshold
+        if (this.score >= this.powerupThreshold && !this.powerupAvailable) {
+            this.powerupAvailable = true;
+            this.powerupIndicator.fillColor = 0xff0000;
+            // Flash effect for the powerup indicator
+            this.tweens.add({
+                targets: this.powerupIndicator,
+                alpha: { from: 0.5, to: 1 },
+                duration: 500,
+                yoyo: true,
+                repeat: 3
+            });
+        }
     }
+
     spawnEnemy() {
         if (!this.isGameOver) {
 
