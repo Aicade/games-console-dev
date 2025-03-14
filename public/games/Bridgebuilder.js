@@ -1,11 +1,14 @@
-// Touuch Screen Controls
+// Device detection: mobile devices use portrait; desktop devices use landscape.
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+const deviceOrientation = isMobileDevice() ? "portrait" : "landscape";
+
+// Touch Screen Controls
 const joystickEnabled = false;
 const buttonEnabled = false;
 
-// JOYSTICK DOCUMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/virtualjoystick/
 const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
-
-// BUTTON DOCMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/button/
 const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
 
 // Game Scene
@@ -22,106 +25,98 @@ class GameScene extends Phaser.Scene {
         if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
-          }
-        
-          for (const key in _CONFIG.soundsLoader) {
+        }
+        for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
-          }
+        }
         this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
         this.load.image("pillar", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png");
 
         const fontName = 'pix';
-        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
+        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
 
         displayProgressLoader.call(this);
-
     }
 
     create() {
+        // Stop any previously playing background music before starting a new instance.
+        this.sound.stopByKey("background");
+
+        this.score = 0;
+        addEventListenersPhaser.bind(this)();
+
+        // Set up sounds and play background music only if not already playing.
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
             this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
         }
-        this.sounds.background.setVolume(8).setLoop(true).play();
+        if (!this.sounds.background.isPlaying) {
+            this.sounds.background.setVolume(8).setLoop(true).play();
+        }
 
         this.vfx = new VFXLibrary(this);
 
         this.width = this.game.config.width;
         this.height = this.game.config.height;
-        this.bg = this.add.image(this.game.config.width / 2, this.game.config.height / 2, "background").setOrigin(0.5);
+        this.bg = this.add.image(this.width / 2, this.height / 2, "background").setOrigin(0.5);
         const scale = Math.max(this.width / this.bg.displayWidth, this.height / this.bg.displayHeight);
         this.bg.setScale(scale);
 
-
-        // Add UI elements
+        // UI Elements
         this.scoreText = this.add.bitmapText(this.width / 2, 100, 'pixelfont', '0', 128).setOrigin(0.5, 0.5);
-        this.scoreText.setDepth(11)
+        this.scoreText.setDepth(11);
 
-        // Add input listeners
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
-
-        this.pauseButton = this.add.sprite(this.game.config.width - 60, 60, "pauseButton").setOrigin(0.5, 0.5);
+        this.pauseButton = this.add.sprite(this.width - 60, 60, "pauseButton").setOrigin(0.5, 0.5);
         this.pauseButton.setInteractive({ cursor: 'pointer' });
         this.pauseButton.setScale(3);
         this.pauseButton.on('pointerdown', () => this.pauseGame());
 
-        const joyStickRadius = 50;
+        // High score display at top-left.
+        this.highScore = localStorage.getItem('bridgeBuilderHighScore') ? parseInt(localStorage.getItem('bridgeBuilderHighScore')) : 0;
+        this.highScoreText = this.add.bitmapText(10, 10, 'pixelfont', 'High Score: ' + this.highScore, 28).setOrigin(0, 0);
+        this.highScoreText.setDepth(11);
 
-        if (joystickEnabled) {
-            this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-                x: joyStickRadius * 2,
-                y: this.height - (joyStickRadius * 2),
-                radius: 50,
-                base: this.add.circle(0, 0, 80, 0x888888, 0.5),
-                thumb: this.add.circle(0, 0, 40, 0xcccccc, 0.5),
-                dir: '8dir',   // 'up&down'|0|'left&right'|1|'4dir'|2|'8dir'|3
-                // forceMin: 16,
-            });
-            this.joystickKeys = this.joyStick.createCursorKeys();
-        }
-
-        if (buttonEnabled) {
-            this.buttonA = this.add.rectangle(this.width - 80, this.height - 100, 80, 80, 0xcccccc, 0.5)
-            this.buttonA.button = this.plugins.get('rexbuttonplugin').add(this.buttonA, {
-                mode: 1,
-                clickInterval: 100,
-            });
-
-            this.buttonA.button.on('down', (button, gameObject) => {
-                console.log("buttonA clicked");
-            });
-        }
-
+        // Add platforms, player, and pole.
         this.addPlatforms();
         this.addPlayer();
         this.addPole();
+
+        // Game input listeners
         this.input.on("pointerdown", this.grow, this);
         this.input.on("pointerup", this.stop, this);
         this.input.keyboard.disableGlobalCapture();
-
-
     }
 
     addPlatforms() {
         this.mainPlatform = 0;
         this.platforms = [];
         this.platforms.push(this.addPlatform(0));
-        this.platforms.push(this.addPlatform(this.game.config.width));
+        this.platforms.push(this.addPlatform(this.width));
         this.tweenPlatform();
     }
 
+    // In portrait, platform occupies full height at bottom.
     addPlatform(posX) {
-        let platform = this.physics.add.sprite(posX, this.game.config.height - gameOptions.platformHeight, "pillar");
+        let yPos, displayHeight;
+        if (deviceOrientation === "landscape") {
+            yPos = this.game.config.height - (gameOptions.platformHeight * 0.5);
+            displayHeight = gameOptions.platformHeight * 0.5;
+        } else {
+            displayHeight = gameOptions.platformHeight;
+            yPos = this.game.config.height - displayHeight;
+        }
+        let platform = this.physics.add.sprite(posX, yPos, "pillar");
         platform.displayWidth = (gameOptions.platformWidthRange[0] + gameOptions.platformWidthRange[1]) / 2;
-        platform.displayHeight = gameOptions.platformHeight;
+        platform.displayHeight = displayHeight;
         platform.setAlpha(1);
         platform.setOrigin(0, 0);
         let bodyHeight = platform.displayHeight * 0.5;
         platform.body.setSize(bodyHeight);
-
         return platform;
     }
+
     tweenPlatform() {
         let destination = this.platforms[this.mainPlatform].displayWidth + Phaser.Math.Between(gameOptions.platformGapRange[0], gameOptions.platformGapRange[1]);
         let size = Phaser.Math.Between(gameOptions.platformWidthRange[0], gameOptions.platformWidthRange[1]);
@@ -133,34 +128,45 @@ class GameScene extends Phaser.Scene {
             callbackScope: this,
             onComplete: function () {
                 this.gameMode = WAITING;
-                // this.placeCoin(); // Assuming you have this method defined elsewhere
             }
         });
     }
 
     addPlayer() {
-        // keep the player size to .1;
-        // Original position and scale
-        var originalX = this.platforms[this.mainPlatform].displayWidth - gameOptions.poleWidth;
-        var originalY = this.game.config.height - gameOptions.platformHeight + 20;
-        var originalScale = 0.20;
-
-        var decreaseAmount = 0.2 * originalX;
-        var newX = originalX - decreaseAmount;
+        let originalX, originalY, originalScale;
+        if (deviceOrientation === "landscape") {
+            originalX = this.platforms[this.mainPlatform].displayWidth - gameOptions.poleWidth;
+            originalY = this.game.config.height - (gameOptions.platformHeight * 0.5);
+            originalScale = 0.15;
+        } else {
+            originalX = this.platforms[this.mainPlatform].displayWidth - gameOptions.poleWidth;
+            originalY = this.game.config.height - gameOptions.platformHeight + 20;
+            originalScale = 0.20;
+        }
+        let decreaseAmount = 0.2 * originalX;
+        let newX = originalX - decreaseAmount;
         this.player = this.physics.add.sprite(newX, originalY, "player").setScale(originalScale);
         this.player.setOrigin(1, 1);
         this.vfx.scaleGameObject(this.player, 1.1, 500);
-
     }
 
     addPole() {
-        this.pole = this.physics.add.sprite(this.platforms[this.mainPlatform].displayWidth - 60, this.game.config.height - gameOptions.platformHeight + 20, "projectile");
+        let poleX, poleY;
+        if (deviceOrientation === "landscape") {
+            poleX = this.platforms[this.mainPlatform].displayWidth - 60;
+            poleY = this.game.config.height - (gameOptions.platformHeight * 0.5) + 20;
+        } else {
+            poleX = this.platforms[this.mainPlatform].displayWidth - 60;
+            poleY = this.game.config.height - gameOptions.platformHeight + 20;
+        }
+        this.pole = this.physics.add.sprite(poleX, poleY, "projectile");
         this.pole.setOrigin(1, 1);
         this.pole.displayWidth = gameOptions.poleWidth;
         this.pole.displayHeight = gameOptions.playerHeight / 4;
     }
+
     grow() {
-        if (this.gameMode == WAITING) {
+        if (this.gameMode === WAITING) {
             this.gameMode = GROWING;
             this.growTween = this.tweens.add({
                 targets: [this.pole],
@@ -171,7 +177,7 @@ class GameScene extends Phaser.Scene {
     }
 
     stop() {
-        if (this.gameMode == GROWING) {
+        if (this.gameMode === GROWING) {
             this.gameMode = IDLE;
             this.growTween.stop();
             if (this.pole.displayHeight > this.platforms[1 - this.mainPlatform].x - this.pole.x) {
@@ -183,24 +189,18 @@ class GameScene extends Phaser.Scene {
                     callbackScope: this,
                     onComplete: function () {
                         this.gameMode = WALKING;
-
                         if (this.pole.displayHeight < this.platforms[1 - this.mainPlatform].x + this.platforms[1 - this.mainPlatform].displayWidth - this.pole.x) {
-                            // score++;
                             this.walkTween = this.tweens.add({
-
                                 targets: [this.player],
                                 x: this.platforms[1 - this.mainPlatform].x + this.platforms[1 - this.mainPlatform].displayWidth - this.pole.displayWidth,
                                 duration: gameOptions.walkTime * this.pole.displayHeight,
                                 callbackScope: this,
                                 onComplete: function () {
-                                    // this.coin.visible = false;
+                                    // Play score sound as soon as Mario reaches the platform.
+                                    this.sounds.score.setVolume(0.75).setLoop(false).play();
                                     this.tweens.add({
                                         targets: [this.player, this.pole, this.platforms[1 - this.mainPlatform], this.platforms[this.mainPlatform]],
-                                        props: {
-                                            x: {
-                                                value: "-= " + this.platforms[1 - this.mainPlatform].x
-                                            }
-                                        },
+                                        props: { x: { value: "-= " + this.platforms[1 - this.mainPlatform].x } },
                                         duration: gameOptions.scrollTime,
                                         callbackScope: this,
                                         onComplete: function () {
@@ -209,14 +209,12 @@ class GameScene extends Phaser.Scene {
                                     });
                                 }
                             });
-                        }
-                        else {
+                        } else {
                             this.platformTooLong();
                         }
                     }
                 });
-            }
-            else {
+            } else {
                 this.platformTooShort();
             }
         }
@@ -229,7 +227,7 @@ class GameScene extends Phaser.Scene {
             duration: gameOptions.walkTime * this.pole.displayHeight,
             callbackScope: this,
             onComplete: function () {
-                this.fallAndDie(); // Define this method to handle the player falling and dying
+                this.fallAndDie();
             }
         });
     }
@@ -277,24 +275,22 @@ class GameScene extends Phaser.Scene {
     }
 
     prepareNextMove() {
-        this.sounds.damage.setVolume(.75).setLoop(false).play();
-
+        // Remove sound call from here so that it only plays when Mario lands.
         let pointsText = this.add.bitmapText(this.player.x, this.player.y - 50, 'pixelfont', '+10', 75)
             .setOrigin(0.5, 0.5).setTint(0xffd700);
         this.tweens.add({
             targets: pointsText,
             y: pointsText.y - 200,
-            alpha: 0, // Fade out
-            ease: 'Linear', // Animation ease
+            alpha: 0,
+            ease: 'Linear',
             duration: 2500,
             onComplete: function () {
                 pointsText.destroy();
             }
         });
-
         this.updateScore(10);
         this.gameMode = IDLE;
-        this.platforms[this.mainPlatform].x = this.game.config.width;
+        this.platforms[this.mainPlatform].x = this.width;
         this.mainPlatform = 1 - this.mainPlatform;
         this.tweenPlatform();
         this.pole.angle = 0;
@@ -303,13 +299,11 @@ class GameScene extends Phaser.Scene {
     }
 
     shakeAndRestart() {
-        // this.cameras.main.shake(800, 0.01);
         let gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 350, 'pixelfont', 'Game Over', 64)
             .setOrigin(0.5)
             .setVisible(false)
             .setAngle(-15).setTint(0xFF0000);
         this.vfx.shakeCamera();
-
         this.time.delayedCall(500, () => {
             this.sounds.lose.setVolume(1).setLoop(false).play();
             gameOverText.setVisible(true);
@@ -326,18 +320,18 @@ class GameScene extends Phaser.Scene {
                 }
             });
         });
-
     }
 
-    update(time, delta) {
-
-
-    }
-
+    update(time, delta) {}
 
     updateScore(points) {
         this.score += points;
         this.updateScoreText();
+        if (this.score > this.highScore) {
+            this.highScore = this.score;
+            localStorage.setItem('bridgeBuilderHighScore', this.highScore);
+            this.highScoreText.setText('High Score: ' + this.highScore);
+        }
     }
 
     updateScoreText() {
@@ -359,31 +353,23 @@ function displayProgressLoader() {
     let height = 50;
     let x = (this.game.config.width / 2) - 160;
     let y = (this.game.config.height / 2) - 50;
-
     const progressBox = this.add.graphics();
     progressBox.fillStyle(0x222222, 0.8);
     progressBox.fillRect(x, y, width, height);
-
     const loadingText = this.make.text({
         x: this.game.config.width / 2,
         y: this.game.config.height / 2 + 20,
         text: 'Loading...',
-        style: {
-            font: '20px monospace',
-            fill: '#ffffff'
-        }
+        style: { font: '20px monospace', fill: '#ffffff' }
     }).setOrigin(0.5, 0.5);
     loadingText.setOrigin(0.5, 0.5);
-
     const progressBar = this.add.graphics();
     this.load.on('progress', (value) => {
         progressBar.clear();
         progressBar.fillStyle(0x364afe, 1);
         progressBar.fillRect(x, y, width * value, height);
     });
-    this.load.on('fileprogress', function (file) {
-        
-    });
+    this.load.on('fileprogress', function (file) {});
     this.load.on('complete', function () {
         progressBar.destroy();
         progressBox.destroy();
@@ -391,33 +377,30 @@ function displayProgressLoader() {
     });
 }
 
-
-
-// Configuration object
 const config = {
     type: Phaser.AUTO,
-    width: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width,
-    height: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].height,
+    width: _CONFIG.orientationSizes[deviceOrientation].width,
+    height: _CONFIG.orientationSizes[deviceOrientation].height,
     scene: [GameScene],
     scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     pixelArt: true,
     physics: {
-      default: "arcade",
-      arcade: {
-        gravity: { y: 0 },
-        debug: false,
-      },
+        default: "arcade",
+        arcade: {
+            gravity: { y: 0 },
+            debug: false,
+        },
     },
     dataObject: {
-      name: _CONFIG.title,
-      description: _CONFIG.description,
-      instructions: _CONFIG.instructions,
+        name: _CONFIG.title,
+        description: _CONFIG.description,
+        instructions: _CONFIG.instructions,
     },
-    orientation: _CONFIG.deviceOrientation === "portrait" 
-  };
+    orientation: deviceOrientation
+};
 
 let gameOptions = {
     platformGapRange: [200, 400],
@@ -431,10 +414,11 @@ let gameOptions = {
     walkTime: 3,
     fallTime: 500,
     scrollTime: 250
-}
-
+};
 
 const IDLE = 0;
 const WAITING = 1;
 const GROWING = 2;
 const WALKING = 3;
+
+const game = new Phaser.Game(config);
