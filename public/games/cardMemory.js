@@ -2,6 +2,8 @@
 class GameScene extends Phaser.Scene {
 
     cardNames = ["collectible_1", "collectible_2", "collectible_3", "collectible_4", "collectible_5", "collectible_6"];
+    hearts = [];
+    cardScale = 0.25; // Store the card scale as a property
 
     constructor() {
         super({ key: 'GameScene' });
@@ -26,6 +28,60 @@ class GameScene extends Phaser.Scene {
         displayProgressLoader.call(this)
     }
 
+    // Add this method to the GameScene class
+    resize() {
+        // Get current game dimensions
+        const width = this.game.config.width;
+        const height = this.game.config.height;
+        
+        // Update background scaling
+        if (this.bg) {
+            const scale = Math.max(width / this.bg.width, height / this.bg.height);
+            this.bg.setScale(scale);
+        }
+        
+        // Recalculate grid positioning based on current dimensions
+        if (this.gridConfiguration) {
+            // Update in the resize method
+            this.gridConfiguration = {
+                x: width * 0.28, // Move starting position more to the left
+                y: height * 0.25,
+                paddingX: width * 0.12, // Increase horizontal padding between cards
+                paddingY: height * 0.05  // Keep vertical padding the same
+            };
+            
+            // Update card positions if they exist
+            if (this.cards && this.cards.length) {
+                this.cards.forEach((card, index) => {
+                    if (card.gameObject && card.gameObject.active) {
+                        // Increase horizontal spacing by using a larger multiplier for the x position
+                        card.gameObject.x = this.gridConfiguration.x + (120 * this.cardScale + this.gridConfiguration.paddingX) * (index % 4);
+                        card.gameObject.y = this.gridConfiguration.y + (128 * this.cardScale + this.gridConfiguration.paddingY) * Math.floor(index / 4);
+                    }
+                });
+            }
+        }
+        
+        // Update UI elements positioning
+        if (this.pauseButton) {
+            this.pauseButton.x = width - width * 0.06;  // 6% from right edge
+            this.pauseButton.y = height * 0.06;         // 6% from top
+        }
+        
+        if (this.scoreText) {
+            this.scoreText.x = width / 2;
+            this.scoreText.y = height * 0.03;
+        }
+        
+        // Update hearts positioning
+        if (this.hearts && this.hearts.length) {
+            this.hearts.forEach((heart, index) => {
+                heart.x = width * 0.06 + (width * 0.035) * index; // 6% from left + spacing
+                heart.y = height * 0.06;                          // 6% from top
+            }); 
+        }
+    }
+
     create() {
 
         //for keyboard control
@@ -37,10 +93,10 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
 
         this.gridConfiguration = {
-            x: this.width * 0.32,
-            y: this.height * 0.28,
-            paddingX: 60,
-            paddingY: 60
+            x: this.width * 0.25,
+            y: this.height * 0.25,
+            paddingX: this.width * 0.08,
+            paddingY: this.height * 0.05
         }
 
         this.sounds = {};
@@ -67,6 +123,8 @@ class GameScene extends Phaser.Scene {
         this.pauseButton.on('pointerdown', () => this.pauseGame());
 
         this.startGame();
+        this.scale.on('resize', this.resize, this);
+        this.resize();
 
     }
 
@@ -103,7 +161,7 @@ class GameScene extends Phaser.Scene {
         return gridCardNames.map((name, index) => {
             const newCard = this.createCard({
                 scene: this,
-                x: this.gridConfiguration.x + (98 + this.gridConfiguration.paddingX) * (index % 4),
+                x: this.gridConfiguration.x + (120 * this.cardScale + this.gridConfiguration.paddingX) * (index % 4),
                 y: -1000,
                 frontTexture: name,
                 cardName: name
@@ -120,19 +178,20 @@ class GameScene extends Phaser.Scene {
     }
 
     createHearts() {
-        return Array.from(new Array(this.lives)).map((el, index) => {
+        this.hearts = Array.from(new Array(this.lives)).map((el, index) => {
             const heart = this.add.image(this.width, 45, "heart")
-                .setScale(0.032)
-
+                .setScale(0.032 * (this.height / 800)); // Make heart scale responsive
+    
             this.add.tween({
                 targets: heart,
                 ease: Phaser.Math.Easing.Expo.InOut,
                 duration: 1000,
                 delay: 1000 + index * 200,
-                x: 60 + 35 * index // marginLeft + spaceBetween * index
+                x: this.width * 0.06 + (this.width * 0.035) * index // Make position responsive
             });
             return heart;
         });
+        return this.hearts;
     }
 
     startGame() {
@@ -290,10 +349,12 @@ class GameScene extends Phaser.Scene {
         const rotation = { y: 0 };
 
         const backTexture = "platform";
+        
 
         const card = scene.add.plane(x, y, backTexture)
-            .setName(cardName)
-            .setInteractive({ cursor: 'pointer' }).setScale(0.3);
+        .setName(cardName)
+        .setInteractive({ cursor: 'pointer' })
+        .setScale(this.cardScale * Math.min(this.width / 1000, this.height / 700));
 
         // start with the card face down
         card.modelRotationY = 180;
@@ -316,11 +377,11 @@ class GameScene extends Phaser.Scene {
                         tweens: [
                             {
                                 duration: 200,
-                                scale: 0.25,
+                                scale: this.cardScale * Math.min(this.width / 1000, this.height / 700) * 0.9, // 90% of normal size
                             },
                             {
                                 duration: 300,
-                                scale: 0.3
+                                scale: this.cardScale * Math.min(this.width / 1000, this.height / 700)
                             },
                         ]
                     })
@@ -433,6 +494,10 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: _CONFIG.deviceOrientationSizes[_CONFIG.deviceOrientation].width,
+        height: _CONFIG.deviceOrientationSizes[_CONFIG.deviceOrientation].height,
+        parent: 'game-container',
+        expandParent: true
     },
     pixelArt: true,
     /* ADD CUSTOM CONFIG ELEMENTS HERE */
@@ -448,5 +513,5 @@ const config = {
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
     },
-    orientation: _CONFIG.deviceOrientation === "landscape"
+    deviceOrientation: _CONFIG.deviceOrientation === "portrait"
 };

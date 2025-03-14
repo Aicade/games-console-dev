@@ -1,6 +1,6 @@
 {
     "description": "Memory game. Memorize & match the symbols behind the cards.",
-    "deviceOrientation": "landscape",
+    "deviceOrientation": "portrait",
     "imageLoader": {
         "background": "background",
         "platform": "platform",
