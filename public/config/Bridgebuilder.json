@@ -1,15 +1,16 @@
 {
     "description": "Tap to create the bridges.",
-    "deviceOrientation": "portrait",
+    "deviceOrientation": "auto",
     "imageLoader": {
         "background": "background",
         "player": "player",
         "projectile": "projectile"
     },
     "soundsLoader": {
-        "background": "background",
+        "background": "https://files.catbox.moe/0i68mc.mp3",
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
-        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3"
+        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
+        "score": "https://files.catbox.moe/mand0o.mp3"
     },
     "instructions": "1. Tap to strech.",
     "orientationSizes": {
