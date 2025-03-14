@@ -14,7 +14,7 @@ const orientationSizes = {
 
 // Touuch Screen Controls
 const joystickEnabled = true;
-const buttonEnabled = true;
+const buttonEnabled = false;
 
 // JOYSTICK DOCUMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/virtualjoystick/
 const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
@@ -78,7 +78,7 @@ class GameScene extends Phaser.Scene {
         }
 
 
-        this.sounds.background.setVolume(3).setLoop(true).play();
+        this.sounds.background.setVolume(0.1).setLoop(true).play();
 
         this.bg = this.add.image(this.game.config.width / 2, this.game.config.height / 2, "background").setOrigin(0.5);
         this.bg.postFX.addBlur(0.5, 2, 2, 0.8);
@@ -111,15 +111,7 @@ class GameScene extends Phaser.Scene {
             this.joystickKeys = this.joyStick.createCursorKeys();
         }
 
-        if (buttonEnabled) {
-            this.buttonA = this.add.rectangle(this.width - 80, this.height - 100, 80, 80, 0xcccccc, 0.5)
-            this.buttonA.button = this.plugins.get('rexbuttonplugin').add(this.buttonA, {
-                mode: 1,
-                clickInterval: 100,
-            });
-
-            this.buttonA.button.on('down', () => this.fireBullet(), this);
-        }
+        
 
         // this.scoreText = this.add.bitmapText(0, 40, 'pixelfont', this.timer + " S", 50);
         // this.scoreText.setDepth(10);
@@ -263,7 +255,6 @@ class GameScene extends Phaser.Scene {
     toggleControlsVisibility(visibility) {
         this.joyStick.base.visible = visibility;
         this.joyStick.thumb.visible = visibility;
-        this.buttonA.visible = visibility;
     }
 
     update() {
