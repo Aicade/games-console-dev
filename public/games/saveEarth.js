@@ -24,7 +24,7 @@ class SliceEffect {
 
     update(x, y) {
         if (this.scene.pointerDown) {
-            // this.emitter.emitParticleAt(x, y);
+            this.emitter.emitParticleAt(x, y);
         }
     }
 }
@@ -120,7 +120,7 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        this.sliceEffect.addSlice(this.input.x, this.input.y, this.input.activePointer.prevPosition.x, this.input.activePointer.prevPosition.y);
+        // this.sliceEffect.addSlice(this.input.x, this.input.y, this.input.activePointer.prevPosition.x, this.input.activePointer.prevPosition.y);
 
     }
 
@@ -180,7 +180,7 @@ class GameScene extends Phaser.Scene {
         }
         enemy = this.enemies.create(x, y, 'avoidable');
 
-        enemy.setScale(0.2);
+        enemy.setScale(0.27);
 
         enemy.flamesParticle = this.vfx.addCircleTexture('flames', 0xffa500, 1, 6);
         enemy.followEmitter = this.vfx.createEmitter('flames', 0, 0, 1, 0, 500).setAlpha(0.8);

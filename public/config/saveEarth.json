@@ -1,6 +1,6 @@
 {
     "description": "Reaction game.",
-    "deviceOrientation": "landscape",
+    "deviceOrientation": "portrait",
     "imageLoader": {
         "background": "background",
         "player": "player",
