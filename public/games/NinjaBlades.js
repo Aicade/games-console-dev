@@ -20,6 +20,9 @@ class GameScene extends Phaser.Scene {
         this.enemyKilledScore = 0;
         this.gameOverText = null;
         this.loseSoundPlayed = false;
+        this.aimLine = null;
+        this.isAiming = false;
+        this.shootOnRelease = true;
 
 
         this.playerBulletBounces = 8;
@@ -151,6 +154,7 @@ class GameScene extends Phaser.Scene {
 
         this.destroyPlayerBullet(bullet);
         this.gameScoreHandler(100);
+        this.updateScore(100);
         this.enemyKilledScore += 100;
         this.destroyEnemy(enemy);
         this.gameSceneHandler();
@@ -232,12 +236,54 @@ class GameScene extends Phaser.Scene {
         this.displayBulletsRemaining();
         this.gameScoreHandler(0)
 
-        this.input.on('pointerdown', function (pointer) {
+        this.input.on('pointerdown', function(pointer) {
             if (!this.gameStarted)
                 this.gameStarted = true;
-            this.shootPlayerBullet(pointer, this.playerBulletBounces, 0, false);
+            
+            this.isAiming = true;
+            this.drawAimLine(pointer);
+        }, this);
+        
+        this.input.on('pointermove', function(pointer) {
+            if (this.isAiming) {
+                this.drawAimLine(pointer);
+            }
+        }, this);
+        
+        this.input.on('pointerup', function(pointer) {
+            if (this.isAiming) {
+                // Shoot the bullet on release if we were aiming
+                this.shootPlayerBullet(pointer, this.playerBulletBounces, 0, false);
+                this.isAiming = false;
+                
+                // Clean up the aim line
+                if (this.aimLine) {
+                    this.aimLine.destroy();
+                    this.aimLine = null;
+                }
+            }
         }, this);
 
+        
+
+    }
+
+    drawAimLine(pointer) {
+        // Remove existing line if there is one
+        if (this.aimLine) {
+            this.aimLine.destroy();
+        }
+        
+        // Create a new line from player to pointer
+        this.aimLine = this.add.line(
+            0, 0,
+            this.player.x, this.player.y,
+            pointer.x, pointer.y,
+            0xff0000, 0.7
+        );
+        this.aimLine.setOrigin(0, 0);
+        this.aimLine.setLineWidth(3);
+        this.aimLine.setDepth(2); // Make sure it appears above most elements
     }
 
     update(delta) {
@@ -473,7 +519,7 @@ class GameScene extends Phaser.Scene {
 
     resetGame() {
         this.isGameOver = true;
-        this.score = 0;
+        // this.score = 0;
         this.vfx.shakeCamera();
         // this.car.destroy();
         // this.physics.pause();

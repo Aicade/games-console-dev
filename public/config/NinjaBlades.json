@@ -22,7 +22,7 @@
     "phaserVersion": "3.80.1",
     "soundsLoader": {
         "background": "background",
-        "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
+        "shoot": "https://files.catbox.moe/b87m5h.mp3",
         "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav",
         "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/slice.flac",
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3"
