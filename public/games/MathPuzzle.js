@@ -51,7 +51,7 @@ class GameScene extends Phaser.Scene {
             this.hearts[i] = this.add.image(x, 100, "heart").setScale(0.025).setDepth(11);
         }
 
-        this.scoreText = this.add.bitmapText(40, 20, 'pixelfont', 'Score: 0', 28).setDepth(11);
+        // this.scoreText = this.add.bitmapText(40, 20, 'pixelfont', 'Score: 0', 28).setDepth(11);
 
         // Add input listeners
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
@@ -61,7 +61,7 @@ class GameScene extends Phaser.Scene {
         this.pauseButton.on('pointerdown', () => this.pauseGame());
         this.score = 0;
         this.missed = 0;
-        this.createUI();
+        this.createImprovedUI();
 
         this.vfx.addCircleTexture('greenCircleTexture', 0x00ff00);
         this.greenEmitter = this.vfx.createEmitter('greenCircleTexture', this.width / 2, this.height - 100, 0.2, 0, 800).setAlpha(0.5);
@@ -70,12 +70,145 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.disableGlobalCapture();
     }
 
+    // Add this method to the GameScene class
+    createImprovedUI() {
+        // Create a semi-transparent panel for the question
+        this.questionPanel = this.add.rectangle(
+            this.game.config.width / 2,
+            this.game.config.height / 2.5 - 2,
+            this.game.config.width * 0.8,
+            80,
+            0x000000,
+            0.7
+        ).setOrigin(0.5);
+        
+        // Create a better timer bar
+        this.timerBarBackground = this.add.rectangle(
+            this.game.config.width / 2,
+            50,
+            this.game.config.width * 0.6,
+            20,
+            0x333333
+        ).setOrigin(0.5);
+        
+        this.timerBar = this.add.rectangle(
+            this.game.config.width / 2 - (this.game.config.width * 0.6) / 2,
+            50,
+            this.game.config.width * 0.6,
+            20,
+            0x00ff00
+        ).setOrigin(0, 0.5);
+        
+        // Style the buttons with background rectangles
+        this.correctButtonBg = this.add.rectangle(
+            this.game.config.width / 2 + 100,
+            this.game.config.height / 2 + 50,
+            120,
+            50,
+            0x006600,
+            0.8
+        ).setOrigin(0.5).setInteractive({ cursor: 'pointer' })
+        .on('pointerdown', () => this.checkAnswer(true))
+        .on('pointerover', () => this.correctButtonBg.setFillStyle(0x009900, 0.8))
+        .on('pointerout', () => this.correctButtonBg.setFillStyle(0x006600, 0.8));
+        
+        this.wrongButtonBg = this.add.rectangle(
+            this.game.config.width / 2 - 100,
+            this.game.config.height / 2 + 50,
+            120,
+            50,
+            0x660000,
+            0.8
+        ).setOrigin(0.5).setInteractive({ cursor: 'pointer' })
+        .on('pointerdown', () => this.checkAnswer(false))
+        .on('pointerover', () => this.wrongButtonBg.setFillStyle(0x990000, 0.8))
+        .on('pointerout', () => this.wrongButtonBg.setFillStyle(0x660000, 0.8));
+        
+        // Create and position UI text elements on top of the new backgrounds
+        this.questionText = this.add.bitmapText(
+            this.game.config.width / 2,
+            this.game.config.height / 2.5,
+            'pixelfont', 
+            '55', 
+            40
+        ).setOrigin(0.5).setDepth(1);
+
+        this.timerText = this.add.bitmapText(
+            this.game.config.width / 2,
+            20,
+            'pixelfont',
+            `Time: ${this.timeLeft}s`, 
+            28
+        ).setOrigin(0.5).setTint(0xffffff).setDepth(1);
+
+        this.rightButton = this.add.bitmapText(
+            this.game.config.width / 2 + 100,
+            this.game.config.height / 2 + 50,
+            'pixelfont', 
+            'CORRECT', 
+            22
+        ).setOrigin(0.5).setTint(0xffffff).setDepth(1);
+
+        this.wrongButton = this.add.bitmapText(
+            this.game.config.width / 2 - 100,
+            this.game.config.height / 2 + 50,
+            'pixelfont', 
+            'WRONG', 
+            22
+        ).setOrigin(0.5).setTint(0xffffff).setDepth(1);
+
+        // Create feedback text for correct/wrong answers
+        this.correctText = this.add.bitmapText(
+            this.game.config.width / 2,
+            this.game.config.height - 100,
+            'pixelfont',
+            "CORRECT! +10",
+            30
+        ).setOrigin(0.5).setAlpha(0).setTint(0x00ff00).setDepth(1);
+
+        this.wrongText = this.add.bitmapText(
+            this.game.config.width / 2,
+            this.game.config.height - 100,
+            'pixelfont',
+            `WRONG!`,
+            30
+        ).setOrigin(0.5).setAlpha(0).setTint(0xff4f5f).setDepth(1);
+        
+        // Create a scoreboard panel
+        // this.scorePanel = this.add.rectangle(
+        //     40,
+        //     20,
+        //     150,
+        //     40,
+        //     0x000000,
+        //     0.7
+        // ).setOrigin(0, 0);
+        
+        this.scoreText = this.add.bitmapText(
+            this.game.config.width / 2,
+            80,
+            'pixelfont', 
+            'Score: 0', 
+            28
+        ).setOrigin(0.5, 0.5).setDepth(11);
+    }
+
 
     checkAnswer(playerChoice) {
         if (this.timeLeft <= 0) return;
         if (!this.clickAllowed) return;
         this.answerChosen = true;
         this.clickAllowed = false;
+
+        if (this.timerTween) {
+            this.timerTween.stop();
+        }
+
+        if (playerChoice) {
+            this.correctButtonBg.setFillStyle(0x00ff00, 1);
+        } else {
+            this.wrongButtonBg.setFillStyle(0xff0000, 1);
+        }
         if (playerChoice === this.correctAnswer) {
             this.greenEmitter.explode(250);
             this.sounds.success.setVolume(0.4).setLoop(false).play()
@@ -156,7 +289,7 @@ class GameScene extends Phaser.Scene {
                 answer = num1 * num2;
                 break;
             case '/':
-                answer = Math.round(num1 / num2);
+                answer = Math.floor(num1 / num2);
                 break;
         }
 
@@ -221,7 +354,24 @@ class GameScene extends Phaser.Scene {
     resetTimer() {
         if (this.timerEvent) this.timerEvent.remove(false);
         this.timeLeft = 10; // Reset the time for each question
-        this.timerText.setText(`Time left : ${this.timeLeft}s`).setTint(0xffffff);
+        this.timerText.setText(`Time: ${this.timeLeft}s`).setTint(0xffffff);
+        
+        // Stop any existing timer tween
+        if (this.timerTween) {
+            this.timerTween.stop();
+        }
+        
+        // Reset timer bar and animate it
+        this.timerBar.setFillStyle(0x00ff00);
+        this.timerBar.width = this.game.config.width * 0.6;
+        
+        this.timerTween = this.tweens.add({
+            targets: this.timerBar,
+            width: 0,
+            duration: 10000,
+            ease: 'Linear'
+        });
+        
         this.timerEvent = this.time.addEvent({
             delay: 1000,
             callback: this.updateTimer,
@@ -231,25 +381,27 @@ class GameScene extends Phaser.Scene {
     }
 
     updateTimer() {
-        if (this.answerChosen) {
-            return;
-        };
+        if (this.answerChosen) return;
+        
         this.timeLeft--;
-        this.timerText.setText(`Time left : ${this.timeLeft}s`);
-        this.sounds.shoot.setVolume(0.05).setLoop(false).play()
+        this.timerText.setText(`Time: ${this.timeLeft}s`);
+        this.sounds.shoot.setVolume(0.05).setLoop(false).play();
+        
         if (this.timeLeft <= 0) {
             this.gameOver();
         }
+        
         if (this.timeLeft <= 5) {
-            this.timerText.setTint(0xff0000)
-        } else {
-            this.timerText.setTint(0xffffff)
-
+            this.timerText.setTint(0xff0000);
+            this.timerBar.setFillStyle(0xff0000);
         }
     }
 
     gameOver() {
         this.timerEvent.remove(false);
+        if (this.timerTween) {
+            this.timerTween.stop();
+        }
         initiateGameOver.bind(this)({ score: this.score });
     }
 
@@ -341,5 +493,5 @@ const config = {
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
     },
-    orientation: _CONFIG.deviceOrientation === "landscape"
+    orientation: _CONFIG.deviceOrientation === "portrait"
 };
