@@ -12,6 +12,8 @@ const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-n
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
+        this.distanceTravelled = 0;
+        this.coinsCollected = 0;
     }
 
     preload() {
@@ -34,6 +36,9 @@ class GameScene extends Phaser.Scene {
 
         this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
         this.load.image("pillar", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png");
+        this.load.image("coin", "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/Cf5TXRack0ueJP5Y/history/iteration/xxIASQI4aDag.webp");
+        this.load.image("booster", "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/Cf5TXRack0ueJP5Y/history/iteration/IIWr7cpNu7kj.webp");
+
 
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
@@ -59,7 +64,7 @@ class GameScene extends Phaser.Scene {
 
         this.isGameOver = false;
 
-        this.sounds.background.setVolume(1.0).setLoop(true).play();
+        this.sounds.background.setVolume(0.1).setLoop(true).play();
         this.gameSceneBackground();
 
         this.vfx = new VFXLibrary(this);
@@ -75,6 +80,11 @@ class GameScene extends Phaser.Scene {
         this.player.body.setSize(this.player.width * 0.7, this.player.height * 0.7);
 
         this.enemies = this.physics.add.group();
+        this.boosters = this.physics.add.group(); // Add boosters group  <--- ADD THIS LINE AFTER THIS LINE
+        this.physics.add.overlap(this.player, this.boosters, this.collectBooster, null, this); // Add overlap for boosters <--- ADD THIS LINE AFTER THIS LINE
+
+        this.coins = this.physics.add.group();
+        this.physics.add.overlap(this.player, this.coins, this.collectCoin, null, this);
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.isMovingRight = true;
@@ -95,8 +105,18 @@ class GameScene extends Phaser.Scene {
             args: [1]
         });
 
-        this.scoreText = this.add.bitmapText(this.width / 2, 100, 'pixelfont', '0', 128).setOrigin(0.5, 0.5);
-        this.scoreText.setDepth(11)
+        this.scoreText = this.add.bitmapText(this.game.config.width / 2, 100, 'pixelfont', '0', 128)
+        .setOrigin(0.5, 0.5);
+        const textScaleFactor = _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width / 1100;
+        this.scoreText.setScale(textScaleFactor);
+        this.scoreText.setDepth(11);
+
+        this.coinCounterText = this.add.bitmapText(
+            _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width * 0.1, 
+            100, 'pixelfont', 'Coins: 0', 64)
+            .setOrigin(0, 0.5);
+        this.coinCounterText.setScale(textScaleFactor);
+        this.coinCounterText.setDepth(11);
 
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
 
@@ -133,6 +153,22 @@ class GameScene extends Phaser.Scene {
         }
         this.vfx.scaleGameObject(this.player, 1.1, 500);
 
+        this.player._originalScale = 0.25;
+        this.scaleAssetToOrientation(this.player);
+
+        // Apply scaling to UI elements
+        this.scaleAssetToOrientation(this.pauseButton);
+        // const textScaleFactor = _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width / 800;
+        this.scoreText.setScale(textScaleFactor);
+        this.coinCounterText.setScale(textScaleFactor);
+        this.coinCounterText.setFontSize(Math.floor(64 * _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width / 800));
+
+        // Adjust position of coin counter for different screen sizes
+        this.coinCounterText.setPosition(
+            _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width * 0.055,
+            100
+        );
+
         let bubble = this.add.graphics({ x: -100, y: 0, add: false });
 
         const bubbleRadius = 10;
@@ -152,23 +188,170 @@ class GameScene extends Phaser.Scene {
         });
         this.trail.startFollow(this.player);
         this.input.keyboard.disableGlobalCapture();
+        this.scale.on('resize', this.handleResize, this);
+    }
+
+    scaleAssetToOrientation(gameObject) {
+        const baseWidth = 800; // Reference width for scaling calculations
+        const currentWidth = _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width;
+        const scaleFactor = currentWidth / baseWidth;
+        
+        // Apply the scale factor to the game object
+        if (gameObject.setScale) {
+            // For objects that already have a scale, multiply by the scaleFactor
+            const originalScale = gameObject._originalScale || 1;
+            gameObject.setScale(originalScale * scaleFactor);
+        }
+        
+        return gameObject;
+    }
+
+    handleResize() {
+        // Re-scale all active game objects when the window is resized
+        if (this.player && this.player.active) this.scaleAssetToOrientation(this.player);
+        
+        // Rescale enemies
+        this.enemies.getChildren().forEach(enemy => {
+            if (enemy.active) this.scaleAssetToOrientation(enemy);
+        });
+        
+        // Rescale boosters
+        this.boosters.getChildren().forEach(booster => {
+            if (booster.active) this.scaleAssetToOrientation(booster);
+        });
+        
+        // Rescale coins
+        this.coins.getChildren().forEach(coin => {
+            if (coin.active) this.scaleAssetToOrientation(coin);
+        });
+        
+        // Update UI elements
+        if (this.scoreText) {
+            const textScaleFactor = _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width / 1000;
+            this.scoreText.setScale(textScaleFactor);
+        }
+        
+        if (this.coinCounterText) {
+            const textScaleFactor = _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width / 800;
+            this.coinCounterText.setScale(textScaleFactor);
+            this.coinCounterText.setPosition(
+                _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width * 0.1,
+                100
+            );
+        }
+        
+        if (this.pauseButton) this.scaleAssetToOrientation(this.pauseButton);
     }
 
     update(time, delta) {
         if (!this.isGameOver) {
             this.bg.tilePositionY += 3;
+            if(this.distanceIncrement === undefined){
+              this.distanceIncrement = 0.003;
+            }
+            this.distanceTravelled += this.distanceIncrement;
+            this.updateScoreText();
 
-            if (this.isMovingRight) {
-                this.player.setVelocityX(300);
-                this.player.flipX = true;
+            // Update player speed based on immunity
+            if (this.player.isImmune) {
+                const boostedSpeed = 600;
+                this.player.setVelocityX(this.isMovingRight ? boostedSpeed : -boostedSpeed);
             } else {
-                this.player.setVelocityX(-300);
-                this.player.flipX = false;
+                const originalSpeed = 300;
+                this.player.setVelocityX(this.isMovingRight ? originalSpeed : -originalSpeed);
             }
 
             this.enemySpawn();
+            this.boosterSpawn();
+            this.coinSpawn();
         }
 
+    }
+
+    collectBooster(player, booster) { // Add collectBooster function <--- ADD THIS FUNCTION AFTER THE END OF THE `update` FUNCTION
+        booster.destroy();
+        // this.updateScore(10); // Or any other score increase
+        this.sounds.booster.play();
+        this.increasePlayerSpeedAndImmunity();
+        this.increaseDistanceIncrement();
+    }
+
+    increaseDistanceIncrement() {
+        const originalIncrement = 0.003;
+        const boostedIncrement = 0.1;
+        const incrementDuration = 5000;
+
+        this.distanceIncrement = boostedIncrement;
+
+        this.time.delayedCall(incrementDuration, () => {
+            this.distanceIncrement = originalIncrement; // Reset here!
+        }, [], this);
+    }
+
+
+    increasePlayerSpeedAndImmunity() {
+        const originalSpeed = 300;
+        const boostedSpeed = 600; // Double the speed, adjust as needed
+        const immunityDuration = 5000; // 5 seconds
+    
+        this.player.setVelocityX(this.isMovingRight ? boostedSpeed : -boostedSpeed);
+        this.player.isImmune = true; // Add a flag for immunity
+    
+        // Change collider temporarily
+        this.physics.world.removeCollider(this.player.body.collider);
+    
+        // Reset speed and immunity after 5 seconds
+        this.time.delayedCall(immunityDuration, () => {
+            // Check if player still exists before modifying properties
+            if (this.player && this.player.active) {
+                this.player.setVelocityX(this.isMovingRight ? originalSpeed : -originalSpeed);
+                this.player.isImmune = false;
+                this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
+                    this.resetGame();
+                }); // Re-add the collider
+            }
+        }, [], this);
+    }
+
+    boosterSpawn() {
+        let spawnProbability = 0.001 + this.gameLevel * 0.0005; // Less frequent than enemies
+
+        if (Math.random() < spawnProbability) {
+            let spawnX = Phaser.Math.Between(0, this.game.config.width);
+            let velocityY = -(150 + this.gameLevel * 10);
+
+            var booster = this.boosters.create(spawnX, this.game.config.height + 50, 'booster');
+            booster._originalScale = 0.25;
+            this.scaleAssetToOrientation(booster);
+            booster.body.setSize(booster.width * 0.7, booster.height * 0.7);
+            booster.setVelocityY(velocityY);
+        }
+    }
+
+    coinSpawn() {
+        let spawnProbability = 0.0015 + this.gameLevel * 0.00075; // Adjust frequency as needed
+
+        if (Math.random() < spawnProbability) {
+            let spawnX = Phaser.Math.Between(0, this.game.config.width);
+            let velocityY = -(150 + this.gameLevel * 10);
+
+            var coin = this.coins.create(spawnX, this.game.config.height + 50, 'coin');
+            coin._originalScale = 0.1;
+            this.scaleAssetToOrientation(coin);
+            coin.body.setSize(coin.width * 0.7, coin.height * 0.7);
+            coin.setVelocityY(velocityY);
+        }
+    }
+
+    collectCoin(player, coin) {
+        coin.destroy();
+        this.updateScore(1); // Adjust score value as needed
+        this.sounds.coin.play(); // Play coin collection sound
+        this.coinsCollected++; // Increment coin counter
+        this.updateCoinCounterText();
+    }
+    updateCoinCounterText() {
+        this.coinCounterText.setText('Coins: ' + this.coinsCollected);
     }
 
     updateGameLevel() {
@@ -189,7 +372,9 @@ class GameScene extends Phaser.Scene {
             let spawnX = Phaser.Math.Between(0, this.game.config.width);
             let velocityY = -(200 + this.gameLevel * 10);
 
-            var enemy = this.enemies.create(spawnX, this.game.config.height + 50, 'enemy').setScale(.25);
+            var enemy = this.enemies.create(spawnX, this.game.config.height + 50, 'enemy');
+            enemy._originalScale = 0.25;
+            this.scaleAssetToOrientation(enemy);
             enemy.body.setSize(enemy.width * 0.7, enemy.height * 0.7);
             enemy.setVelocityY(velocityY);
         }
@@ -231,12 +416,13 @@ class GameScene extends Phaser.Scene {
     }
 
     updateScoreText() {
-        this.scoreText.setText(this.score);
+        this.scoreText.setText(Math.floor(this.distanceTravelled) + "m");
     }
 
     gameOver() {
         this.sounds.background.stop();
-        initiateGameOver.bind(this)({ score: this.score });
+        initiateGameOver.bind(this)({ distance: Math.floor(this.distanceTravelled) + "m",
+        coins: this.coinsCollected }); // Pass distance travelled as score
     }
 
     pauseGame() {
