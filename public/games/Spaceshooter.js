@@ -29,7 +29,7 @@ class GameScene extends Phaser.Scene {
         this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
 
         const fontName = 'pix';
-        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
+        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
 
         this.load.image('blue_shield', `https://play.rosebud.ai/assets/blue_shield_80x78.png.png?CgMm`);
@@ -51,12 +51,11 @@ class GameScene extends Phaser.Scene {
         }
 
         this.bg = this.add.image(this.game.config.width / 2, this.game.config.height / 2, "background").setOrigin(0.5);
-
         // Use the larger scale factor to ensure the image covers the whole canvas
         const scale = Math.max(this.game.config.width / this.bg.displayWidth, this.game.config.height / this.bg.displayHeight);
         this.bg.setScale(scale).setDepth(-100);
 
-        this.sounds.background.setVolume(1).setLoop(true).play();
+        this.sounds.background.setVolume(0.3).setLoop(true).play();
         this.width = this.game.config.width;
         this.height = this.game.config.height;
 
@@ -64,11 +63,10 @@ class GameScene extends Phaser.Scene {
         this.scoreText = this.add.bitmapText(this.width / 2, 50, 'pixelfont', '0', 64).setOrigin(0.5, 0.5);
         this.scoreText.setDepth(100);
 
-        // here u can remove the keyword to have less tile sheet
         this.pauseButton = this.add.sprite(this.width - 50, 60, "pauseButton").setOrigin(0.5, 0.5);
         this.pauseButton.setInteractive({ cursor: 'pointer' });
         this.pauseButton.setScale(3);
-        this.pauseButton.setDepth(11)
+        this.pauseButton.setDepth(11);
         this.pauseButton.on('pointerdown', () => this.pauseGame());
 
         // Add input listeners
@@ -82,9 +80,21 @@ class GameScene extends Phaser.Scene {
         this.players = this.physics.add.group();
         this.create_playerObj();
 
-        this.shields = this.physics.add.group(); this.coins = this.physics.add.group();
-        this.asteroids = this.physics.add.group(); this.powerups = this.physics.add.group();
-        this.enemies = this.physics.add.group(); this.enemyBullets = this.physics.add.group();
+        // Create 5 heart icons on top left for player lives
+        this.playerShip.lives = 5;
+        this.lifeIcons = [];
+        for (let i = 0; i < 5; i++) {
+            let heart = this.add.image(10 + i * 40, 10, 'pink_heart').setOrigin(0, 0);
+            heart.setScale(0.5);
+            this.lifeIcons.push(heart);
+        }
+
+        this.shields = this.physics.add.group(); 
+        this.coins = this.physics.add.group();
+        this.asteroids = this.physics.add.group(); 
+        this.powerups = this.physics.add.group();
+        this.enemies = this.physics.add.group(); 
+        this.enemyBullets = this.physics.add.group();
 
         this.enemyTypes = [{
             spriteKey: '1', speedX: 10, sideMovementDistance: 200, speedY: 50,
@@ -94,13 +104,15 @@ class GameScene extends Phaser.Scene {
         this.gameStageController(this.gameStage);
 
         // Collision detection
-        this.physics.add.overlap(this.playerBullets, this.enemies, this.bulletHitsEnemy, null, this); this.physics.add.overlap(this.playerBullets, this.asteroids, this.bulletHitsAsteroid, null, this);
-        this.physics.add.overlap(this.enemyBullets, this.players, this.bulletHitsPlayer, null, this); this.physics.add.overlap(this.asteroids, this.players, this.bulletHitsPlayer, null, this);
-        this.physics.add.overlap(this.enemyBullets, this.shields, this.bulletHitsPlayerShield, null, this); this.physics.add.overlap(this.players, this.powerups, this.collectPowerup, null, this);
+        this.physics.add.overlap(this.playerBullets, this.enemies, this.bulletHitsEnemy, null, this);
+        this.physics.add.overlap(this.playerBullets, this.asteroids, this.bulletHitsAsteroid, null, this);
+        this.physics.add.overlap(this.enemyBullets, this.players, this.bulletHitsPlayer, null, this);
+        this.physics.add.overlap(this.asteroids, this.players, this.bulletHitsPlayer, null, this);
+        this.physics.add.overlap(this.enemyBullets, this.shields, this.bulletHitsPlayerShield, null, this);
+        this.physics.add.overlap(this.players, this.powerups, this.collectPowerup, null, this);
         this.physics.add.overlap(this.players, this.coins, this.collectPowerup, null, this);
         this.setCoinTimer();
         this.setAsteroidTimer();
-
     }
 
     setCoinTimer() {
@@ -111,11 +123,12 @@ class GameScene extends Phaser.Scene {
             this.spawnCoinTimerEvent = this.time.addEvent({
                 delay: Phaser.Math.Between(3000, 8000), // between 3-5 seconds,
                 callback: () => {
-                    let x = Phaser.Math.Between(0, this.screenWidth); let y = Phaser.Math.Between(0, this.screenHeight);
+                    let x = Phaser.Math.Between(0, this.screenWidth);
+                    let y = Phaser.Math.Between(0, this.screenHeight);
                     if (!this.gameAllOver) {
                         if (this.coins.getLength() < 12) {
                             let coin = this.create_powerupObj('collectible', x, y);
-                            coin.setScale(.2);
+                            coin.setScale(0.2);
                             this.moveObjectRandomly(coin, 100);
                         }
                         this.setCoinTimer(); // Reset the timer again
@@ -146,7 +159,7 @@ class GameScene extends Phaser.Scene {
                             this.tweens.add({
                                 targets: asteroid,
                                 alpha: 1,
-                                scale: .04,
+                                scale: 0.04,
                                 ease: 'linear',
                                 duration: 500
                             });
@@ -163,11 +176,11 @@ class GameScene extends Phaser.Scene {
     create_playerObj() {
         this.playerShip = this.add.sprite(this.screenWidth / 2, this.screenHeight * 1.2, 'player');
         this.players.add(this.playerShip);
-        this.playerShip.setScale(.3);
+        this.playerShip.setScale(0.3);
         let originalWidth = this.playerShip.width;
         let originalHeight = this.playerShip.height;
         let newWidth = originalWidth * 0.8; // 80% of the original width
-        let newHeight = originalHeight * 0.7; // 80% of the original height
+        let newHeight = originalHeight * 0.7; // 70% of the original height
         this.playerShip.body.setSize(newWidth, newHeight);
         this.playerShip.targetX = this.playerShip.x;
         this.playerShip.targetY = this.playerShip.y;
@@ -238,13 +251,13 @@ class GameScene extends Phaser.Scene {
         this.physics.velocityFromAngle(direction, speed, bullet.body.velocity);
         bullet.setCollideWorldBounds(false);
         bullet.setDepth(-1);
-        bullet.setScale(.1);
+        bullet.setScale(0.1);
         console.log(spr);
         if (spr == 'projectile') {
             let bubble = this.add.graphics({ x: -100, y: 0, add: false });
             const bubbleRadius = 10;
             const bubbleColor = 0xffffff; // A nice bubble color
-            bubble.fillStyle(bubbleColor, .1); // Semi-transparent
+            bubble.fillStyle(bubbleColor, 0.1); // Semi-transparent
             bubble.fillCircle(bubbleRadius, bubbleRadius, bubbleRadius);
             bubble.generateTexture('bubbles', 100, 100);
             let trail = this.add.particles(15, 15, 'bubbles', {
@@ -287,7 +300,6 @@ class GameScene extends Phaser.Scene {
     }
 
     createGun(ship, bulletSpr, bulletArray, gunOptions) {
-
         let gun = {
             myShip: ship, bulletSprite: bulletSpr, myBulletArray: bulletArray, x: ship.x,
             y: ship.y, speed: gunOptions.gunSpeed, numBullets: gunOptions.numberOfBullets, arcAngle: gunOptions.shootingArc,
@@ -315,7 +327,6 @@ class GameScene extends Phaser.Scene {
                 }
             },
             scene: this,
-
             destroy: function () {
                 this.myShip = null;
                 this.bulletSprite = null;
@@ -411,7 +422,6 @@ class GameScene extends Phaser.Scene {
         bigObj.destroy();
     }
 
-
     moveAlongBorder(obj, speed, margin, clockwise) {
         const directions = clockwise ? [
             { prop: 'x', target: this.cameras.main.width - margin, rotation: 90 },
@@ -450,20 +460,26 @@ class GameScene extends Phaser.Scene {
     }
 
     spawnEnemy(enemyType, x, y) {
-        let enemy = this.enemies.create(x, y, 'enemy')
-        enemy.setFrame(enemyType.spriteKey); enemy.setScale(.4);
-        enemy.hitPoints = enemyType.hitPoints; enemy.hitPointsCurrent = enemyType.hitPointsCurrent;
-        enemy.hitPointsBars = enemyType.hitPointsBars, enemy.hitPointsBarsCurrent = enemyType.hitPointsBarsCurrent,
-            enemy.speedX = enemyType.speedX; enemy.speedY = enemyType.speedY;
-        enemy.sideMovementDistance = enemyType.sideMovementDistance; enemy.hasGun = enemyType.hasGun;
-        enemy.gunOption = enemyType.gunOption; enemy.gunTarget = enemyType.gunTarget;
+        let enemy = this.enemies.create(x, y, 'enemy');
+        enemy.setFrame(enemyType.spriteKey);
+        enemy.setScale(0.4);
+        enemy.hitPoints = enemyType.hitPoints;
+        enemy.hitPointsCurrent = enemyType.hitPointsCurrent;
+        enemy.hitPointsBars = enemyType.hitPointsBars;
+        enemy.hitPointsBarsCurrent = enemyType.hitPointsBarsCurrent;
+        enemy.speedX = enemyType.speedX;
+        enemy.speedY = enemyType.speedY;
+        enemy.sideMovementDistance = enemyType.sideMovementDistance;
+        enemy.hasGun = enemyType.hasGun;
+        enemy.gunOption = enemyType.gunOption;
+        enemy.gunTarget = enemyType.gunTarget;
 
         let gunOptionsEnemy = [{
             gunSpeed: 60, numberOfBullets: 4,
             shootingArc: 35, startingAngle: 90,
             shootingCooldown: 1500, delay: 50
         }];
-        enemy.gun = this.createGun(enemy, 'projectile_1', this.enemyBullets, gunOptionsEnemy[enemy.gunOption])
+        enemy.gun = this.createGun(enemy, 'projectile_1', this.enemyBullets, gunOptionsEnemy[enemy.gunOption]);
         return enemy;
     }
 
@@ -507,7 +523,7 @@ class GameScene extends Phaser.Scene {
         }
         bullet.destroy();
         enemy.hitPointsCurrent -= 1;
-        this.sounds.damage.setVolume(.1).setLoop(false).play()
+        this.sounds.damage.setVolume(0.1).setLoop(false).play();
 
         if (enemy.hitPointsCurrent <= ((enemy.hitPoints / enemy.hitPointsBars) * (enemy.hitPointsBarsCurrent - 1))) {
             enemy.hitPointsBarsCurrent -= 1;
@@ -519,7 +535,6 @@ class GameScene extends Phaser.Scene {
             if (enemy.hitPointsCurrent <= 0) {
                 this.gameStage += 1;
                 enemy.destroy();
-
                 this.gameStageController(this.gameStage);
             }
         }
@@ -532,30 +547,43 @@ class GameScene extends Phaser.Scene {
 
     bulletHitsPlayer(bullet, player) {
         if (bullet.emitter) {
-            bullet.emitter.stop();  // Stop emitting new particles
-            bullet.emitter = null;  // Clear the reference to help with garbage collection
+            bullet.emitter.stop();
+            bullet.emitter = null;
         }
         bullet.destroy();
+    
+        // Flash the screen red for 50ms
+        this.cameras.main.flash(50, 255, 0, 0);
+    
+        // Prevent repeated collision processing
+        if (player.invulnerable) return;
+        player.invulnerable = true;
+        this.time.delayedCall(500, () => {
+            player.invulnerable = false;
+        }, [], this);
+    
         this.vfx.shakeCamera();
-        this.sounds.damage.setVolume(.1).setLoop(false).play()
-        player.hitPointsCurrent -= 1;
-        if (player.hitPointsCurrent <= 0) {
+        this.sounds.damage.setVolume(0.1).setLoop(false).play();
+    
+        // Subtract one life and update UI
+        player.lives -= 1;
+        this.updateLivesUI();
+        if (player.lives <= 0) {
             player.destroy();
-            //this.physics.pause();
             this.gameAllOver = true;
             this.resetGame();
         }
     }
+    
 
     bulletHitsPlayerShield(bullet, shield) {
         if (bullet.emitter) {
             bullet.emitter.stop();  // Stop emitting new particles
-            bullet.emitter = null;  // Clear the reference to help with garbage collection
+            bullet.emitter = null;  // Clear the reference
         }
-
         bullet.destroy();
         shield.hitPointsCurrent -= 1;
-        shield.alpha = shield.hitPointsCurrent / shield.hitPoints; // Update alpha as a percentage of remaining hitpoints
+        shield.alpha = shield.hitPointsCurrent / shield.hitPoints;
         if (shield.hitPointsCurrent <= 0) {
             shield.destroy();
         }
@@ -572,53 +600,96 @@ class GameScene extends Phaser.Scene {
         powerup.name = spr;
         switch (powerup.name) {
             case "collectible":
-                this.coins.add(powerup); break;
-            // case "small_asteroid":
+                this.coins.add(powerup);
+                break;
             case "avoidable":
-                this.asteroids.add(powerup); break;
+                this.asteroids.add(powerup);
+                break;
             default:
-                this.powerups.add(powerup); break;
+                this.powerups.add(powerup);
+                break;
         }
         powerup.setScale(this.gameScale);
-
         this.moveObjectRandomly(powerup, 100);
         return powerup;
     }
 
-    collectPowerup(player, powerup) {
-        let pupName = powerup.name;
-        switch (pupName) {
-            case "collectible":
-                this.gameCoinScore += 100;
-                this.updateScore(100);
-                this.displayFadeAwayText("+100", powerup.x, powerup.y);
-                this.sounds.collect.setVolume(.2).setLoop(false).play(); break;
-            case "blue_shield":
-                this.createPlayerShield(player.x, player.y + 350);
-                this.sounds.collect.setVolume(.2).setLoop(false).play(); break;
-            case "pink_heart":
-                player.hitPointsCurrent = Math.min(player.hitPoints, player.hitPointsCurrent + 3);
-                this.sounds.collect.setVolume(.2).setLoop(false).play(); break;
-            default:
-                console.error(`Powerup ${pupName} not recognized`); break;
-        }        powerup.destroy();
+collectPowerup(player, powerup) {
+    let pupName = powerup.name;
+    switch (pupName) {
+        case "collectible":
+            this.gameCoinScore += 100;
+            this.updateScore(100);
+            this.displayFadeAwayText("+100", powerup.x, powerup.y);
+            this.sounds.collect.setVolume(0.2).setLoop(false).play();
+            // Golden flash when collecting a coin
+            this.cameras.main.flash(50, 255, 215, 0);
+            break;
+        case "blue_shield":
+            this.createPlayerShield(player.x, player.y + 350);
+            this.sounds.collect.setVolume(0.2).setLoop(false).play();
+            break;
+        case "pink_heart":
+            // Add an extra life and create a new heart icon just after the currently visible hearts.
+            player.lives++;
+            let activeCount = this.lifeIcons.filter(heart => heart.visible).length;
+            let newHeart = this.add.image(10 + activeCount * 40, 10, 'pink_heart').setOrigin(0, 0);
+            newHeart.setScale(0.5);
+            this.lifeIcons.push(newHeart);
+            this.sounds.collect.setVolume(0.2).setLoop(false).play();
+            // Green flash when collecting a heart
+            this.cameras.main.flash(50, 0, 255, 0);
+            break;
+        default:
+            console.error(`Powerup ${pupName} not recognized`);
+            break;
     }
+    powerup.destroy();
+}
+
 
     displayFadeAwayText(text, x, y) {
-        let displayText = this.add.text(x, y, text, {
-            font: '14px Courier',
-            fill: '#ffffff',
-            align: 'center'
-        }); displayText.setOrigin(0.5, 0.5);
+        let displayText = this.add.bitmapText(x, y, 'pixelfont', text, 32) // 32 is the font size; adjust as needed
+                            .setOrigin(0.5, 0.5)
+                            .setTint(0xFFD700); // Golden tint
         this.tweens.add({
             targets: displayText,
-            y: y - 20,
+            y: y - 30,
             alpha: 0,
             ease: 'linear',
-            duration: 500,
+            duration: 700,
             onComplete: () => displayText.destroy()
         });
-
+    }
+    
+    
+    
+    // New function: updateLivesUI with animation for disappearing hearts
+    updateLivesUI() {
+        for (let i = 0; i < this.lifeIcons.length; i++) {
+            if (i < this.playerShip.lives) {
+                // Ensure the heart is visible and reset its alpha if needed.
+                if (!this.lifeIcons[i].visible) {
+                    this.lifeIcons[i].setVisible(true);
+                    this.lifeIcons[i].alpha = 1;
+                }
+            } else {
+                // If the heart is visible, animate it upward and fade out, then hide it.
+                if (this.lifeIcons[i].visible && this.lifeIcons[i].alpha === 1) {
+                    this.tweens.add({
+                        targets: this.lifeIcons[i],
+                        y: this.lifeIcons[i].y - 20,
+                        alpha: 0,
+                        duration: 500,
+                        ease: 'Linear',
+                        onComplete: () => {
+                            this.lifeIcons[i].setVisible(false);
+                            this.lifeIcons[i].alpha = 1;
+                        }
+                    });
+                }
+            }
+        }
     }
 
     gameStageController(gameStage) {
@@ -634,30 +705,32 @@ class GameScene extends Phaser.Scene {
                 });
                 break;
             default:
-                this.sounds.background.stop(); this.sounds.success.setVolume(1).setLoop(false).play()
-                this.gameAllOver = true; this.gameWin = true; this.resetGame(); break;
+                this.sounds.background.stop();
+                this.sounds.success.setVolume(1).setLoop(false).play();
+                this.gameAllOver = true;
+                this.gameWin = true;
+                this.resetGame();
+                break;
         }
     }
 
     update() {
         this.graphics.clear();
-        //Enemy update section
+        // Enemy update section
         if (this.enemies) {
             this.enemies.getChildren().forEach(enemy => {
                 if (enemy.hasGun && !this.gameAllOver)
-                    this.enemyShootAtTarget(enemy)
+                    this.enemyShootAtTarget(enemy);
                 this.drawEnemyHealthBars(enemy);
             });
         }
-
         // Powerups update section
         this.asteroids.getChildren().forEach((asteroid) => {
             if (asteroid.wrap) {
                 this.physics.world.wrap(asteroid, 100);
             }
         });
-
-        //Player update section
+        // Player update section
         if (this.playerShip && !this.gameAllOver) {
             if (this.gameStarted) {
                 this.movePlayerToPointer(0, 16);
@@ -666,15 +739,14 @@ class GameScene extends Phaser.Scene {
             this.drawHealthBar(this.playerShip,
                 this.playerShip.hitPoints,
                 this.playerShip.hitPointsCurrent,
-                0x00ff00, 0xff0000, 55, .1);
+                0x00ff00, 0xff0000, 55, 0.1);
             this.shields.getChildren().forEach(shield => {
                 if (this.playerShip) {
-                    this.updatePlayerShieldPosition(this.playerShip, shield, -30)
+                    this.updatePlayerShieldPosition(this.playerShip, shield, -30);
                 }
                 else
                     shield.destroy();
-            }
-            );
+            });
         }
     }
 
@@ -692,13 +764,22 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
         this.vfx.shakeCamera();
         if (this.gameWin) {
-            let gameWINText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 500, 'pixelfont', 'Congratulations!!!', 24).setOrigin(0.5).setVisible(false).setAngle(-15).setDepth(10).setTint(0xffff00);
+            let gameWINText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 500, 'pixelfont', 'Congratulations!!!', 24)
+                .setOrigin(0.5)
+                .setVisible(false)
+                .setAngle(-15)
+                .setDepth(10)
+                .setTint(0xffff00);
             this.time.delayedCall(500, () => {
-                this.sounds.lose.setVolume(0.5).setLoop(false).play()
+                this.sounds.lose.setVolume(0.5).setLoop(false).play();
                 gameWINText.setVisible(true);
                 this.tweens.add({
-                    targets: gameWINText, y: '+=200', angle: 0,
-                    scale: { from: 0.5, to: 2 }, alpha: { from: 0, to: 1 }, ease: 'Elastic.easeOut',
+                    targets: gameWINText,
+                    y: '+=200',
+                    angle: 0,
+                    scale: { from: 0.5, to: 2 },
+                    alpha: { from: 0, to: 1 },
+                    ease: 'Elastic.easeOut',
                     duration: 1500,
                     onComplete: () => {
                         this.time.delayedCall(1000, this.gameOver, [], this);
@@ -706,10 +787,14 @@ class GameScene extends Phaser.Scene {
                 });
             });
         } else {
-            let gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'pixelfont', 'Game Over', 64).setOrigin(0.5).setVisible(false).setAngle(-15).setTint(0xFF0000);
+            let gameOverText = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY - 200, 'pixelfont', 'Game Over', 64)
+                .setOrigin(0.5)
+                .setVisible(false)
+                .setAngle(-15)
+                .setTint(0xFF0000);
 
             this.time.delayedCall(500, () => {
-                this.sounds.lose.setVolume(1).setLoop(false).play()
+                this.sounds.lose.setVolume(1).setLoop(false).play();
                 gameOverText.setVisible(true);
                 this.tweens.add({
                     targets: gameOverText,
@@ -729,7 +814,6 @@ class GameScene extends Phaser.Scene {
 
     gameOver() {
         initiateGameOver.bind(this)({ score: this.gameCoinScore });
-
     }
 
     pauseGame() {
@@ -746,7 +830,7 @@ const orientationSizes = {
         "width": 720,
         "height": 1280,
     }
-}
+};
 
 // Game Orientation
 const orientation = "landscape";
@@ -774,16 +858,20 @@ function displayProgressLoader() {
 
     const progressBar = this.add.graphics();
     this.load.on('progress', (value) => {
-        progressBar.clear(); progressBar.fillStyle(0x364afe, 1); progressBar.fillRect(x, y, width * value, height);
+        progressBar.clear();
+        progressBar.fillStyle(0x364afe, 1);
+        progressBar.fillRect(x, y, width * value, height);
     });
     this.load.on('fileprogress', function (file) {
         // console.log(file.src);
     });
     this.load.on('complete', function () {
-        progressBar.destroy(); progressBox.destroy(); loadingText.destroy();
+        progressBar.destroy();
+        progressBox.destroy();
+        loadingText.destroy();
     });
 }
-// Configuration object
+
 const config = {
     type: Phaser.AUTO,
     width: _CONFIG.deviceOrientationSizes[_CONFIG.deviceOrientation].width,
