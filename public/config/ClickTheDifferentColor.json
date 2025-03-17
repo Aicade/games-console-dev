@@ -18,8 +18,8 @@
     "phaserVersion": "3.80.1",
     "soundsLoader": {
         "background": "background",
-        "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav",
-        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav",
-        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3"
+        "success": "https://files.catbox.moe/psj9yf.mp3",
+        "damage": "https://files.catbox.moe/mmg1lz.mp3",
+        "lose": "https://files.catbox.moe/skrenm.mp3"
     }
 }

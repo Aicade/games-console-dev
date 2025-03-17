@@ -1,3 +1,7 @@
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+_CONFIG.deviceOrientation = isMobile ? 'portrait' : 'landscape';
+
+
 // Game Scene
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -73,16 +77,29 @@ class GameScene extends Phaser.Scene {
 
     gameOver() {
         this.sound.stopAll();
-        this.sounds.lose.setVolume(0.5).setLoop(false).play()
-        this.timerEvent.destroy()
+    
+        // Fade out all remaining hearts together
+        this.hearts.forEach(heart => {
+            if (heart && heart.visible) {
+                this.tweens.add({
+                    targets: heart,
+                    alpha: 0,
+                    duration: 500,
+                    ease: 'Linear'
+                });
+            }
+        });
+    
+        this.sounds.lose.setVolume(0.5).setLoop(false).play();
+        this.timerEvent.destroy();
         this.gameOverText.setAlpha(1);
-        this.vfx.blinkEffect(this.gameOverText, 400, 3)
+        this.vfx.blinkEffect(this.gameOverText, 400, 3);
         this.vfx.shakeCamera(300, 0.04);
         this.time.delayedCall(2500, () => {
             initiateGameOver.bind(this)({ score: this.score });
         });
-
     }
+    
 
     pauseGame() {
         handlePauseGame.bind(this)();
@@ -194,7 +211,6 @@ function gameSceneCreate(game) {
 }
 
 function fillColour(game) {
-
     const colors = ["#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e", "#f1c40f", "#e67e22", "#e74c3c", "#7f8c8d", "#523D1F", "#D33257", "#45362E", "#E3000E", "#60646D", "#AAB69B", "#8870FF", "#3E4651", "#EB9532", "#FACA9B", "#D8335B", "#897FBA", "#BF4ACC", "#710301", "#8F6910", "#FFF457"];
 
     let n = Math.floor(Math.random() * colors.length);
@@ -213,40 +229,72 @@ function fillColour(game) {
     game.answer = randSquare;
 
     game.squarePositions.forEach((pos, index) => {
+        let rect;
         if (index == randSquare) {
-            let square = game.add.rectangle(pos.x, pos.y, 100, 100, newColor)
+            rect = game.add.rectangle(pos.x, pos.y, 100, 100, newColor)
                 .setInteractive()
                 .on('pointerdown', function () {
                     if (index == randSquare) {
                         if (game.difficulty > 0.05)
-                            game.difficulty -= 0.05
+                            game.difficulty -= 0.05;
                         game.updateScore(1);
-                        game.sounds.success.setVolume(0.5).setLoop(false).play()
+                        game.sounds.success.setVolume(0.5).setLoop(false).play();
                         game.timerEvent.destroy();
                         game.time.delayedCall(0, restartTimer, null, game);
                         fillColour(game);
                     }
-                    else { checkLife(game) }
+                    else { checkLife(game); }
                 });
-        }
-        else {
-            game.add.rectangle(pos.x, pos.y, 100, 100, color)
+        } else {
+            rect = game.add.rectangle(pos.x, pos.y, 100, 100, color)
                 .setInteractive()
                 .on('pointerdown', function () {
                     if (index == randSquare) {
                         if (game.difficulty > 0.05)
-                            game.difficulty -= 0.05
+                            game.difficulty -= 0.05;
                         fillColour(game);
                     }
-                    else { checkLife(game) }
+                    else { checkLife(game); }
                 });
+        }
+        // Add hover effect only for PC (non-mobile)
+        if (!isMobile) {
+            rect.on('pointerover', function () {
+                game.tweens.add({
+                    targets: rect,
+                    scaleX: 1.1,
+                    scaleY: 1.1,
+                    duration: 150,
+                    ease: 'Sine.easeInOut'
+                });
+            });
+            rect.on('pointerout', function () {
+                game.tweens.add({
+                    targets: rect,
+                    scaleX: 1,
+                    scaleY: 1,
+                    duration: 150,
+                    ease: 'Sine.easeInOut'
+                });
+            });
         }
     });
 }
 
+
 function checkLife(game) {
     game.lives--;
-    game.hearts[game.lives].destroy();
+    let heart = game.hearts[game.lives];
+    game.tweens.add({
+        targets: heart,
+        y: heart.y - 20,
+        alpha: 0,
+        duration: 500,
+        ease: 'Linear',
+        onComplete: () => {
+            heart.destroy();
+        }
+    });
 
     if (game.lives > 0) {
         game.sounds.damage.setVolume(0.5).setLoop(false).play();
@@ -255,6 +303,7 @@ function checkLife(game) {
         game.gameOver();
     }
 }
+
 
 function startTimer(game) {
     game.timerValue = 2;
