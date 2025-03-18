@@ -51,6 +51,24 @@ class GameScene extends Phaser.Scene {
         this.gameOverText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', 'GAME OVER!', 55).setOrigin(0.5, 0.5).setTint(0xff0000).setDepth(11);
         this.gameOverText.visible = false;
 
+        this.instructionText = this.add.bitmapText(
+            this.width / 2, 
+            this.height / 2, 
+            'pixelfont', 
+            'Tap on Projectile to Land it', 
+            40
+        ).setOrigin(0.5, 0.5).setTint(0xffffff).setDepth(11);
+        
+        // Make it fade out after 7 seconds
+        this.tweens.add({
+            targets: this.instructionText,
+            alpha: 0,
+            duration: 7000,
+            onComplete: () => {
+                this.instructionText.destroy();
+            }
+        });
+
         // Add input listeners
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
         const pauseButton = this.add.sprite(this.game.config.width * 0.9, this.game.config.height * 0.1, "pauseButton").setOrigin(0.5, 0.5).setScale(2);
@@ -89,22 +107,39 @@ class GameScene extends Phaser.Scene {
 
             projectile.on("pointerdown", () => {
                 this.sounds.jump.play();
+                
+                // Store initial speed value to avoid referencing issues
+                const initialSpeed = projectile.body ? projectile.body.speed : 200;
+                
                 projectile.emitter = this.add.particles(0, 0, 'projectile', {
                     frequency: 2,
                     speed: 200,
                     lifespan: 300,
                     alpha: {
-                        onEmit: (particle, key, t, value) => Phaser.Math.Percent(projectile.body.speed, 0, 300) * 1000
+                        // Use a safer approach with a fixed value or the stored initial speed
+                        onEmit: () => {
+                            // Check if projectile and body still exist
+                            if (projectile && projectile.body) {
+                                return Phaser.Math.Percent(projectile.body.speed, 0, 300) * 1000;
+                            }
+                            // Fallback to a default value if projectile or body is undefined
+                            return Phaser.Math.Percent(initialSpeed, 0, 300) * 1000;
+                        }
                     },
                     scale: { start: 0.015, end: 0 },
                     blendMode: 'ADD',
                 });
-                projectile.emitter.startFollow(projectile);
-                this.time.delayedCall(200, () => {
-                    projectile.emitter.stop();
-                })
-
-                projectile.setVelocityY(-250);
+                
+                if (projectile.active) {
+                    projectile.emitter.startFollow(projectile);
+                    this.time.delayedCall(300, () => {
+                        if (projectile.emitter && projectile.emitter.active) {
+                            projectile.emitter.stop();
+                        }
+                    });
+                    
+                    projectile.setVelocityY(-250);
+                }
             }, this);
         }
     }
@@ -113,10 +148,17 @@ class GameScene extends Phaser.Scene {
         if (projectile.body.touching.down && target.body.touching.up) {
             this.updateScore(10);
             this.scorePointAnim();
+            
+            // Make sure to stop and destroy the emitter if it exists before destroying the projectile
+            if (projectile.emitter) {
+                projectile.emitter.stop();
+                projectile.emitter.destroy();
+            }
+            
             projectile.destroy();
             this.sounds.collect.play();
         } else {
-            projectile.setAngularVelocity(60)
+            projectile.setAngularVelocity(60);
             this.updateLives(1);
             this.sounds.damage.play();
         }
@@ -128,13 +170,19 @@ class GameScene extends Phaser.Scene {
                 if (p == undefined) return;
 
                 if (p.x > this.width || p.y > this.height) {
+                    // Make sure to stop and destroy the emitter if it exists before destroying the projectile
+                    if (p.emitter) {
+                        p.emitter.stop();
+                        p.emitter.destroy();
+                    }
+                    
                     p.destroy();
 
                     this.sounds.damage.play();
                     this.updateLives(1);
-                    this.shakeTarget()
+                    this.shakeTarget();
                 }
-            })
+            });
         }
 
         if (this.time.now > this.spawnTimeDelay && this.time.now > this.startDelay) {
@@ -146,6 +194,16 @@ class GameScene extends Phaser.Scene {
             this.difficulty -= 0.02;
             this.difficultyDelay = this.time.now + 10000;
         }
+    }
+
+    shakeTarget() {
+        this.tweens.add({
+            targets: this.landingTarget,
+            x: this.landingTarget.x + 10,
+            yoyo: true,
+            repeat: 2,
+            duration: 50
+        });
     }
 
     shakeTarget() {
