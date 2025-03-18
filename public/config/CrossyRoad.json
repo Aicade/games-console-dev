@@ -23,8 +23,8 @@
     "phaserVersion": "3.80.1",
     "soundsLoader": {
         "background": "background",
-    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
-    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3"
+    "lose": "https://files.catbox.moe/skrenm.mp3",
+    "collect": "https://files.catbox.moe/psj9yf.mp3"
     },
     "title": "Crossy Road"
   }
