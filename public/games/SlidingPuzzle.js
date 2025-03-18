@@ -104,7 +104,7 @@ class GameScene extends Phaser.Scene {
         // this.bg.displayWidth = this.width;
 
 
-        this.sounds.background.setVolume(1).setLoop(true).play()
+        this.sounds.background.setVolume(0.2).setLoop(true).play()
         // Add UI elements
         this.scoreText = this.add.text(10, 10, 'Score: 0', { fontSize: '20px', fill: globalPrimaryFontColor }).setAlpha(0);
         this.levelUpText = this.add.bitmapText(this.width / 2, this.height / 2, "pixelfont", "YOU WON! \nLEVEL UP!", 90).setAlpha(0).setDepth(11).setOrigin(0.5);
@@ -703,5 +703,5 @@ const config = {
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
     },
-    orientation: _CONFIG.deviceOrientation === "landscape"
+    orientation: _CONFIG.deviceOrientation === "portrait"
 };
