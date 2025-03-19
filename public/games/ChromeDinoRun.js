@@ -35,14 +35,46 @@ class GameScene extends Phaser.Scene {
         this.height = this.game.config.height;
         this.vfx = new VFXLibrary(this);
 
-        this.scoreText = this.add.bitmapText(30, 15, 'pixelfont', 'Score: 0', 25).setScrollFactor(0).setDepth(11);
+// Add UI elements with animated transitions.
+this.scoreText = this.add.bitmapText(30, 15, 'pixelfont', 'Score: 0', 25)
+                      .setScrollFactor(0)
+                      .setDepth(11);
+// Set initial alpha to 0 and position off-screen for slide-in effect.
+this.scoreText.alpha = 0;
+this.scoreText.x = -100; // start off-screen left
 
-        this.lives = 3;
-        this.hearts = [];
-        for (let i = 0; i < this.lives; i++) {
-            let x = 50 + (i * 35);
-            this.hearts[i] = this.add.image(x, 90, "heart").setScale(0.025).setDepth(11);
-        }
+// Tween the scoreText into view.
+this.tweens.add({
+    targets: this.scoreText,
+    x: 30,          // move to its normal position
+    alpha: 1,       // fade in to full opacity
+    duration: 1000, // duration in ms
+    ease: 'Sine.easeInOut'
+});
+
+this.lives = 3;
+this.hearts = [];
+for (let i = 0; i < this.lives; i++) {
+    let xPos = 50 + (i * 35);
+    let heart = this.add.image(xPos, 90, "heart")
+                     .setScale(0.025)
+                     .setDepth(11);
+    // Set initial properties for a smooth transition.
+    heart.alpha = 0;
+    heart.y = 50; // start higher than final position.
+    this.hearts.push(heart);
+
+    // Tween each heart into place with a stagger effect.
+    this.tweens.add({
+        targets: heart,
+        y: 90,        // final y position
+        alpha: 1,     // fade in
+        duration: 1000,
+        delay: i * 100, // stagger delay
+        ease: 'Sine.easeInOut'
+    });
+}
+
 
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
@@ -61,11 +93,24 @@ class GameScene extends Phaser.Scene {
         this.scale.pageAlignVertically = true;
         this.scale.refresh();
 
-        this.bg = this.add.image(this.game.config.width / 2, this.game.config.height / 2, "background").setOrigin(0.5);
+this.bg = this.add.tileSprite(this.game.config.width / 2, this.game.config.height / 2, this.game.config.width, this.game.config.height, "background");
 
-        // Use the larger scale factor to ensure the image covers the whole canvas
-        const scale = Math.max(this.game.config.width / this.bg.displayWidth, this.game.config.height / this.bg.displayHeight);
-        this.bg.setScale(scale);
+// Create the tileSprite as before:
+this.bg = this.add.tileSprite(
+    this.game.config.width / 2,
+    this.game.config.height / 2,
+    this.game.config.width,
+    this.game.config.height,
+    "background"
+  );
+  
+  // Get the source image dimensions.
+  let bgSource = this.textures.get("background").getSourceImage();
+  
+  // Scale the tile texture so one image fills the screen.
+  this.bg.tileScaleX = this.game.config.width / bgSource.width;
+  this.bg.tileScaleY = this.game.config.height / bgSource.height;
+  
 
         this.cameras.main.setBackgroundColor('#eee');
 
@@ -136,7 +181,10 @@ class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        // Adjust the background scroll speed so its effective movement matches the platform's speed.
+        this.bg.tilePositionX += 2 / this.bg.tileScaleX;
         this.platform.tilePositionX += 2;
+    
         if (this.player.body.touching.down) {
             this.player.setAngle(0);
             this.player.setAngularVelocity(0);
@@ -153,6 +201,7 @@ class GameScene extends Phaser.Scene {
             }
         }
     }
+    
 
 
     updateScore(points) {
@@ -198,19 +247,46 @@ class GameScene extends Phaser.Scene {
     }
 
     addBox(x, y) {
-        let box = this.boxes.getFirstDead(true, x, y, 'avoidable');
-
-        if (!box) {
-            box = this.boxes.create(x, y, 'box');
+        // Random chance: if less than 30% chance, spawn a 2x2 formation; otherwise, spawn a single obstacle.
+        if (Phaser.Math.Between(0, 100) < 30) {
+            // Manually set the x positions for the two columns.
+            // You can adjust these values as desired.
+            let colX = [x + 10, x + 60];  
+            // Set a fixed vertical offset for the two rows.
+            let offsetY = 30;
+            
+            // Spawn obstacles in a 2x2 formation.
+            for (let row = 0; row < 2; row++) {
+                for (let col = 0; col < 2; col++) {
+                    let posX = colX[col];  // Use manually defined x coordinate
+                    let posY = y + row * offsetY;
+                    let box = this.boxes.getFirstDead(true, posX, posY, 'avoidable');
+                    if (!box) {
+                        box = this.boxes.create(posX, posY, 'avoidable');
+                    }
+                    box.body.setSize(box.width * 0.8, box.height * 0.8);
+                    box.setScale(2 * 0.09);
+                    box.body.velocity.x = this.tileVelocity / 10;
+                    box.body.width *= 0.5;
+                    box.checkWorldBounds = true;
+                    box.outOfBoundsKill = true;
+                }
+            }
+        } else {
+            // Spawn a single obstacle (as before).
+            let box = this.boxes.getFirstDead(true, x, y, 'avoidable');
+            if (!box) {
+                box = this.boxes.create(x, y, 'avoidable');
+            }
+            box.body.setSize(box.width * 0.8, box.height * 0.8);
+            box.setScale(2 * 0.09);
+            box.body.velocity.x = this.tileVelocity / 10;
+            box.body.width *= 0.5;
+            box.checkWorldBounds = true;
+            box.outOfBoundsKill = true;
         }
-        box.body.setSize(box.width * 0.8, box.height * 0.8);
-
-        box.setScale(2*0.09);
-        box.body.velocity.x = this.tileVelocity / 10;
-        box.body.width *= 0.5;
-        box.checkWorldBounds = true;
-        box.outOfBoundsKill = true;
     }
+    
 
     gameOverWithEffects(player, boxes) {
         if (this.lives <= 0) {
@@ -218,7 +294,18 @@ class GameScene extends Phaser.Scene {
             return;
         }
         this.lives--;
-        this.hearts[this.lives].destroy();
+        let heart = this.hearts[this.lives];
+        this.tweens.add({
+            targets: heart,
+            y: heart.y + 50,  // Drop it down 50 pixels; adjust as desired.
+            alpha: 0,         // Fade out to 0.
+            duration: 500,    // Animation lasts 500ms.
+            ease: 'Power1',
+            onComplete: () => {
+                heart.destroy();
+            }
+        });
+        
 
         if (this.lives === 1) {
             this.sounds.countdown.play({ volume: 0.6 }); // Duration in milliseconds
@@ -237,12 +324,23 @@ class GameScene extends Phaser.Scene {
             this.sound.stopAll();
             this.sounds.lose.play();
             this.player.setTint(0xff0000);
-            this.physics.pause();
+            // Disable the player's physics body so it doesn't interfere with the drop
+            this.player.body.enable = false;
             this.vfx.shakeCamera(300, 0.04);
-            this.time.delayedCall(1000, () => {
-                this.gameOver();
+            
+            // Animate the player dropping below the ground.
+            // Here, we move the player to y = this.height + this.player.height (below the bottom)
+            this.tweens.add({
+                targets: this.player,
+                y: this.height + this.player.height,
+                duration: 1000,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.gameOver();
+                }
             });
         }
+        
     }
 
 }

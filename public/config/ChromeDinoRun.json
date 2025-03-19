@@ -2,7 +2,7 @@
     "description": "A horizontal side-scroller running game",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "background",
+        "background": "background_1",
         "player": "player",
         "avoidable": "enemy",
         "platform": "platform"
@@ -22,7 +22,7 @@
     "phaserVersion": "3.80.1",
     "soundsLoader": {
         "background": "background",
-    "jump": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
+    "jump": "https://files.catbox.moe/y95spl.mp3",
     "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav",
     "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
     "countdown": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/countdown_1.mp3"
