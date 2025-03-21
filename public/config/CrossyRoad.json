@@ -4,11 +4,9 @@
     "imageLoader": {
         "background": "background",
         "player": "player",
-        "enemy": "enemy",
-        "collectible": "collectible"
-        
+        "enemy": "enemy"
     },
-    "instructions": "Instructions:1. Hold to move forward 2. Release to stop moving",
+    "instructions": "Use arrow keys to move up, down, left, and right.",
     "orientationSizes": {
         "landscape": {
             "height": 720,
@@ -23,8 +21,8 @@
     "phaserVersion": "3.80.1",
     "soundsLoader": {
         "background": "background",
-    "lose": "https://files.catbox.moe/skrenm.mp3",
-    "collect": "https://files.catbox.moe/psj9yf.mp3"
+        "lose": "https://files.catbox.moe/skrenm.mp3",
+        "collect": "https://files.catbox.moe/psj9yf.mp3"
     },
     "title": "Crossy Road"
-  }
+}
