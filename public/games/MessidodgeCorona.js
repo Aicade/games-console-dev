@@ -334,5 +334,5 @@ const config = {
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
     },
-    orientation: _CONFIG.deviceOrientation === "landscape"
+    orientation: _CONFIG.deviceOrientation === "portrait"
 };
