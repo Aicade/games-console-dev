@@ -514,6 +514,12 @@ class GameScene extends Phaser.Scene {
             if (!this.oneTime) {
                 this.emitter.explode(100);
                 this.oneTime = true;
+                // Add this section to trigger game over when meter is full
+                this.time.delayedCall(2000, () => {
+                    this.physics.pause();
+                    this.player.setTint(0x00ff00);
+                    this.gameOver();
+                });
             }
             else {
                 this.emitter.explode(15);
