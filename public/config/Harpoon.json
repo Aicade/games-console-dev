@@ -6,8 +6,8 @@
         "player": "player",
         "collectible": "collectible",
         "avoidable": "enemy",
-        "projectile": "projectile"
-        
+        "projectile": "projectile",
+        "platform": "platform"
     },
     "instructions": "Tap to throw harpoon.",
     "orientationSizes": {
@@ -24,9 +24,9 @@
     "phaserVersion": "3.80.1",
     "soundsLoader": {
         "background": "background",
-    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
-    "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
-    "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3"
+        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
+        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
+        "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3"
     },
     "title": "Harpoon throw"
-  }
+}
