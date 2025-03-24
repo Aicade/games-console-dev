@@ -2,7 +2,7 @@
     "description": "A thrilling shooting and survival game.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "background",
+        "background": "background_1",
         "player": "player",
         "enemy": "enemy",
         "collectible": "collectible",
@@ -22,7 +22,7 @@
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
     "soundsLoader": {
-        "background": "background",
+        "background": "https://files.catbox.moe/tq2d3l.mp3",
         "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_3.mp3",
         "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/damage_1.mp3",
         "upgrade": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_1.mp3",
