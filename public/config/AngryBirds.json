@@ -2,7 +2,7 @@
     "description": "Aim and throw your character at targets with increasing difficulty to score the highest points possible.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "background",
+        "background": "background_1",
         "player": "player",
         "enemy": "enemy"
     },
