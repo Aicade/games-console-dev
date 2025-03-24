@@ -1,3 +1,5 @@
+// CandyCrush.js
+
 // Game Scene
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -6,139 +8,152 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        // Load images from the JSON config
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
-          }
-        
-          for (const key in _CONFIG.soundsLoader) {
+        }
+        // Load sounds from the JSON config
+        for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
-          }
-
+        }
+        
+        // IMPORTANT: Attach Braincade SDK event listeners
         addEventListenersPhaser.bind(this)();
 
+        // Load additional assets: pause button and bitmap font
         this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-
         const fontName = 'pix';
-        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
+        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
+        
+        displayProgressLoader.call(this);
     }
 
     create() {
+        // Create VFX instance (assumed defined elsewhere)
         this.vfx = new VFXLibrary(this);
 
+        // Initialize sounds but DO NOT start background music until first move.
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
-        this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
+            this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
         }
-        if (this.sounds.background.isPlaying) {
-            this.sounds.background.stop();
-        }
+        // (Background music will start on first move)
 
-        this.sounds.background.setVolume(1).setLoop(true).play()
-        var me = this;
-
+        // Set background image (centered)
         this.bg = this.add.sprite(0, 0, 'background').setOrigin(0, 0);
         this.bg.displayWidth = this.game.config.width;
         this.bg.displayHeight = this.game.config.height;
 
-
         this.width = this.game.config.width;
         this.height = this.game.config.height;
 
-        // Add UI elements
-        this.scoreText = this.add.bitmapText(this.width / 2, 50, 'pixelfont', '0', 64).setOrigin(0.5, 0.5);
-        this.scoreText.setDepth(100)
-        // here u can remove the keyword to have less tile sheet
-        this.pauseButton = this.add.sprite(this.width - 150, 60, "pauseButton").setOrigin(0.5, 0.5);
+        // Add platform and player (Mario) sprites on the left side.
+        // Adjust origins and scales as needed.
+        const platform = this.add.sprite(150, this.height - 1, 'platform').setOrigin(0.15, 0.5);
+        platform.setScale(1, 0.6);
+        this.mario = this.add.sprite(150, this.height - 250, 'mario').setOrigin(-0.7, 0.55);
+        this.mario.setScale(0.5, 0.5);
+
+        // Score text at the top-center.
+        this.scoreText = this.add.bitmapText(this.width / 2, 50, 'pixelfont', '0', 64)
+                              .setOrigin(0.5, 0.5);
+        this.scoreText.setDepth(100);
+
+        // Pause button at the top-right.
+        this.pauseButton = this.add.sprite(this.width - 60, 60, "pauseButton")
+                              .setOrigin(0.5, 0.5);
         this.pauseButton.setInteractive({ cursor: 'pointer' });
-        this.pauseButton.setScale(3);
-        this.pauseButton.setDepth(11)
-        this.pauseButton.on('pointerdown', () => this.pauseGame());
-
-        me.tileTypes = ['collectible_1', 'collectible_2', 'collectible_3'];
-        for (const tileType of me.tileTypes) {
-            this.vfx.createEmitter(tileType)
-        }
-        // this.vfx.createEmitter()
-        me.candyscore = 0;
-        me.activeTile1 = null;
-        me.activeTile2 = null;
-        me.canMove = false;
-
-        // In Phaser 3, we need to use this.textures.get() to get image data
-        // me.tileWidth = this.textures.get('blue').getSourceImage().width;
-        // me.tileHeight = this.textures.get('blue').getSourceImage().height;
-
-
-        // In Phaser 3, groups are created a bit differently
-        me.tiles = this.add.group({
-            key: me.tileTypes,
-            frameQuantity: 0 // Assuming you want 6 of each type
+        this.pauseButton.setScale(2);
+        this.pauseButton.setDepth(101);
+        this.pauseButton.on('pointerdown', () => {
+            // Dispatch pause event via Braincade SDK (which handles the pause UI)
+            handlePauseGame.call(this);
         });
 
-        me.tileGrid = [
-            [null, null, null, null],
-            [null, null, null, null],
-            [null, null, null, null],
-            [null, null, null, null],
-            [null, null, null, null],
-        ];
+        // Prepare collectible tile types and create particle emitters.
+        this.tileTypes = ['collectible_1', 'collectible_2', 'collectible_3'];
+        for (const tileType of this.tileTypes) {
+            this.vfx.createEmitter(tileType);
+        }
 
-        me.tileWidth = (this.width) / me.tileGrid.length;
-        me.tileHeight = this.height / (me.tileGrid[0].length + 1);
-        var seed = Date.now();
-        me.random = new Phaser.Math.RandomDataGenerator([seed]);
+        // --- Grid Setup ---
+        // For Candy Crush we use an 8 x 7 grid.
+        this.gridOffsetX = this.width * 0.50;  // Grid starts halfway across the screen.
+        this.gridOffsetY = this.height * 0.20;   // 20% from the top.
 
-        me.initTiles();
+        this.numCols = 8;
+        this.numRows = 7;
+        let availableWidth = this.width - this.gridOffsetX - 20;
+        let availableHeight = this.height - this.gridOffsetY - 20;
+        let tileSize = Math.min(availableWidth / this.numCols, availableHeight / this.numRows);
+        this.tileWidth = tileSize;
+        this.tileHeight = tileSize;
 
-        // Add input listeners
-        this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
+        // Create a 2D array for tiles.
+        this.tileGrid = [];
+        for (let i = 0; i < this.numCols; i++) {
+            this.tileGrid[i] = [];
+            for (let j = 0; j < this.numRows; j++) {
+                this.tileGrid[i][j] = null;
+            }
+        }
+
+        this.drawGridLines();
+        this.activeTile1 = null;
+        this.activeTile2 = null;
+        this.canMove = false;
+
+        let seed = Date.now();
+        this.random = new Phaser.Math.RandomDataGenerator([seed]);
+        this.initTiles();
+
+        // Also pause via ESC key.
+        this.input.keyboard.on('keydown-ESC', () => {
+            handlePauseGame.call(this);
+        });
 
         timerEvent = this.time.addEvent({
-            delay: 120000, // 120 seconds in milliseconds
+            delay: 120000,
             callback: () => this.gameOver(),
             callbackScope: this,
             loop: false
         });
 
+        timerText = this.add.bitmapText(this.width - 150, 50, 'pixelfont', '120', 64)
+                        .setOrigin(0.5)
+                        .setDepth(100);
 
-        // Create a text object for displaying the time
-        timerText = this.add.bitmapText(150, 50, 'pixelfont', '0', 64).setOrigin(0.5).setDepth(100);
-        this.input.keyboard.disableGlobalCapture();
+        this.canMove = true;
     }
 
-    update(delta) {
-        var me = this;
-
-        if (me.activeTile1 && !me.activeTile2) {
-            var hoverX = me.input.activePointer.x;
-            var hoverY = me.input.activePointer.y;
-
-            var hoverPosX = Math.floor(hoverX / me.tileWidth);
-            var hoverPosY = Math.floor((hoverY - me.tileHeight) / me.tileHeight);
-            console.log(hoverPosX, hoverPosY);
-
-            var difX = (hoverPosX - me.startPosX);
-            var difY = (hoverPosY - me.startPosY);
-
-            if (!(hoverPosY > me.tileGrid[0].length - 1 || hoverPosY < 0) && !(hoverPosX > me.tileGrid.length - 1 || hoverPosX < 0)) {
-                if ((Math.abs(difY) == 1 && difX == 0) || (Math.abs(difX) == 1 && difY == 0)) {
-                    me.canMove = false;
-                    me.activeTile2 = me.tileGrid[hoverPosX][hoverPosY];
-
-                    me.swapTiles();
-
-                    // Phaser 3 uses a different syntax for time events
-                    me.time.delayedCall(500, function () {
-                        me.checkMatch();
+    update() {
+        if (this.activeTile1 && !this.activeTile2) {
+            let hoverX = this.input.activePointer.x;
+            let hoverY = this.input.activePointer.y;
+            let tilePos = this.getTileCoordinates(hoverX, hoverY);
+            let hoverPosX = tilePos.x;
+            let hoverPosY = tilePos.y;
+            let difX = (hoverPosX - this.startPosX);
+            let difY = (hoverPosY - this.startPosY);
+            if (
+                hoverPosX >= 0 && hoverPosX < this.numCols &&
+                hoverPosY >= 0 && hoverPosY < this.numRows
+            ) {
+                if ((Math.abs(difY) === 1 && difX === 0) ||
+                    (Math.abs(difX) === 1 && difY === 0)) {
+                    this.canMove = false;
+                    this.activeTile2 = this.tileGrid[hoverPosX][hoverPosY];
+                    this.swapTiles();
+                    this.time.delayedCall(500, () => {
+                        this.checkMatch();
                     });
                 }
             }
         }
 
         if (timerEvent) {
-            // Calculate remaining time in seconds
-            var remainingTime = Math.floor((timerEvent.delay - timerEvent.getElapsed()) / 1000);
+            let remainingTime = Math.floor((timerEvent.delay - timerEvent.getElapsed()) / 1000);
             timerText.setText(remainingTime.toString());
             if (remainingTime <= 0) {
                 timerEvent = null;
@@ -146,420 +161,352 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    initTiles() {
-        var me = this;
+    // -------------------------
+    // Draw Grid Lines
+    // -------------------------
+    drawGridLines() {
+        this.gridGraphics = this.add.graphics();
+        this.gridGraphics.lineStyle(2, 0x000000, 1);
+        for (let col = 0; col <= this.numCols; col++) {
+            let startX = this.gridOffsetX + col * this.tileWidth;
+            let startY = this.gridOffsetY;
+            let endY = this.gridOffsetY + this.numRows * this.tileHeight;
+            this.gridGraphics.beginPath();
+            this.gridGraphics.moveTo(startX, startY);
+            this.gridGraphics.lineTo(startX, endY);
+            this.gridGraphics.closePath();
+            this.gridGraphics.strokePath();
+        }
+        for (let row = 0; row <= this.numRows; row++) {
+            let startX = this.gridOffsetX;
+            let startY = this.gridOffsetY + row * this.tileHeight;
+            let endX = this.gridOffsetX + this.numCols * this.tileWidth;
+            this.gridGraphics.beginPath();
+            this.gridGraphics.moveTo(startX, startY);
+            this.gridGraphics.lineTo(endX, startY);
+            this.gridGraphics.closePath();
+            this.gridGraphics.strokePath();
+        }
+    }
 
-        for (var i = 0; i < me.tileGrid.length; i++) {
-            for (var j = 0; j < me.tileGrid[i].length; j++) {
-                var tile = me.addTile(i, j);
-                me.tileGrid[i][j] = tile;
+    // -------------------------
+    // Initialize Tiles
+    // -------------------------
+    initTiles() {
+        for (let i = 0; i < this.numCols; i++) {
+            for (let j = 0; j < this.numRows; j++) {
+                let tile = this.addTile(i, j);
+                this.tileGrid[i][j] = tile;
             }
         }
-
-        // Phaser 3 uses a different syntax for time events
-        me.time.delayedCall(600, function () {
-            me.checkMatch();
+        this.time.delayedCall(600, () => {
+            this.checkMatch();
         });
     }
-    addTile(x, y) {
-        var me = this;
 
-        var tileToAdd = me.tileTypes[Phaser.Math.Between(0, me.tileTypes.length - 1)];
-
-        // Creating the tile
-        var tile = me.add.sprite((x * me.tileWidth) + me.tileWidth / 2, 0, tileToAdd);
-        tile.setScale(.5);
-        tile.setOrigin(0.5, 0.5); // Setting the anchor point to the center
-
-        // Adding tween for the tile
-        me.tweens.add({
+    addTile(col, row) {
+        let tileToAdd = this.tileTypes[Phaser.Math.Between(0, this.tileTypes.length - 1)];
+        let posX = this.gridOffsetX + col * this.tileWidth + this.tileWidth / 2;
+        let posY = this.gridOffsetY + row * this.tileHeight + this.tileHeight / 2;
+        let tile = this.add.sprite(posX, 0, tileToAdd);
+        tile.setOrigin(0.5);
+        tile.setDisplaySize(this.tileWidth * 0.9, this.tileHeight * 0.9);
+        tile.tileType = tileToAdd;
+        this.tweens.add({
             targets: tile,
-            y: me.tileHeight + (y * me.tileHeight) + (me.tileHeight / 2),
+            y: posY,
             duration: 500,
             ease: 'Linear'
         });
-
-        // Enabling input and setting up a click event
         tile.setInteractive();
-        tile.on('pointerdown', function () {
-            me.tileDown(tile);
-        });
-
-        tile.tileType = tileToAdd;
-
+        tile.on('pointerdown', () => this.tileDown(tile));
         return tile;
     }
+
     tileDown(tile) {
-        var me = this;
-
-        if (me.canMove) {
-            me.activeTile1 = tile;
-
-            me.startPosX = (tile.x - me.tileWidth / 2) / me.tileWidth;
-            me.startPosY = (tile.y - (me.tileHeight / 2) - me.tileHeight) / me.tileHeight;
+        if (this.canMove) {
+            // Start background music on first move if not already playing.
+            if (!this.sounds.background.isPlaying) {
+                this.sounds.background.setVolume(1).setLoop(true).play();
+            }
+            this.activeTile1 = tile;
+            let coords = this.getTileCoordinates(tile.x, tile.y, true);
+            this.startPosX = coords.x;
+            this.startPosY = coords.y;
         }
     }
 
     tileUp() {
-        var me = this;
-        me.activeTile1 = null;
-        me.activeTile2 = null;
+        this.activeTile1 = null;
+        this.activeTile2 = null;
     }
+
     swapTiles() {
-        var me = this;
-
-        if (me.activeTile1 && me.activeTile2) {
-            this.sounds.move.setVolume(1).setLoop(false).play();
-            console.log(me.activeTile1.x, me.activeTile1.y, me.tileWidth, me.tileHeight);
-            var tile1Pos = {
-                x: (me.activeTile1.x - me.tileWidth / 2) / me.tileWidth,
-                y: ((me.activeTile1.y - (me.tileHeight / 2) - me.tileHeight) / me.tileHeight)
-            }
-            console.log(me.activeTile2.x, me.activeTile2.y, me.tileWidth, me.tileHeight);
-            var tile2Pos = {
-                x: (me.activeTile2.x - me.tileWidth / 2) / me.tileWidth,
-                y: ((me.activeTile2.y - (me.tileHeight / 2) - me.tileHeight) / me.tileHeight)
-            };
-
-            console.log(tile1Pos, tile2Pos);
-
-            me.tileGrid[tile1Pos.x][tile1Pos.y] = me.activeTile2;
-            me.tileGrid[tile2Pos.x][tile2Pos.y] = me.activeTile1;
-
-            // Phaser 3 Tween
-            me.tweens.add({
-                targets: me.activeTile1,
-                x: tile2Pos.x * me.tileWidth + (me.tileWidth / 2),
-                y: me.tileHeight + (tile2Pos.y * me.tileHeight) + (me.tileHeight / 2),
+        if (this.activeTile1 && this.activeTile2) {
+            this.sounds.move.play();
+            let tile1Pos = this.getTileCoordinates(this.activeTile1.x, this.activeTile1.y, true);
+            let tile2Pos = this.getTileCoordinates(this.activeTile2.x, this.activeTile2.y, true);
+            this.tileGrid[tile1Pos.x][tile1Pos.y] = this.activeTile2;
+            this.tileGrid[tile2Pos.x][tile2Pos.y] = this.activeTile1;
+            let tile1DestX = this.gridOffsetX + tile2Pos.x * this.tileWidth + this.tileWidth / 2;
+            let tile1DestY = this.gridOffsetY + tile2Pos.y * this.tileHeight + this.tileHeight / 2;
+            let tile2DestX = this.gridOffsetX + tile1Pos.x * this.tileWidth + this.tileWidth / 2;
+            let tile2DestY = this.gridOffsetY + tile1Pos.y * this.tileHeight + this.tileHeight / 2;
+            this.tweens.add({
+                targets: this.activeTile1,
+                x: tile1DestX,
+                y: tile1DestY,
                 duration: 200,
                 ease: 'Linear'
             });
-
-            // Phaser 3 Tween
-            me.tweens.add({
-                targets: me.activeTile2,
-                x: tile1Pos.x * me.tileWidth + (me.tileWidth / 2),
-                y: me.tileHeight + (tile1Pos.y * me.tileHeight) + (me.tileHeight / 2),
+            this.tweens.add({
+                targets: this.activeTile2,
+                x: tile2DestX,
+                y: tile2DestY,
                 duration: 200,
                 ease: 'Linear'
             });
-
-            me.activeTile1 = me.tileGrid[tile1Pos.x][tile1Pos.y];
-            me.activeTile2 = me.tileGrid[tile2Pos.x][tile2Pos.y];
-
-            me.comboActive = true;
-            me.combo = 0;
+            this.comboActive = true;
+            this.combo = (this.combo || 0);
         }
     }
 
     checkMatch() {
-        var me = this;
-
-        var matches = me.getMatches(me.tileGrid);
-
+        let matches = this.getMatches(this.tileGrid);
         if (matches.length > 0) {
             if (this.comboActive) {
                 this.combo++;
             }
-            me.removeTileGroup(matches);
+            this.removeTileGroup(matches);
             this.vfx.shakeCamera(200);
-            this.sounds.collect.setVolume(1).setLoop(false).play();
+            this.sounds.collect.play();
             if (this.comboActive) {
-                var text = "NICE!"
-                switch (this.combo) {
-                    case 2:
-                        text = "GREAT!!"
-                        break;
-                    case 3:
-                        text = "AWESOME!!!"
-                        break;
-                }
-                if (this.combo >= 4) {
-                    text = "UNSTOPPABLE!!!!"
-                }
-                this.centerText = this.add.bitmapText(this.width / 2, this.height / 2.5, 'pixelfont', text, 128).setOrigin(0.5, 0.5).setDepth(100);
-                this.comboText = this.add.bitmapText(this.width / 2, this.height / 2.5 + 200, 'pixelfont', "COMBO x" + this.combo, 128).setOrigin(0.5, 0.5).setDepth(100);
-                this.time.delayedCall(400, () => {
+                let comboText = "NICE!";
+                if (this.combo === 2) comboText = "GREAT!!";
+                if (this.combo === 3) comboText = "AWESOME!!!";
+                if (this.combo >= 4) comboText = "UNSTOPPABLE!!!!";
+                this.centerText = this.add.bitmapText(
+                    this.width / 2, 
+                    this.height / 2.5, 
+                    'pixelfont', 
+                    comboText, 
+                    80
+                ).setOrigin(0.5).setDepth(200);
+                this.time.delayedCall(600, () => {
                     this.centerText.destroy();
-                    this.comboText.destroy();
                 });
             }
-            me.resetTile();
-            me.fillTile();
-
-            // Phaser 3 Time Events
-            me.time.delayedCall(500, function () {
-                me.tileUp();
+            this.resetTile();
+            this.fillTile();
+            this.time.delayedCall(500, () => {
+                this.tileUp();
             });
-
-            // Phaser 3 Time Events
-            me.time.delayedCall(600, function () {
-                me.checkMatch();
+            this.time.delayedCall(600, () => {
+                this.checkMatch();
             });
-
         } else {
-            me.swapTiles();
-            me.combo = 0;
-            me.comboActive = false;
-
-            // Phaser 3 Time Events
-            me.time.delayedCall(500, function () {
-                me.tileUp();
-                me.canMove = true;
+            this.swapTiles();
+            this.combo = 0;
+            this.comboActive = false;
+            this.time.delayedCall(500, () => {
+                this.tileUp();
+                this.canMove = true;
             });
         }
     }
+
     getMatches(tileGrid) {
-        var matches = [];
-        var groups = [];
-
-        for (var i = 0; i < tileGrid.length; i++) {
-            var tempArr = tileGrid[i];
+        let matches = [];
+        let groups = [];
+        for (let i = 0; i < this.numCols; i++) {
             groups = [];
-            for (var j = 0; j < tempArr.length; j++) {
-                if (j < tempArr.length - 2)
-                    if (tileGrid[i][j] && tileGrid[i][j + 1] && tileGrid[i][j + 2]) {
-                        if (tileGrid[i][j].tileType == tileGrid[i][j + 1].tileType && tileGrid[i][j + 1].tileType == tileGrid[i][j + 2].tileType) {
-                            if (groups.length > 0) {
-                                if (groups.indexOf(tileGrid[i][j]) == -1) {
-                                    matches.push(groups);
-                                    groups = [];
-                                }
-                            }
-
-                            if (groups.indexOf(tileGrid[i][j]) == -1) {
-                                groups.push(tileGrid[i][j]);
-                            }
-                            if (groups.indexOf(tileGrid[i][j + 1]) == -1) {
-                                groups.push(tileGrid[i][j + 1]);
-                            }
-                            if (groups.indexOf(tileGrid[i][j + 2]) == -1) {
-                                groups.push(tileGrid[i][j + 2]);
-                            }
+            for (let j = 0; j < this.numRows; j++) {
+                if (j < this.numRows - 2) {
+                    let tile1 = tileGrid[i][j];
+                    let tile2 = tileGrid[i][j + 1];
+                    let tile3 = tileGrid[i][j + 2];
+                    if (tile1 && tile2 && tile3) {
+                        if (tile1.tileType === tile2.tileType && tile2.tileType === tile3.tileType) {
+                            if (groups.indexOf(tile1) === -1) groups.push(tile1);
+                            if (groups.indexOf(tile2) === -1) groups.push(tile2);
+                            if (groups.indexOf(tile3) === -1) groups.push(tile3);
                         }
                     }
+                }
             }
             if (groups.length > 0) matches.push(groups);
         }
-
-        for (j = 0; j < tileGrid.length; j++) {
-            var tempArr = tileGrid[j];
+        for (let j = 0; j < this.numRows; j++) {
             groups = [];
-            for (i = 0; i < tempArr.length; i++) {
-                if (i < tempArr.length - 2)
-                    if (tileGrid[i][j] && tileGrid[i + 1][j] && tileGrid[i + 2][j]) {
-                        if (tileGrid[i][j].tileType == tileGrid[i + 1][j].tileType && tileGrid[i + 1][j].tileType == tileGrid[i + 2][j].tileType) {
-                            if (groups.length > 0) {
-                                if (groups.indexOf(tileGrid[i][j]) == -1) {
-                                    matches.push(groups);
-                                    groups = [];
-                                }
-                            }
-
-                            if (groups.indexOf(tileGrid[i][j]) == -1) {
-                                groups.push(tileGrid[i][j]);
-                            }
-                            if (groups.indexOf(tileGrid[i + 1][j]) == -1) {
-                                groups.push(tileGrid[i + 1][j]);
-                            }
-                            if (groups.indexOf(tileGrid[i + 2][j]) == -1) {
-                                groups.push(tileGrid[i + 2][j]);
-                            }
+            for (let i = 0; i < this.numCols; i++) {
+                if (i < this.numCols - 2) {
+                    let tile1 = tileGrid[i][j];
+                    let tile2 = tileGrid[i + 1][j];
+                    let tile3 = tileGrid[i + 2][j];
+                    if (tile1 && tile2 && tile3) {
+                        if (tile1.tileType === tile2.tileType && tile2.tileType === tile3.tileType) {
+                            if (groups.indexOf(tile1) === -1) groups.push(tile1);
+                            if (groups.indexOf(tile2) === -1) groups.push(tile2);
+                            if (groups.indexOf(tile3) === -1) groups.push(tile3);
                         }
                     }
+                }
             }
             if (groups.length > 0) matches.push(groups);
         }
-
         return matches;
     }
+
     removeTileGroup(matches) {
-        var me = this;
-
-        for (var i = 0; i < matches.length; i++) {
-            var tempArr = matches[i];
-
-            for (var j = 0; j < tempArr.length; j++) {
-                var tile = tempArr[j];
-                var tilePos = me.getTilePos(me.tileGrid, tile);
+        for (let i = 0; i < matches.length; i++) {
+            let group = matches[i];
+            for (let tile of group) {
+                let pos = this.getTilePos(tile);
                 if (tile) {
-                    this.vfx.createEmitter(tile.tileType, tile.x, tile.y, 0.01, 0.02, 500).explode(100);
+                    this.vfx.createEmitter(tile.tileType, tile.x, tile.y, 0.01, 0.02, 500)
+                        .explode(100);
                     tile.destroy();
                 }
-
-                me.incrementScore();
-                // me.updateScore(10);
-
-                if (tilePos.x != -1 && tilePos.y != -1) {
-                    me.tileGrid[tilePos.x][tilePos.y] = null;
+                this.incrementScore();
+                if (pos.x !== -1 && pos.y !== -1) {
+                    this.tileGrid[pos.x][pos.y] = null;
                 }
             }
         }
     }
-    getTilePos(tileGrid, tile) {
-        var pos = { x: -1, y: -1 };
 
-        for (var i = 0; i < tileGrid.length; i++) {
-            for (var j = 0; j < tileGrid[i].length; j++) {
-                if (tile == tileGrid[i][j]) {
-                    pos.x = i;
-                    pos.y = j;
-                    break;
+    getTilePos(tile) {
+        for (let i = 0; i < this.numCols; i++) {
+            for (let j = 0; j < this.numRows; j++) {
+                if (this.tileGrid[i][j] === tile) {
+                    return { x: i, y: j };
                 }
             }
         }
-
-        return pos;
+        return { x: -1, y: -1 };
     }
+
     resetTile() {
-        var me = this;
-
-        for (var i = 0; i < me.tileGrid.length; i++) {
-            for (var j = me.tileGrid[i].length - 1; j > 0; j--) {
-                if (me.tileGrid[i][j] == null && me.tileGrid[i][j - 1] != null) {
-                    var tempTile = me.tileGrid[i][j - 1];
-                    me.tileGrid[i][j] = tempTile;
-                    me.tileGrid[i][j - 1] = null;
-
-                    // Phaser 3 Tween
-                    me.tweens.add({
-                        targets: tempTile,
-                        y: me.tileHeight + (me.tileHeight * j) + (me.tileHeight / 2),
-                        duration: 200,
-                        ease: 'Linear'
-                    });
-
-                    j = me.tileGrid[i].length;
+        for (let i = 0; i < this.numCols; i++) {
+            for (let j = this.numRows - 1; j > 0; j--) {
+                if (this.tileGrid[i][j] === null) {
+                    for (let k = j - 1; k >= 0; k--) {
+                        if (this.tileGrid[i][k]) {
+                            this.tileGrid[i][j] = this.tileGrid[i][k];
+                            this.tileGrid[i][k] = null;
+                            this.tweens.add({
+                                targets: this.tileGrid[i][j],
+                                y: this.gridOffsetY + j * this.tileHeight + this.tileHeight / 2,
+                                duration: 200,
+                                ease: 'Linear'
+                            });
+                            break;
+                        }
+                    }
                 }
             }
         }
     }
+
     fillTile() {
-
-        var me = this;
-
-        for (var i = 0; i < me.tileGrid.length; i++) {
-
-            for (var j = 0; j < me.tileGrid.length; j++) {
-
-                if (me.tileGrid[i][j] == null) {
-                    var tile = me.addTile(i, j);
-
-                    me.tileGrid[i][j] = tile;
+        for (let i = 0; i < this.numCols; i++) {
+            for (let j = 0; j < this.numRows; j++) {
+                if (this.tileGrid[i][j] === null) {
+                    let tile = this.addTile(i, j);
+                    this.tileGrid[i][j] = tile;
                 }
-
             }
         }
-
     }
 
     incrementScore() {
-
-        var me = this;
-
-        gameScore += 10 * this.combo || 1;
-        me.updateScore(gameScore);
+        gameScore += 10 * (this.combo || 1);
+        this.updateScore(gameScore);
     }
 
     updateScore(points) {
-        this.score += points;
+        this.score = points;
         this.updateScoreText();
     }
 
     updateScoreText() {
-        this.scoreText.setText(gameScore);
+        this.scoreText.setText(this.score);
     }
 
     gameOver() {
-        initiateGameOver.bind(this)({
-            "score": this.score
-        });
+        initiateGameOver.bind(this)({ "score": this.score });
     }
 
     pauseGame() {
-        handlePauseGame.bind(this)();
+        handlePauseGame.call(this);
+    }
+
+    getTileCoordinates(x, y, exactTile = false) {
+        let adjustedX = x - this.gridOffsetX;
+        let adjustedY = y - this.gridOffsetY;
+        if (exactTile) {
+            let col = Math.round((adjustedX - this.tileWidth / 2) / this.tileWidth);
+            let row = Math.round((adjustedY - this.tileHeight / 2) / this.tileHeight);
+            return { x: col, y: row };
+        } else {
+            let col = Math.floor(adjustedX / this.tileWidth);
+            let row = Math.floor(adjustedY / this.tileHeight);
+            return { x: col, y: row };
+        }
     }
 }
 
+// Loader Progress UI
 function displayProgressLoader() {
     let width = 320;
     let height = 50;
     let x = (this.game.config.width / 2) - 160;
-    let y = (this.game.config.height / 2) - 50;
-
+    let y = (this.game.config.height / 2) - 25;
     const progressBox = this.add.graphics();
     progressBox.fillStyle(0x222222, 0.8);
     progressBox.fillRect(x, y, width, height);
-
     const loadingText = this.make.text({
         x: this.game.config.width / 2,
         y: this.game.config.height / 2 + 20,
         text: 'Loading...',
-        style: {
-            font: '20px monospace',
-            fill: '#ffffff'
-        }
+        style: { font: '20px monospace', fill: '#ffffff' }
     }).setOrigin(0.5, 0.5);
-    loadingText.setOrigin(0.5, 0.5);
-
     const progressBar = this.add.graphics();
     this.load.on('progress', (value) => {
         progressBar.clear();
         progressBar.fillStyle(0x364afe, 1);
         progressBar.fillRect(x, y, width * value, height);
     });
-    this.load.on('fileprogress', function (file) {
-
-    });
-    this.load.on('complete', function () {
+    this.load.on('complete', () => {
         progressBar.destroy();
         progressBox.destroy();
         loadingText.destroy();
     });
 }
 
-const orientationSizes = {
-    "landscape": {
-        "width": 1280,
-        "height": 720,
-    },
-    "portrait": {
-        "width": 720,
-        "height": 1280,
-    }
-}
-
-// Game Orientation
-const orientation = "landscape";
-
-// Configuration object
+// Game configuration (using JSON settings from _CONFIG)
 const config = {
     type: Phaser.AUTO,
     width: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width,
     height: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].height,
     scene: [GameScene],
-    scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-    },
+    scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     pixelArt: true,
     physics: {
-      default: "arcade",
-      arcade: {
-        gravity: { y: 0 },
-        debug: false,
-      },
+        default: "arcade",
+        arcade: { gravity: { y: 0 }, debug: false }
     },
     dataObject: {
-      name: _CONFIG.title,
-      description: _CONFIG.description,
-      instructions: _CONFIG.instructions,
+        name: _CONFIG.title,
+        description: _CONFIG.description,
+        instructions: _CONFIG.instructions
     },
-    orientation: _CONFIG.deviceOrientation === "landscape" 
-  };
+    orientation: _CONFIG.deviceOrientation
+};
 
 let gameScore = 0;
 let gameLevel = 1;
 let timerEvent;
 let timerText;
-var timeDown = 120000;
+let timeDown = 120000;
+
