@@ -2,7 +2,7 @@
     "description": "A game where you have to slice the rope at the right time.",
     "deviceOrientation": "portrait",
     "imageLoader": {
-        "background": "background",
+        "background": "background_3",
         "platform": "platform",
         "player": "player",
         "projectile": "projectile"
