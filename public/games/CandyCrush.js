@@ -1,97 +1,84 @@
 // CandyCrush.js
 
-// Game Scene
+// Import the Braincade SDK functions (adjust the import path as needed)
+// import { addEventListenersPhaser, handlePauseGame } from './braincadeSDK.js';
+
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.score = 0;
     }
-
+    
     preload() {
-        // Load images from the JSON config
+        // Load images from JSON config
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
         }
-        // Load sounds from the JSON config
+        // Load sounds from JSON config
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
-        
-        // Attach Braincade SDK event listeners
-        addEventListenersPhaser.bind(this)();
-
-        // Load additional assets: pause button, bitmap font, and alternate player asset
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        // Load bitmap font for UI
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
-        // Load the alternate player image
-        this.load.image("playerAlternate", "https://media-hosting.imagekit.io//9cba1c85098441f1/mario-removebg-preview.png?Expires=1837491680&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=YqEtUQjiJ6yDaHw7xALGviHLMhRlHkWvDG9DvVvht8X2xQEitCD27gXRrcezVaoQJC9IJWvHExW1t~6-C4AcR10JiKBciky-XUnTgC6ub4Tgyy7NaoixhaXHO49wFlRb14VwSKQxcYQvr71pPtJCvr1Rmq611cVpLtW82uDvWMjEIULn-O9W8W~k5IhrZxWk1663VeJqw8rNQn~x2lTqhtXfx0SsXSEgW4kqQb0kdSC1vpCk8vvLMKmrAPoBvgMPut~syJNTAQccRyElqW-XGYsv5OVHFG-J30XmYC5xtQWpaHeG7EhXKbPPDs2bMU75AczB5KE7~939VrJb7EvXWw__");
-
+        // Load pause button asset from base code
+        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        
         displayProgressLoader.call(this);
     }
-
+    
     create() {
-        this.vfx = new VFXLibrary(this);
+        // Register Braincade SDK event listeners.
+        addEventListenersPhaser.bind(this)();
 
-        // Initialize sounds but do not start background music until first move.
+        // Initialize sounds
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
-            this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
+            this.sounds[key] = this.sound.add(key, { loop: key === 'background', volume: 0.5 });
         }
-        // (Background music will start on first move)
+        
+        // Create a trail texture.
+        let trailGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        trailGraphics.fillStyle(0xffffff, 1);  
+        trailGraphics.fillCircle(10, 10, 10);
+        trailGraphics.generateTexture('trail', 20, 20);
 
-        // Set background image
+        // Set background image to fill the screen.
         this.bg = this.add.sprite(0, 0, 'background').setOrigin(0, 0);
         this.bg.displayWidth = this.game.config.width;
         this.bg.displayHeight = this.game.config.height;
-
+        
         this.width = this.game.config.width;
         this.height = this.game.config.height;
 
-        // Add platform and player (Mario) sprites on the left side.
-        const platform = this.add.sprite(150, this.height - 50, 'platform').setOrigin(0.15, 0.5);
-        platform.setScale(1, 0.4);
-        this.mario = this.add.sprite(150, this.height - 250, 'mario').setOrigin(-0.7, 0.55);
-        this.mario.setScale(0.5, 0.5);
-        // Save the original texture key for reverting later.
-        this.mario.originalTexture = this.mario.texture.key;
+        // Add VFX Library.
+        this.vfx = new VFXLibrary(this);
 
-        // Score text at the top-center.
-        this.scoreText = this.add.bitmapText(this.width / 2, 50, 'pixelfont', '0', 64)
-                              .setOrigin(0.5, 0.5);
-        this.scoreText.setDepth(100);
-
-        // Pause button at the top-right.
+        // UI: Display Score and Timer.
+        this.scoreText = this.add.bitmapText(20, 20, 'pixelfont', 'Score: 0', 32);
+        this.timerText = this.add.bitmapText(this.width - 150, 20, 'pixelfont', '120', 32).setOrigin(0.5);
+        
+        // Add Pause Button at top-right.
         this.pauseButton = this.add.sprite(this.width - 60, 60, "pauseButton")
-                              .setOrigin(0.5, 0.5);
-        this.pauseButton.setInteractive({ cursor: 'pointer' });
-        this.pauseButton.setScale(2);
-        this.pauseButton.setDepth(101);
+                                     .setOrigin(0.5, 0.5)
+                                     .setInteractive({ cursor: 'pointer' })
+                                     .setScale(1.5)
+                                     .setDepth(101);
         this.pauseButton.on('pointerdown', () => {
-            // Dispatch the pause event via the Braincade SDK.
             handlePauseGame.call(this);
         });
-
-        // Prepare collectible tile types and create particle emitters.
-        this.tileTypes = ['collectible_1', 'collectible_2', 'collectible_3'];
-        for (const tileType of this.tileTypes) {
-            this.vfx.createEmitter(tileType);
-        }
-
-        // --- Grid Setup ---
-        // We use an 8 x 7 grid.
-        this.gridOffsetX = this.width * 0.50;  // Grid starts halfway across the screen.
-        this.gridOffsetY = this.height * 0.20;   // 20% from the top.
+        
+        // Grid Setup: 8 columns x 7 rows with fixed tile size (80).
+        this.tileTypes = ['candy_1', 'candy_2', 'candy_3'];
         this.numCols = 8;
         this.numRows = 7;
-        let availableWidth = this.width - this.gridOffsetX - 20;
-        let availableHeight = this.height - this.gridOffsetY - 20;
-        let tileSize = Math.min(availableWidth / this.numCols, availableHeight / this.numRows);
-        this.tileWidth = tileSize;
-        this.tileHeight = tileSize;
-
-        // Create the 2D array for tiles.
+        this.tileWidth = 80;
+        this.tileHeight = 80;
+        this.gridOffsetX = (this.width - (this.numCols * this.tileWidth)) / 2;
+        this.gridOffsetY = 100;
+        
+        // Create 2D tile array.
         this.tileGrid = [];
         for (let i = 0; i < this.numCols; i++) {
             this.tileGrid[i] = [];
@@ -99,50 +86,48 @@ class GameScene extends Phaser.Scene {
                 this.tileGrid[i][j] = null;
             }
         }
-
+        
+        // Draw the chessboard-style background.
+        this.drawChessBoard();
+        // Draw subtle inner grid lines with a rounded outer border.
         this.drawGridLines();
+        
         this.activeTile1 = null;
         this.activeTile2 = null;
         this.canMove = false;
-
+        
         let seed = Date.now();
         this.random = new Phaser.Math.RandomDataGenerator([seed]);
         this.initTiles();
-
-        // Also allow pausing via the ESC key.
-        this.input.keyboard.on('keydown-ESC', () => {
-            handlePauseGame.call(this);
-        });
-
-        timerEvent = this.time.addEvent({
+        
+        // Timer event: 120 seconds countdown.
+        this.timerEvent = this.time.addEvent({
             delay: 120000,
             callback: () => this.gameOver(),
-            callbackScope: this,
-            loop: false
+            callbackScope: this
         });
-
-        timerText = this.add.bitmapText(this.width - 150, 50, 'pixelfont', '120', 64)
-                        .setOrigin(0.5)
-                        .setDepth(100);
-
+        
+        // Start background music on first pointer interaction.
+        this.input.on('pointerdown', () => {
+            if (!this.sounds.background.isPlaying) {
+                this.sounds.background.play();
+            }
+        });
+        
         this.canMove = true;
     }
-
+    
     update() {
+        // Handle tile swap based on pointer movement.
         if (this.activeTile1 && !this.activeTile2) {
-            let hoverX = this.input.activePointer.x;
-            let hoverY = this.input.activePointer.y;
-            let tilePos = this.getTileCoordinates(hoverX, hoverY);
+            let pointer = this.input.activePointer;
+            let tilePos = this.getTileCoordinates(pointer.x, pointer.y);
             let hoverPosX = tilePos.x;
             let hoverPosY = tilePos.y;
-            let difX = (hoverPosX - this.startPosX);
-            let difY = (hoverPosY - this.startPosY);
-            if (
-                hoverPosX >= 0 && hoverPosX < this.numCols &&
-                hoverPosY >= 0 && hoverPosY < this.numRows
-            ) {
-                if ((Math.abs(difY) === 1 && difX === 0) ||
-                    (Math.abs(difX) === 1 && difY === 0)) {
+            let difX = hoverPosX - this.startPosX;
+            let difY = hoverPosY - this.startPosY;
+            if (hoverPosX >= 0 && hoverPosX < this.numCols && hoverPosY >= 0 && hoverPosY < this.numRows) {
+                if ((Math.abs(difY) === 1 && difX === 0) || (Math.abs(difX) === 1 && difY === 0)) {
                     this.canMove = false;
                     this.activeTile2 = this.tileGrid[hoverPosX][hoverPosY];
                     this.swapTiles();
@@ -152,112 +137,96 @@ class GameScene extends Phaser.Scene {
                 }
             }
         }
-
-        if (timerEvent) {
-            let remainingTime = Math.floor((timerEvent.delay - timerEvent.getElapsed()) / 1000);
-            timerText.setText(remainingTime.toString());
+        
+        // Update timer text and add pulse effect.
+        if (this.timerEvent) {
+            let remainingTime = Math.floor((this.timerEvent.delay - this.timerEvent.getElapsed()) / 1000);
+            this.timerText.setText(remainingTime.toString());
+            
+            // Add a pulse tween effect on the timer text.
+            this.tweens.add({
+                targets: this.timerText,
+                scale: { from: 1.2, to: 1 },
+                duration: 200,
+                ease: 'Power1'
+            });
+            
             if (remainingTime <= 0) {
-                timerEvent = null;
+                this.timerEvent = null;
             }
         }
     }
-
-    // -------------------------
-    // Show Player Speech with Alternate Asset
-    // -------------------------
-    showPlayerSpeech() {
-        // Array of possible phrases
-        const phrases = ["Nice!", "Amazing!", "Crazy!", "Oooof, nice!", "Awesome!", "Fantastic!"];
-        const phrase = Phaser.Utils.Array.GetRandom(phrases);
-
-        // Store current texture key (original asset)
-        const currentTexture = this.mario.originalTexture;
-        // Swap to alternate asset and decrease its height (using y-scale)
-        this.mario.setTexture('playerAlternate');
-        this.mario.setScale(0.5, 0.48);
-
-        // Create speech text shifted to the right a bit (adjust x offset as needed)
-        let speechText = this.add.bitmapText(this.mario.x + 170, this.mario.y - 100, 'pixelfont', phrase, 48)
-                            .setOrigin(0.5, 1)
-                            .setTint(0xffaa00);
-
-        // Tween the text: move upward and fade out, then revert player's asset
+    
+    
+    // Helper function to display a match message overlay.
+    displayMatchMessage() {
+        const messages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
+        let message = Phaser.Utils.Array.GetRandom(messages);
+        let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', message, 64)
+                                 .setOrigin(0.5)
+                                 .setDepth(102);
         this.tweens.add({
-            targets: speechText,
-            y: speechText.y - 50,
+            targets: overlayText,
+            y: overlayText.y - 50,
             alpha: 0,
             duration: 1500,
-            ease: 'Power1',
+            ease: 'Linear',
             onComplete: () => {
-                speechText.destroy();
-                // Revert player's texture back to the original asset and reset scale.
-                this.mario.setTexture(currentTexture);
-                this.mario.setScale(0.5, 0.5);
+                overlayText.destroy();
             }
         });
     }
-
-    // -------------------------
-    // Draw Grid Lines
-    // -------------------------
+    
+    // Draws a chessboard-style background with a rounded mask.
+    drawChessBoard() {
+        const color1 = 0xD0E6F8;
+        const color2 = 0xA0C6E8;
+        let board = this.add.graphics();
+        for (let i = 0; i < this.numCols; i++) {
+            for (let j = 0; j < this.numRows; j++) {
+                let cellX = this.gridOffsetX + i * this.tileWidth;
+                let cellY = this.gridOffsetY + j * this.tileHeight;
+                let cellColor = ((i + j) % 2 === 0) ? color1 : color2;
+                board.fillStyle(cellColor, 1);
+                board.fillRect(cellX, cellY, this.tileWidth, this.tileHeight);
+            }
+        }
+        let maskShape = this.make.graphics();
+        const radius = 10;
+        maskShape.fillStyle(0xffffff);
+        maskShape.fillRoundedRect(this.gridOffsetX, this.gridOffsetY, this.numCols * this.tileWidth, this.numRows * this.tileHeight, radius);
+        let mask = maskShape.createGeometryMask();
+        board.setMask(mask);
+        board.setDepth(0);
+    }
+    
+    // Draws grid lines and an outer rounded border.
     drawGridLines() {
-        // Draw inner grid lines with a thinner line style.
         this.gridGraphics = this.add.graphics();
-        this.gridGraphics.lineStyle(2, 0x000000, 1);
-        // Draw vertical inner lines (excluding the outer boundaries)
+        const darkerShade = 0xA0C6E8;
+        this.gridGraphics.lineStyle(1, darkerShade, 0.3);
         for (let col = 1; col < this.numCols; col++) {
             let x = this.gridOffsetX + col * this.tileWidth;
             let startY = this.gridOffsetY;
             let endY = this.gridOffsetY + this.numRows * this.tileHeight;
-            this.gridGraphics.beginPath();
-            this.gridGraphics.moveTo(x, startY);
-            this.gridGraphics.lineTo(x, endY);
-            this.gridGraphics.closePath();
-            this.gridGraphics.strokePath();
+            this.gridGraphics.strokeLineShape(new Phaser.Geom.Line(x, startY, x, endY));
         }
-        // Draw horizontal inner lines (excluding the outer boundaries)
         for (let row = 1; row < this.numRows; row++) {
             let y = this.gridOffsetY + row * this.tileHeight;
             let startX = this.gridOffsetX;
             let endX = this.gridOffsetX + this.numCols * this.tileWidth;
-            this.gridGraphics.beginPath();
-            this.gridGraphics.moveTo(startX, y);
-            this.gridGraphics.lineTo(endX, y);
-            this.gridGraphics.closePath();
-            this.gridGraphics.strokePath();
+            this.gridGraphics.strokeLineShape(new Phaser.Geom.Line(startX, y, endX, y));
         }
-        
-        // Now draw the outer border with a thicker line style.
-        this.gridGraphics.lineStyle(4, 0x000000, 1);
-        // Left border
-        this.gridGraphics.beginPath();
-        this.gridGraphics.moveTo(this.gridOffsetX, this.gridOffsetY);
-        this.gridGraphics.lineTo(this.gridOffsetX, this.gridOffsetY + this.numRows * this.tileHeight);
-        this.gridGraphics.closePath();
-        this.gridGraphics.strokePath();
-        // Top border
-        this.gridGraphics.beginPath();
-        this.gridGraphics.moveTo(this.gridOffsetX, this.gridOffsetY);
-        this.gridGraphics.lineTo(this.gridOffsetX + this.numCols * this.tileWidth, this.gridOffsetY);
-        this.gridGraphics.closePath();
-        this.gridGraphics.strokePath();
-        // Right border
-        this.gridGraphics.beginPath();
-        this.gridGraphics.moveTo(this.gridOffsetX + this.numCols * this.tileWidth, this.gridOffsetY);
-        this.gridGraphics.lineTo(this.gridOffsetX + this.numCols * this.tileWidth, this.gridOffsetY + this.numRows * this.tileHeight);
-        this.gridGraphics.closePath();
-        this.gridGraphics.strokePath();
-        // Bottom border
-        this.gridGraphics.beginPath();
-        this.gridGraphics.moveTo(this.gridOffsetX, this.gridOffsetY + this.numRows * this.tileHeight);
-        this.gridGraphics.lineTo(this.gridOffsetX + this.numCols * this.tileWidth, this.gridOffsetY + this.numRows * this.tileHeight);
-        this.gridGraphics.closePath();
-        this.gridGraphics.strokePath();
+        this.gridGraphics.lineStyle(2, darkerShade, 1);
+        const radius = 10;
+        this.gridGraphics.strokeRoundedRect(this.gridOffsetX, this.gridOffsetY, this.numCols * this.tileWidth, this.numRows * this.tileHeight, radius);
+        let maskShape = this.make.graphics();
+        maskShape.fillStyle(0xffffff);
+        maskShape.fillRoundedRect(this.gridOffsetX, this.gridOffsetY, this.numCols * this.tileWidth, this.numRows * this.tileHeight, radius);
+        let mask = maskShape.createGeometryMask();
+        this.gridGraphics.setMask(mask);
     }
     
-    // -------------------------
-    // Initialize Tiles
-    // -------------------------
     initTiles() {
         for (let i = 0; i < this.numCols; i++) {
             for (let j = 0; j < this.numRows; j++) {
@@ -269,46 +238,65 @@ class GameScene extends Phaser.Scene {
             this.checkMatch();
         });
     }
-
+    
     addTile(col, row) {
-        let tileToAdd = this.tileTypes[Phaser.Math.Between(0, this.tileTypes.length - 1)];
+        let tileType = this.tileTypes[Phaser.Math.Between(0, this.tileTypes.length - 1)];
         let posX = this.gridOffsetX + col * this.tileWidth + this.tileWidth / 2;
         let posY = this.gridOffsetY + row * this.tileHeight + this.tileHeight / 2;
-        let tile = this.add.sprite(posX, 0, tileToAdd);
-        tile.setOrigin(0.5);
+        let tile = this.add.sprite(posX, 0, tileType).setInteractive();
         tile.setDisplaySize(this.tileWidth * 0.9, this.tileHeight * 0.9);
-        tile.tileType = tileToAdd;
+        tile.tileType = tileType;
+        // Use a more lively easing for the initial drop.
         this.tweens.add({
             targets: tile,
             y: posY,
             duration: 500,
-            ease: 'Linear'
+            ease: 'Quad.easeOut'
         });
-        tile.setInteractive();
         tile.on('pointerdown', () => this.tileDown(tile));
+        
+        // Add hover animations.
+        tile.originalScaleX = tile.scaleX;
+        tile.originalScaleY = tile.scaleY;
+        tile.on('pointerover', () => {
+            this.tweens.add({
+                targets: tile,
+                scaleX: tile.originalScaleX * 1.1,
+                scaleY: tile.originalScaleY * 1.1,
+                duration: 100,
+                ease: 'Linear'
+            });
+        });
+        tile.on('pointerout', () => {
+            this.tweens.add({
+                targets: tile,
+                scaleX: tile.originalScaleX,
+                scaleY: tile.originalScaleY,
+                duration: 100,
+                ease: 'Linear'
+            });
+        });
+        
         return tile;
     }
-
+    
     tileDown(tile) {
         if (this.canMove) {
-            if (!this.sounds.background.isPlaying) {
-                this.sounds.background.setVolume(1).setLoop(true).play();
-            }
             this.activeTile1 = tile;
             let coords = this.getTileCoordinates(tile.x, tile.y, true);
             this.startPosX = coords.x;
             this.startPosY = coords.y;
         }
     }
-
+    
     tileUp() {
         this.activeTile1 = null;
         this.activeTile2 = null;
     }
-
+    
     swapTiles() {
         if (this.activeTile1 && this.activeTile2) {
-            this.sounds.move.play();
+            this.sounds.swap.play();
             let tile1Pos = this.getTileCoordinates(this.activeTile1.x, this.activeTile1.y, true);
             let tile2Pos = this.getTileCoordinates(this.activeTile2.x, this.activeTile2.y, true);
             this.tileGrid[tile1Pos.x][tile1Pos.y] = this.activeTile2;
@@ -317,116 +305,176 @@ class GameScene extends Phaser.Scene {
             let tile1DestY = this.gridOffsetY + tile2Pos.y * this.tileHeight + this.tileHeight / 2;
             let tile2DestX = this.gridOffsetX + tile1Pos.x * this.tileWidth + this.tileWidth / 2;
             let tile2DestY = this.gridOffsetY + tile1Pos.y * this.tileHeight + this.tileHeight / 2;
+    
+            // Create timed events to spawn trail sprites along each candy's path.
+            let trailTimer1 = this.time.addEvent({
+                delay: 50,
+                callback: () => {
+                    let trailSprite = this.add.sprite(this.activeTile1.x, this.activeTile1.y, 'trail');
+                    trailSprite.setDisplaySize(30, 10);
+                    this.tweens.add({
+                        targets: trailSprite,
+                        alpha: 0,
+                        duration: 300,
+                        ease: 'Linear',
+                        onComplete: () => {
+                            trailSprite.destroy();
+                        }
+                    });
+                },
+                loop: true
+            });
+    
+            let trailTimer2 = this.time.addEvent({
+                delay: 50,
+                callback: () => {
+                    let trailSprite = this.add.sprite(this.activeTile2.x, this.activeTile2.y, 'trail');
+                    trailSprite.setDisplaySize(30, 10);
+                    this.tweens.add({
+                        targets: trailSprite,
+                        alpha: 0,
+                        duration: 300,
+                        ease: 'Linear',
+                        onComplete: () => {
+                            trailSprite.destroy();
+                        }
+                    });
+                },
+                loop: true
+            });
+    
+            // Use Cubic.easeInOut for a more fluid swap.
             this.tweens.add({
                 targets: this.activeTile1,
                 x: tile1DestX,
                 y: tile1DestY,
                 duration: 200,
-                ease: 'Linear'
+                ease: 'Cubic.easeInOut',
+                onComplete: () => {
+                    trailTimer1.remove();
+                }
             });
+    
             this.tweens.add({
                 targets: this.activeTile2,
                 x: tile2DestX,
                 y: tile2DestY,
                 duration: 200,
-                ease: 'Linear'
+                ease: 'Cubic.easeInOut',
+                onComplete: () => {
+                    trailTimer2.remove();
+                }
             });
-            this.comboActive = true;
-            this.combo = (this.combo || 0);
         }
     }
-
+    
     checkMatch() {
-        let matches = this.getMatches(this.tileGrid);
+        let matches = this.getMatches();
         if (matches.length > 0) {
-            if (this.comboActive) {
-                this.combo++;
-            }
-            // Show player's speech when a match occurs.
-            this.showPlayerSpeech();
+            // Display a big match message overlay.
+            this.displayMatchMessage();
             this.removeTileGroup(matches);
-            this.vfx.shakeCamera(200);
-            this.sounds.collect.play();
-            // (Removed combo text overlay)
-            this.resetTile();
-            this.fillTile();
-            this.time.delayedCall(500, () => {
+            // Delay tile reset and refill until after the removal animation.
+            this.time.delayedCall(800, () => {
+                this.resetTiles();
+                this.fillTiles();
                 this.tileUp();
-            });
-            this.time.delayedCall(600, () => {
                 this.checkMatch();
             });
         } else {
+            // No match found: revert the swap.
             this.swapTiles();
-            this.combo = 0;
-            this.comboActive = false;
             this.time.delayedCall(500, () => {
                 this.tileUp();
                 this.canMove = true;
             });
         }
     }
-
-    getMatches(tileGrid) {
+    
+    getMatches() {
         let matches = [];
-        let groups = [];
         for (let i = 0; i < this.numCols; i++) {
-            groups = [];
-            for (let j = 0; j < this.numRows; j++) {
-                if (j < this.numRows - 2) {
-                    let tile1 = tileGrid[i][j];
-                    let tile2 = tileGrid[i][j + 1];
-                    let tile3 = tileGrid[i][j + 2];
-                    if (tile1 && tile2 && tile3) {
-                        if (tile1.tileType === tile2.tileType && tile2.tileType === tile3.tileType) {
-                            if (groups.indexOf(tile1) === -1) groups.push(tile1);
-                            if (groups.indexOf(tile2) === -1) groups.push(tile2);
-                            if (groups.indexOf(tile3) === -1) groups.push(tile3);
-                        }
+            for (let j = 0; j < this.numRows - 2; j++) {
+                let tile1 = this.tileGrid[i][j];
+                let tile2 = this.tileGrid[i][j + 1];
+                let tile3 = this.tileGrid[i][j + 2];
+                if (tile1 && tile2 && tile3 && tile1.tileType === tile2.tileType && tile2.tileType === tile3.tileType) {
+                    let group = [tile1, tile2, tile3];
+                    let k = j + 3;
+                    while (k < this.numRows && this.tileGrid[i][k] && this.tileGrid[i][k].tileType === tile1.tileType) {
+                        group.push(this.tileGrid[i][k]);
+                        k++;
                     }
+                    matches.push(group);
                 }
             }
-            if (groups.length > 0) matches.push(groups);
         }
         for (let j = 0; j < this.numRows; j++) {
-            groups = [];
-            for (let i = 0; i < this.numCols; i++) {
-                if (i < this.numCols - 2) {
-                    let tile1 = tileGrid[i][j];
-                    let tile2 = tileGrid[i + 1][j];
-                    let tile3 = tileGrid[i + 2][j];
-                    if (tile1 && tile2 && tile3) {
-                        if (tile1.tileType === tile2.tileType && tile2.tileType === tile3.tileType) {
-                            if (groups.indexOf(tile1) === -1) groups.push(tile1);
-                            if (groups.indexOf(tile2) === -1) groups.push(tile2);
-                            if (groups.indexOf(tile3) === -1) groups.push(tile3);
-                        }
+            for (let i = 0; i < this.numCols - 2; i++) {
+                let tile1 = this.tileGrid[i][j];
+                let tile2 = this.tileGrid[i + 1][j];
+                let tile3 = this.tileGrid[i + 2][j];
+                if (tile1 && tile2 && tile3 && tile1.tileType === tile2.tileType && tile2.tileType === tile3.tileType) {
+                    let group = [tile1, tile2, tile3];
+                    let k = i + 3;
+                    while (k < this.numCols && this.tileGrid[k][j] && this.tileGrid[k][j].tileType === tile1.tileType) {
+                        group.push(this.tileGrid[k][j]);
+                        k++;
                     }
+                    matches.push(group);
                 }
             }
-            if (groups.length > 0) matches.push(groups);
         }
         return matches;
     }
-
+    
     removeTileGroup(matches) {
-        for (let i = 0; i < matches.length; i++) {
-            let group = matches[i];
+        for (let group of matches) {
+            // Play a collect sound based on the candy type of the group.
+            if (group.length > 0) {
+                let type = group[0].tileType;
+                if (type === 'candy_1' && this.sounds.collect1) {
+                    this.sounds.collect1.play();
+                } else if (type === 'candy_2' && this.sounds.collect2) {
+                    this.sounds.collect2.play();
+                } else if (type === 'candy_3' && this.sounds.collect3) {
+                    this.sounds.collect3.play();
+                }
+            }
             for (let tile of group) {
                 let pos = this.getTilePos(tile);
                 if (tile) {
-                    this.vfx.createEmitter(tile.tileType, tile.x, tile.y, 0.01, 0.02, 500)
-                        .explode(100);
-                    tile.destroy();
-                }
-                this.incrementScore();
-                if (pos.x !== -1 && pos.y !== -1) {
-                    this.tileGrid[pos.x][pos.y] = null;
+                    // Apply glow effect to the matched candy.
+                    this.vfx.addGlow(tile, 0.8, 0xffff00);
+                    
+                    // Wait a moment so the glow is visible before animating the candy away.
+                    this.time.delayedCall(200, () => {
+                        this.tweens.add({
+                            targets: tile,
+                            scale: 0,
+                            x: this.scoreText.x,
+                            y: this.scoreText.y,
+                            alpha: 0,
+                            duration: 1000,
+                            ease: 'Power1',
+                            onComplete: () => {
+                                tile.destroy();
+                            }
+                        });
+                    });
+                    
+                    // Increase score.
+                    this.score += 10;
+                    this.scoreText.setText("Score: " + this.score);
+                    
+                    if (pos.x !== -1 && pos.y !== -1) {
+                        this.tileGrid[pos.x][pos.y] = null;
+                    }
                 }
             }
         }
     }
-
+    
     getTilePos(tile) {
         for (let i = 0; i < this.numCols; i++) {
             for (let j = 0; j < this.numRows; j++) {
@@ -437,20 +485,21 @@ class GameScene extends Phaser.Scene {
         }
         return { x: -1, y: -1 };
     }
-
-    resetTile() {
+    
+    resetTiles() {
         for (let i = 0; i < this.numCols; i++) {
-            for (let j = this.numRows - 1; j > 0; j--) {
+            for (let j = this.numRows - 1; j >= 0; j--) {
                 if (this.tileGrid[i][j] === null) {
                     for (let k = j - 1; k >= 0; k--) {
                         if (this.tileGrid[i][k]) {
                             this.tileGrid[i][j] = this.tileGrid[i][k];
                             this.tileGrid[i][k] = null;
+                            let newY = this.gridOffsetY + j * this.tileHeight + this.tileHeight / 2;
                             this.tweens.add({
                                 targets: this.tileGrid[i][j],
-                                y: this.gridOffsetY + j * this.tileHeight + this.tileHeight / 2,
+                                y: newY,
                                 duration: 200,
-                                ease: 'Linear'
+                                ease: 'Bounce.easeOut'
                             });
                             break;
                         }
@@ -459,8 +508,8 @@ class GameScene extends Phaser.Scene {
             }
         }
     }
-
-    fillTile() {
+    
+    fillTiles() {
         for (let i = 0; i < this.numCols; i++) {
             for (let j = 0; j < this.numRows; j++) {
                 if (this.tileGrid[i][j] === null) {
@@ -470,29 +519,15 @@ class GameScene extends Phaser.Scene {
             }
         }
     }
-
-    incrementScore() {
-        gameScore += 10 * (this.combo || 1);
-        this.updateScore(gameScore);
-    }
-
-    updateScore(points) {
-        this.score = points;
-        this.updateScoreText();
-    }
-
-    updateScoreText() {
-        this.scoreText.setText(this.score);
-    }
-
+    
     gameOver() {
-        initiateGameOver.bind(this)({ "score": this.score });
+        // Use the Braincade SDK to initiate game over.
+        // This should dispatch the kGameOver event and pause the scene,
+        // causing the SDK overlay (restart/destroy options) to appear.
+        initiateGameOver.call(this, { score: this.score });
     }
-
-    pauseGame() {
-        handlePauseGame.call(this);
-    }
-
+    
+    
     getTileCoordinates(x, y, exactTile = false) {
         let adjustedX = x - this.gridOffsetX;
         let adjustedY = y - this.gridOffsetY;
@@ -536,7 +571,7 @@ function displayProgressLoader() {
     });
 }
 
-// Game configuration (using JSON settings from _CONFIG)
+// Game configuration (using settings from _CONFIG)
 const config = {
     type: Phaser.AUTO,
     width: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width,
@@ -557,7 +592,3 @@ const config = {
 };
 
 let gameScore = 0;
-let gameLevel = 1;
-let timerEvent;
-let timerText;
-let timeDown = 120000;
