@@ -39,6 +39,12 @@ class GameScene extends Phaser.Scene {
         }
         // Create the streak sound is loaded via JSON as "streak".
 
+        // Below scoreText, at (20, 60) for example.
+this.streakText = this.add.bitmapText(20, 60, 'pixelfont', '', 28)
+.setOrigin(-2, 0)
+.setDepth(102);
+
+
         // Create a trail texture.
         let trailGraphics = this.make.graphics({ x: 0, y: 0, add: false });
         trailGraphics.fillStyle(0xffffff, 1);
@@ -158,46 +164,37 @@ class GameScene extends Phaser.Scene {
         }
     }
     
-    displayMatchMessage(message) {
-        const defaultMessages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
-        let msg = message || Phaser.Utils.Array.GetRandom(defaultMessages);
-        // Use a larger font size and longer duration if it's the "Sugar Crush" message.
-        let fontSize = (msg === "Sugar Crush") ? 80 : 64;
-        let duration = (msg === "Sugar Crush") ? 2500 : 1500; // 2500ms for Sugar Crush, 1500ms for others.
-        
-        let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', msg, fontSize)
-                                 .setOrigin(0.5)
-                                 .setDepth(102);
-        
-        // If it's Sugar Crush, change the text tint to a theme-matching color.
-        if (msg === "Sugar Crush") {
-            overlayText.setTint(0xffaa00);
-            // Delay the animation by 500ms.
-            this.time.delayedCall(500, () => {
-                this.tweens.add({
-                    targets: overlayText,
-                    y: overlayText.y - 50,
-                    alpha: 0,
-                    duration: duration,
-                    ease: 'Linear',
-                    onComplete: () => {
-                        overlayText.destroy();
-                    }
-                });
-            });
-        } else {
-            this.tweens.add({
-                targets: overlayText,
-                y: overlayText.y - 50,
-                alpha: 0,
-                duration: duration,
-                ease: 'Linear',
-                onComplete: () => {
-                    overlayText.destroy();
-                }
-            });
-        }
+// Helper function to display a match message overlay.
+// If a message is passed in (e.g., "Sweet", "Tasty", or "Sugar Crush"),
+// that text is used with a larger font size and tinted; otherwise, a random message is chosen.
+displayMatchMessage(message) {
+    const defaultMessages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
+    let msg = message || Phaser.Utils.Array.GetRandom(defaultMessages);
+    // Use a larger font size and longer duration for "Sugar Crush"
+    let fontSize = (msg === "Sugar Crush") ? 80 : 64;
+    let duration = (msg === "Sugar Crush") ? 2500 : 1500;
+    
+    let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', msg, fontSize)
+                             .setOrigin(0.5)
+                             .setDepth(102);
+    
+    // If a specific chain message is provided, tint the text with the Sugar Crush theme color.
+    if (message) {
+        overlayText.setTint(0xffaa00);
     }
+    
+    this.tweens.add({
+        targets: overlayText,
+        y: overlayText.y - 50,
+        alpha: 0,
+        duration: duration,
+        ease: 'Linear',
+        onComplete: () => {
+            overlayText.destroy();
+        }
+    });
+}
+
     
     
     // Draws a chessboard-style background with a rounded mask.
@@ -395,10 +392,16 @@ class GameScene extends Phaser.Scene {
         if (matches.length > 0) {
             // A chain reaction is occurring.
             this.chainCount++;
-            // Display a big match message overlay.
-            this.displayMatchMessage();
+            // Update the streak text (e.g., "2x", "3x", etc.)
+            this.streakText.setText(this.chainCount + "x");
+            
+            // For chain counts less than 2, display the normal random match message.
+            if (this.chainCount < 2) {
+                this.displayMatchMessage();
+            }
+            // Remove matched tiles.
             this.removeTileGroup(matches);
-            // Delay tile reset and refill to allow animations to finish.
+            // Delay tile reset/refill to allow animations to finish.
             this.time.delayedCall(800, () => {
                 this.resetTiles();
                 this.fillTiles();
@@ -407,16 +410,30 @@ class GameScene extends Phaser.Scene {
             });
         } else {
             // No more matches – chain reaction ended.
-            if (this.chainCount >= 5) {
-                // Display the streak message.
+            if (this.chainCount >= 8) {
                 this.displayMatchMessage("Sugar Crush");
-                // Delay 500ms before playing the streak sound.
                 this.time.delayedCall(500, () => {
                     if (this.sounds.streak) {
                         this.sounds.streak.play();
                     }
                 });
+            } else if (this.chainCount >= 5) {
+                this.displayMatchMessage("Tasty");
+                this.time.delayedCall(500, () => {
+                    if (this.sounds.tasty) {
+                        this.sounds.tasty.play();
+                    }
+                });
+            } else if (this.chainCount >= 2) {
+                this.displayMatchMessage("Sweet");
+                this.time.delayedCall(500, () => {
+                    if (this.sounds.sweet) {
+                        this.sounds.sweet.play();
+                    }
+                });
             }
+            // Clear the streak text.
+            this.streakText.setText("");
             // If no chain reaction occurred at all, revert the swap.
             if (this.chainCount === 0) {
                 this.swapTiles();
@@ -429,6 +446,8 @@ class GameScene extends Phaser.Scene {
             });
         }
     }
+    
+    
     
     getMatches() {
         let matches = [];
