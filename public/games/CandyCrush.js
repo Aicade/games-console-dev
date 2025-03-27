@@ -32,15 +32,16 @@ class GameScene extends Phaser.Scene {
         // Register Braincade SDK event listeners.
         addEventListenersPhaser.bind(this)();
 
-        // Initialize sounds
+        // Initialize sounds.
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
             this.sounds[key] = this.sound.add(key, { loop: key === 'background', volume: 0.5 });
         }
-        
+        // Create the streak sound is loaded via JSON as "streak".
+
         // Create a trail texture.
         let trailGraphics = this.make.graphics({ x: 0, y: 0, add: false });
-        trailGraphics.fillStyle(0xffffff, 1);  
+        trailGraphics.fillStyle(0xffffff, 1);
         trailGraphics.fillCircle(10, 10, 10);
         trailGraphics.generateTexture('trail', 20, 20);
 
@@ -96,6 +97,9 @@ class GameScene extends Phaser.Scene {
         this.activeTile2 = null;
         this.canMove = false;
         
+        // Initialize chain counter.
+        this.chainCount = 0;
+        
         let seed = Date.now();
         this.random = new Phaser.Math.RandomDataGenerator([seed]);
         this.initTiles();
@@ -142,40 +146,59 @@ class GameScene extends Phaser.Scene {
         if (this.timerEvent) {
             let remainingTime = Math.floor((this.timerEvent.delay - this.timerEvent.getElapsed()) / 1000);
             this.timerText.setText(remainingTime.toString());
-            
-            // Add a pulse tween effect on the timer text.
             this.tweens.add({
                 targets: this.timerText,
                 scale: { from: 1.2, to: 1 },
                 duration: 200,
                 ease: 'Power1'
             });
-            
             if (remainingTime <= 0) {
                 this.timerEvent = null;
             }
         }
     }
     
-    
-    // Helper function to display a match message overlay.
-    displayMatchMessage() {
-        const messages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
-        let message = Phaser.Utils.Array.GetRandom(messages);
-        let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', message, 64)
+    displayMatchMessage(message) {
+        const defaultMessages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
+        let msg = message || Phaser.Utils.Array.GetRandom(defaultMessages);
+        // Use a larger font size and longer duration if it's the "Sugar Crush" message.
+        let fontSize = (msg === "Sugar Crush") ? 80 : 64;
+        let duration = (msg === "Sugar Crush") ? 2500 : 1500; // 2500ms for Sugar Crush, 1500ms for others.
+        
+        let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', msg, fontSize)
                                  .setOrigin(0.5)
                                  .setDepth(102);
-        this.tweens.add({
-            targets: overlayText,
-            y: overlayText.y - 50,
-            alpha: 0,
-            duration: 1500,
-            ease: 'Linear',
-            onComplete: () => {
-                overlayText.destroy();
-            }
-        });
+        
+        // If it's Sugar Crush, change the text tint to a theme-matching color.
+        if (msg === "Sugar Crush") {
+            overlayText.setTint(0xffaa00);
+            // Delay the animation by 500ms.
+            this.time.delayedCall(500, () => {
+                this.tweens.add({
+                    targets: overlayText,
+                    y: overlayText.y - 50,
+                    alpha: 0,
+                    duration: duration,
+                    ease: 'Linear',
+                    onComplete: () => {
+                        overlayText.destroy();
+                    }
+                });
+            });
+        } else {
+            this.tweens.add({
+                targets: overlayText,
+                y: overlayText.y - 50,
+                alpha: 0,
+                duration: duration,
+                ease: 'Linear',
+                onComplete: () => {
+                    overlayText.destroy();
+                }
+            });
+        }
     }
+    
     
     // Draws a chessboard-style background with a rounded mask.
     drawChessBoard() {
@@ -343,7 +366,6 @@ class GameScene extends Phaser.Scene {
                 loop: true
             });
     
-            // Use Cubic.easeInOut for a more fluid swap.
             this.tweens.add({
                 targets: this.activeTile1,
                 x: tile1DestX,
@@ -371,19 +393,36 @@ class GameScene extends Phaser.Scene {
     checkMatch() {
         let matches = this.getMatches();
         if (matches.length > 0) {
+            // A chain reaction is occurring.
+            this.chainCount++;
             // Display a big match message overlay.
             this.displayMatchMessage();
             this.removeTileGroup(matches);
-            // Delay tile reset and refill until after the removal animation.
+            // Delay tile reset and refill to allow animations to finish.
             this.time.delayedCall(800, () => {
                 this.resetTiles();
                 this.fillTiles();
                 this.tileUp();
-                this.checkMatch();
+                this.checkMatch(); // Check for further chain matches.
             });
         } else {
-            // No match found: revert the swap.
-            this.swapTiles();
+            // No more matches – chain reaction ended.
+            if (this.chainCount >= 5) {
+                // Display the streak message.
+                this.displayMatchMessage("Sugar Crush");
+                // Delay 500ms before playing the streak sound.
+                this.time.delayedCall(500, () => {
+                    if (this.sounds.streak) {
+                        this.sounds.streak.play();
+                    }
+                });
+            }
+            // If no chain reaction occurred at all, revert the swap.
+            if (this.chainCount === 0) {
+                this.swapTiles();
+            }
+            // Reset the chain count and allow new moves.
+            this.chainCount = 0;
             this.time.delayedCall(500, () => {
                 this.tileUp();
                 this.canMove = true;
@@ -472,6 +511,8 @@ class GameScene extends Phaser.Scene {
                     }
                 }
             }
+            // If chain reaction has occurred (even if group is smaller than 5, we keep the count),
+            // the chainCount is handled in checkMatch(). Here we do not play any sound.
         }
     }
     
@@ -522,11 +563,8 @@ class GameScene extends Phaser.Scene {
     
     gameOver() {
         // Use the Braincade SDK to initiate game over.
-        // This should dispatch the kGameOver event and pause the scene,
-        // causing the SDK overlay (restart/destroy options) to appear.
         initiateGameOver.call(this, { score: this.score });
     }
-    
     
     getTileCoordinates(x, y, exactTile = false) {
         let adjustedX = x - this.gridOffsetX;
@@ -592,3 +630,4 @@ const config = {
 };
 
 let gameScore = 0;
+
