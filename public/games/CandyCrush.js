@@ -7,6 +7,8 @@ class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.score = 0;
+        // Updated target score to 12000.
+        this.targetScore = 12000;
     }
     
     preload() {
@@ -14,10 +16,15 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
         }
+        // NOTE: We removed the external star asset load.
+        
         // Load sounds from JSON config
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
+        // Load the star sound.
+        this.load.audio('starSound', 'https://files.catbox.moe/9wqm2a.mp3');
+        
         // Load bitmap font for UI
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
@@ -29,21 +36,32 @@ class GameScene extends Phaser.Scene {
     }
     
     create() {
+        // Stop any previously playing sounds (useful on restart).
+        this.sound.stopAll();
+        // Reset score.
+        this.score = 0;
+        
         // Register Braincade SDK event listeners.
         addEventListenersPhaser.bind(this)();
+
+        // Instantiate the VFX library for this scene.
+        this.vfx = new VFXLibrary(this);
+
+        // Create the star shape texture.
+        this.createStarShape();
 
         // Initialize sounds.
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
             this.sounds[key] = this.sound.add(key, { loop: key === 'background', volume: 0.5 });
         }
-        // Create the streak sound is loaded via JSON as "streak".
+        // Add the star sound.
+        this.sounds.starSound = this.sound.add('starSound', { volume: 0.5 });
 
-        // Below scoreText, at (20, 60) for example.
-this.streakText = this.add.bitmapText(20, 60, 'pixelfont', '', 28)
-.setOrigin(-2, 0)
-.setDepth(102);
-
+        // Streak text.
+        this.streakText = this.add.bitmapText(20, 70, 'pixelfont', '', 28)
+            .setOrigin(-2, 0)
+            .setDepth(102);
 
         // Create a trail texture.
         let trailGraphics = this.make.graphics({ x: 0, y: 0, add: false });
@@ -59,13 +77,126 @@ this.streakText = this.add.bitmapText(20, 60, 'pixelfont', '', 28)
         this.width = this.game.config.width;
         this.height = this.game.config.height;
 
-        // Add VFX Library.
-        this.vfx = new VFXLibrary(this);
-
         // UI: Display Score and Timer.
-        this.scoreText = this.add.bitmapText(20, 20, 'pixelfont', 'Score: 0', 32);
-        this.timerText = this.add.bitmapText(this.width - 150, 20, 'pixelfont', '120', 32).setOrigin(0.5);
+// Create score text.
+this.scoreText = this.add.bitmapText(20, 20, 'pixelfont', 'Score: 0', 32);
+this.scoreText.setDepth(10);
+
+// Calculate bounds and define padding/extra width.
+let bounds = this.scoreText.getTextBounds();
+let paddingX = 10;
+let paddingY = 5;
+let extraWidth = 100; // Updated extra width value
+
+// Create a graphics object to draw the rounded rectangle.
+this.scoreBg = this.add.graphics();
+
+// Draw the filled rectangle.
+this.scoreBg.fillStyle(0xffc107, 1);
+this.scoreBg.fillRoundedRect(
+    this.scoreText.x - paddingX,
+    this.scoreText.y - paddingY,
+    bounds.global.width + 2 * paddingX + extraWidth,
+    bounds.global.height + 2 * paddingY,
+    10 // corner radius
+);
+
+// Draw the black boundary.
+this.scoreBg.lineStyle(3, 0x000000, 1);
+this.scoreBg.strokeRoundedRect(
+    this.scoreText.x - paddingX,
+    this.scoreText.y - paddingY,
+    bounds.global.width + 2 * paddingX + extraWidth,
+    bounds.global.height + 2 * paddingY,
+    10
+);
+
+// Place the rectangle behind the score text.
+this.scoreBg.setDepth(this.scoreText.depth - 1);
+
+
         
+// Define the circle radius for the timer background.
+let timerRadius = 50; // adjust as needed
+
+// Manually set the circle's position.
+let timerCircleX = 1100; // your custom x-coordinate
+let timerCircleY = 60;   // your custom y-coordinate
+
+// Create a graphics object at your specified position.
+this.timerBg = this.add.graphics({ x: timerCircleX, y: timerCircleY });
+
+// Draw the filled circle.
+this.timerBg.fillStyle(0xffc107, 1);
+this.timerBg.fillCircle(0, 0, timerRadius);
+
+// Add a black boundary by setting a line style and drawing the circle outline.
+this.timerBg.lineStyle(3, 0x000000, 1);
+this.timerBg.strokeCircle(0, 0, timerRadius);
+
+// Create timer text with centered origin.
+this.timerText = this.add.bitmapText(timerCircleX, timerCircleY, 'pixelfont', '120', 32)
+    .setOrigin(0.5, 0.5);
+
+// If needed, adjust by a few pixels:
+this.timerText.x = timerCircleX - 5; // adjust horizontal offset as needed
+this.timerText.y = timerCircleY - 5; // adjust vertical offset as needed
+
+// Ensure the timer text appears above the circle.
+this.timerText.setDepth(this.timerBg.depth + 1);
+
+
+
+
+        // **** Add Progress Bar UI with Rounded Corners ****
+        this.progressBarWidth = 400;
+        this.progressBarHeight = 30; // Increased height
+        this.progressBarX = (this.width - this.progressBarWidth) / 2;
+        this.progressBarY = 20; // Top center
+        
+// Create a graphics object for the progress bar background.
+this.progressBarBg = this.add.graphics();
+this.progressBarBg.fillStyle(0x666666, 1);
+this.progressBarBg.fillRoundedRect(
+    this.progressBarX,
+    this.progressBarY - this.progressBarHeight / 2,
+    this.progressBarWidth,
+    this.progressBarHeight,
+    10 // Corner radius
+);
+
+// Draw the black boundary around the progress bar.
+this.progressBarBg.lineStyle(3, 0x000000, 1);
+this.progressBarBg.strokeRoundedRect(
+    this.progressBarX,
+    this.progressBarY - this.progressBarHeight / 2,
+    this.progressBarWidth,
+    this.progressBarHeight,
+    10
+);
+
+        
+        // Create a graphics object for the progress bar fill.
+        this.progressBarFill = this.add.graphics();
+        this.progressBarFill.fillStyle(0x00ff00, 1);
+        // Reset fill (0 progress)
+        this.progressBarFill.fillRoundedRect(
+            this.progressBarX,
+            this.progressBarY - this.progressBarHeight / 2,
+            0,
+            this.progressBarHeight,
+            10
+        );
+        
+        // Text to display numeric progress.
+        this.progressText = this.add.bitmapText(
+            this.width / 2,
+            this.progressBarY,
+            'pixelfont',
+            `0 / ${this.targetScore}`,
+            20
+        ).setOrigin(0.5);
+
         // Add Pause Button at top-right.
         this.pauseButton = this.add.sprite(this.width - 60, 60, "pauseButton")
                                      .setOrigin(0.5, 0.5)
@@ -164,40 +295,207 @@ this.streakText = this.add.bitmapText(20, 60, 'pixelfont', '', 28)
         }
     }
     
-// Helper function to display a match message overlay.
-// If a message is passed in (e.g., "Sweet", "Tasty", or "Sugar Crush"),
-// that text is used with a larger font size and tinted; otherwise, a random message is chosen.
-displayMatchMessage(message) {
-    const defaultMessages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
-    let msg = message || Phaser.Utils.Array.GetRandom(defaultMessages);
-    // Use a larger font size and longer duration for "Sugar Crush"
-    let fontSize = (msg === "Sugar Crush") ? 80 : 64;
-    let duration = (msg === "Sugar Crush") ? 2500 : 1500;
-    
-    let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', msg, fontSize)
-                             .setOrigin(0.5)
-                             .setDepth(102);
-    
-    // If a specific chain message is provided, tint the text with the Sugar Crush theme color.
-    if (message) {
-        overlayText.setTint(0xffaa00);
+    // Create a star shape texture for award purposes.
+    createStarShape() {
+        let graphics = this.make.graphics({ x: 0, y: 0, add: false });
+        let radius = 20;
+        let cx = radius, cy = radius;
+        // Fill star with yellow.
+        graphics.fillStyle(0xffff00, 1);
+        // Add a black stroke (2 pixels thick).
+        graphics.lineStyle(2, 0x000000, 1);
+        graphics.beginPath();
+        let spikes = 5;
+        let outerRadius = radius;
+        let innerRadius = radius / 2;
+        let rot = Math.PI / 2 * 3;
+        let step = Math.PI / spikes;
+        graphics.moveTo(cx, cy - outerRadius);
+        for (let i = 0; i < spikes; i++) {
+            let x = cx + Math.cos(rot) * outerRadius;
+            let y = cy + Math.sin(rot) * outerRadius;
+            graphics.lineTo(x, y);
+            rot += step;
+            x = cx + Math.cos(rot) * innerRadius;
+            y = cy + Math.sin(rot) * innerRadius;
+            graphics.lineTo(x, y);
+            rot += step;
+        }
+        graphics.lineTo(cx, cy - outerRadius);
+        graphics.closePath();
+        graphics.fillPath();
+        graphics.strokePath();
+        graphics.generateTexture('starShape', radius * 2, radius * 2);
+        graphics.destroy();
     }
     
-    this.tweens.add({
-        targets: overlayText,
-        y: overlayText.y - 50,
-        alpha: 0,
-        duration: duration,
-        ease: 'Linear',
-        onComplete: () => {
-            overlayText.destroy();
+    // Update the progress bar fill and award stars at thresholds.
+    updateProgressBar() {
+        let progress = Phaser.Math.Clamp(this.score / this.targetScore, 0, 1);
+        let fillWidth = this.progressBarWidth * progress;
+        
+        // Clear and redraw the fill.
+        this.progressBarFill.clear();
+        this.progressBarFill.fillStyle(0x00ff00, 1);
+        if (fillWidth > 0) {
+            this.progressBarFill.fillRoundedRect(
+                this.progressBarX,
+                this.progressBarY - this.progressBarHeight / 2,
+                fillWidth,
+                this.progressBarHeight,
+                10
+            );
         }
-    });
-}
-
+        
+        // Update numeric display.
+        this.progressText.setText(`${this.score} / ${this.targetScore}`);
+        
+        // Award stars when progress thresholds are met.
+        if (progress >= 0.25 && (!this.starAwarded || !this.starAwarded[25])) {
+            this.awardStar(25);
+        }
+        if (progress >= 0.60 && (!this.starAwarded || !this.starAwarded[60])) {
+            this.awardStar(60);
+        }
+        if (progress >= 1 && (!this.starAwarded || !this.starAwarded[100])) {
+            this.awardStar(100);
+        }
+        
+        // Check win condition.
+        if (this.score >= this.targetScore) {
+            this.gameWin();
+        }
+    }
     
+    // Award a star for reaching a specific threshold.
+    awardStar(threshold) {
+        // Track awarded stars to prevent duplicates.
+        this.starAwarded = this.starAwarded || {};
+        this.starAwarded[threshold] = true;
+        
+        // Play the star sound.
+        this.sounds.starSound.play();
+        
+        // Starting position: center of the progress bar.
+        let startX = this.progressBarX + this.progressBarWidth / 2;
+        let startY = this.progressBarY;
+        
+        // Determine target X based on threshold.
+        let offsetX = 50; // Adjust spacing as needed.
+        let targetX;
+        if (threshold === 25) {
+            targetX = startX - offsetX;
+        } else if (threshold === 60) {
+            targetX = startX;
+        } else if (threshold === 100) {
+            targetX = startX + offsetX;
+        }
+        
+        // Adjust target Y: place the star further below the progress bar.
+        let targetY = this.progressBarY + this.progressBarHeight / 2 + 40;
+        
+        // Create the star sprite using the generated 'starShape' texture.
+        let star = this.add.sprite(startX, startY, 'starShape');
+        star.setScale(0); // Start at 0 scale for a pop-up effect.
+        if (!this.awardedStars) this.awardedStars = [];
+        this.awardedStars.push(star);
+        
+        // First tween: Pop-up effect (scale from 0 to 1.2).
+        this.tweens.add({
+            targets: star,
+            scale: 1.2,
+            duration: 300,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                // Second tween: Move the star to its target position.
+                this.tweens.add({
+                    targets: star,
+                    x: targetX,
+                    y: targetY,
+                    duration: 500,
+                    ease: 'Cubic.easeOut'
+                });
+            }
+        });
+    }
     
-    // Draws a chessboard-style background with a rounded mask.
+    // Called when the target score is reached.
+    gameWin() {
+        // Instead of immediately ending, we call gameOver() to animate end effects.
+        this.gameOver();
+    }
+    
+    // End-of-timer game over: blur everything except the awarded stars,
+    // then arrange the stars side-by-side and animate them to a row at center.
+    gameOver() {
+        // Stop tile interactions.
+        this.canMove = false;
+        
+        // Apply blur to main camera.
+        if (this.cameras.main.setPostPipeline) {
+            this.cameras.main.setPostPipeline('BlurPostFX');
+        }
+        
+        // Rearrange awarded stars so they do not overlap.
+        let totalStars = this.awardedStars ? this.awardedStars.length : 0;
+        let centerX = this.width / 2;
+        let spacing = 60; // spacing between stars
+        let targetY = this.height / 2; // vertical center for stars
+        
+        if (this.awardedStars && totalStars > 0) {
+            this.awardedStars.forEach((star, index) => {
+                // Remove blur from the star.
+                if (star.clearPipeline) {
+                    star.clearPipeline();
+                }
+                // Calculate target X for this star so they are arranged side-by-side.
+                let targetX = centerX + (index - (totalStars - 1) / 2) * spacing;
+                this.tweens.add({
+                    targets: star,
+                    scale: 3,
+                    x: targetX,
+                    y: targetY,
+                    duration: 1000,
+                    ease: 'Cubic.easeInOut'
+                });
+            });
+        }
+        
+        // After the star animation, end the game.
+        this.time.delayedCall(1500, () => {
+            initiateGameOver.call(this, { score: this.score });
+        });
+    }
+    
+    // Helper function to display a match message overlay.
+    displayMatchMessage(message) {
+        const defaultMessages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
+        let msg = message || Phaser.Utils.Array.GetRandom(defaultMessages);
+        // Set a larger font size for "Sugar Crush", "Tasty", "Sweet" and "You Win!"
+        const biggerMessages = ["Sugar Crush", "Tasty", "Sweet", "You Win!"];
+        let fontSize = biggerMessages.includes(msg) ? 150 : 64;
+        let duration = biggerMessages.includes(msg) ? 2500 : 1500;
+        
+        let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', msg, fontSize)
+                             .setOrigin(0.5)
+                             .setDepth(102);
+        if (message) {
+            overlayText.setTint(0xffaa00);
+        }
+        
+        this.tweens.add({
+            targets: overlayText,
+            y: overlayText.y - 50,
+            alpha: 0,
+            duration: duration,
+            ease: 'Linear',
+            onComplete: () => {
+                overlayText.destroy();
+            }
+        });
+    }
+    
+    // Draw a chessboard-style background.
     drawChessBoard() {
         const color1 = 0xD0E6F8;
         const color2 = 0xA0C6E8;
@@ -220,7 +518,7 @@ displayMatchMessage(message) {
         board.setDepth(0);
     }
     
-    // Draws grid lines and an outer rounded border.
+    // Draw grid lines and an outer rounded border.
     drawGridLines() {
         this.gridGraphics = this.add.graphics();
         const darkerShade = 0xA0C6E8;
@@ -231,7 +529,7 @@ displayMatchMessage(message) {
             let endY = this.gridOffsetY + this.numRows * this.tileHeight;
             this.gridGraphics.strokeLineShape(new Phaser.Geom.Line(x, startY, x, endY));
         }
-        for (let row = 1; row < this.numRows; row++) {
+        for (let row = 0; row < this.numRows; row++) {
             let y = this.gridOffsetY + row * this.tileHeight;
             let startX = this.gridOffsetX;
             let endX = this.gridOffsetX + this.numCols * this.tileWidth;
@@ -266,7 +564,6 @@ displayMatchMessage(message) {
         let tile = this.add.sprite(posX, 0, tileType).setInteractive();
         tile.setDisplaySize(this.tileWidth * 0.9, this.tileHeight * 0.9);
         tile.tileType = tileType;
-        // Use a more lively easing for the initial drop.
         this.tweens.add({
             targets: tile,
             y: posY,
@@ -274,8 +571,6 @@ displayMatchMessage(message) {
             ease: 'Quad.easeOut'
         });
         tile.on('pointerdown', () => this.tileDown(tile));
-        
-        // Add hover animations.
         tile.originalScaleX = tile.scaleX;
         tile.originalScaleY = tile.scaleY;
         tile.on('pointerover', () => {
@@ -296,7 +591,6 @@ displayMatchMessage(message) {
                 ease: 'Linear'
             });
         });
-        
         return tile;
     }
     
@@ -326,7 +620,6 @@ displayMatchMessage(message) {
             let tile2DestX = this.gridOffsetX + tile1Pos.x * this.tileWidth + this.tileWidth / 2;
             let tile2DestY = this.gridOffsetY + tile1Pos.y * this.tileHeight + this.tileHeight / 2;
     
-            // Create timed events to spawn trail sprites along each candy's path.
             let trailTimer1 = this.time.addEvent({
                 delay: 50,
                 callback: () => {
@@ -390,26 +683,19 @@ displayMatchMessage(message) {
     checkMatch() {
         let matches = this.getMatches();
         if (matches.length > 0) {
-            // A chain reaction is occurring.
             this.chainCount++;
-            // Update the streak text (e.g., "2x", "3x", etc.)
             this.streakText.setText(this.chainCount + "x");
-            
-            // For chain counts less than 2, display the normal random match message.
             if (this.chainCount < 2) {
                 this.displayMatchMessage();
             }
-            // Remove matched tiles.
             this.removeTileGroup(matches);
-            // Delay tile reset/refill to allow animations to finish.
             this.time.delayedCall(800, () => {
                 this.resetTiles();
                 this.fillTiles();
                 this.tileUp();
-                this.checkMatch(); // Check for further chain matches.
+                this.checkMatch();
             });
         } else {
-            // No more matches – chain reaction ended.
             if (this.chainCount >= 8) {
                 this.displayMatchMessage("Sugar Crush");
                 this.time.delayedCall(500, () => {
@@ -432,13 +718,10 @@ displayMatchMessage(message) {
                     }
                 });
             }
-            // Clear the streak text.
             this.streakText.setText("");
-            // If no chain reaction occurred at all, revert the swap.
             if (this.chainCount === 0) {
                 this.swapTiles();
             }
-            // Reset the chain count and allow new moves.
             this.chainCount = 0;
             this.time.delayedCall(500, () => {
                 this.tileUp();
@@ -446,8 +729,6 @@ displayMatchMessage(message) {
             });
         }
     }
-    
-    
     
     getMatches() {
         let matches = [];
@@ -488,7 +769,6 @@ displayMatchMessage(message) {
     
     removeTileGroup(matches) {
         for (let group of matches) {
-            // Play a collect sound based on the candy type of the group.
             if (group.length > 0) {
                 let type = group[0].tileType;
                 if (type === 'candy_1' && this.sounds.collect1) {
@@ -502,16 +782,16 @@ displayMatchMessage(message) {
             for (let tile of group) {
                 let pos = this.getTilePos(tile);
                 if (tile) {
-                    // Apply glow effect to the matched candy.
-                    this.vfx.addGlow(tile, 0.8, 0xffff00);
-                    
-                    // Wait a moment so the glow is visible before animating the candy away.
+                    if (this.vfx && typeof this.vfx.addGlow === 'function') {
+                        this.vfx.addGlow(tile, 0.8, 0xffff00);
+                    }
+                    // Animate tile to progress bar center.
                     this.time.delayedCall(200, () => {
                         this.tweens.add({
                             targets: tile,
                             scale: 0,
-                            x: this.scoreText.x,
-                            y: this.scoreText.y,
+                            x: this.progressBarX + this.progressBarWidth / 2,
+                            y: this.progressBarY,
                             alpha: 0,
                             duration: 1000,
                             ease: 'Power1',
@@ -520,18 +800,14 @@ displayMatchMessage(message) {
                             }
                         });
                     });
-                    
-                    // Increase score.
                     this.score += 10;
                     this.scoreText.setText("Score: " + this.score);
-                    
+                    this.updateProgressBar();
                     if (pos.x !== -1 && pos.y !== -1) {
                         this.tileGrid[pos.x][pos.y] = null;
                     }
                 }
             }
-            // If chain reaction has occurred (even if group is smaller than 5, we keep the count),
-            // the chainCount is handled in checkMatch(). Here we do not play any sound.
         }
     }
     
@@ -581,8 +857,46 @@ displayMatchMessage(message) {
     }
     
     gameOver() {
-        // Use the Braincade SDK to initiate game over.
-        initiateGameOver.call(this, { score: this.score });
+        // End-of-game effect: blur everything except awarded stars and rearrange them.
+        this.canMove = false;
+        
+        // Stop all sounds to prevent overlapping on restart.
+        this.sound.stopAll();
+        
+        // Apply a blur effect to the main camera.
+        if (this.cameras.main.setPostPipeline) {
+            this.cameras.main.setPostPipeline('BlurPostFX');
+        }
+        
+        // Rearrange the awarded stars so they do not overlap.
+        let totalStars = this.awardedStars ? this.awardedStars.length : 0;
+        let centerX = this.width / 2;
+        let spacing = 60; // horizontal spacing between stars
+        let targetY = this.height / 2; // vertical center for stars
+        
+        if (this.awardedStars && totalStars > 0) {
+            this.awardedStars.forEach((star, index) => {
+                // Remove blur from the star so it remains clear.
+                if (star.clearPipeline) {
+                    star.clearPipeline();
+                }
+                // Calculate target X for this star so they are arranged side-by-side.
+                let targetX = centerX + (index - (totalStars - 1) / 2) * spacing;
+                this.tweens.add({
+                    targets: star,
+                    scale: 3,
+                    x: targetX,
+                    y: targetY,
+                    duration: 1000,
+                    ease: 'Cubic.easeInOut'
+                });
+            });
+        }
+        
+        // After the star animation, end the game.
+        this.time.delayedCall(1500, () => {
+            initiateGameOver.call(this, { score: this.score });
+        });
     }
     
     getTileCoordinates(x, y, exactTile = false) {
@@ -649,4 +963,3 @@ const config = {
 };
 
 let gameScore = 0;
-

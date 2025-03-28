@@ -7,7 +7,7 @@
     "candy_2": "collectible_2",
     "candy_3": "collectible_3"
   },
-  "instructions": "1. Match 3 or more candies to score points.\n2. Swipe to swap adjacent candies.\n3. Beat the timer!",
+  "instructions": "1. Match 3 or more candies to score points.\n2. Swipe to swap adjacent candies.\n3. Beat the timer!\n4. Fill the progress bar to earn stars!",
   "orientationSizes": {
     "landscape": {
       "height": 720,
@@ -28,7 +28,8 @@
     "swap": "https://files.catbox.moe/viio08.mp3",
     "sweet": "https://files.catbox.moe/avb0lw.mp3",
     "tasty": "https://files.catbox.moe/s1xp0v.mp3",
-    "streak": "https://files.catbox.moe/lbweos.mp3"
+    "streak": "https://files.catbox.moe/lbweos.mp3",
+    "starSound": "https://files.catbox.moe/9wqm2a.mp3"
   },
   "title": "Candy Crush"
 }
