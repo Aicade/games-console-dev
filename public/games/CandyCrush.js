@@ -3,6 +3,11 @@
 // Import the Braincade SDK functions (adjust the import path as needed)
 // import { addEventListenersPhaser, handlePauseGame } from './braincadeSDK.js';
 
+
+if (/Mobi|Android/i.test(navigator.userAgent)) {
+    _CONFIG.deviceOrientation = "portrait";
+}
+
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
@@ -59,9 +64,21 @@ class GameScene extends Phaser.Scene {
         this.sounds.starSound = this.sound.add('starSound', { volume: 0.5 });
 
         // Streak text.
-        this.streakText = this.add.bitmapText(20, 70, 'pixelfont', '', 28)
-            .setOrigin(-2, 0)
-            .setDepth(102);
+// Define default streak text coordinates.
+let streakTextX = 20;
+let streakTextY = 70;
+
+// If on mobile, update the position.
+if (/Mobi|Android/i.test(navigator.userAgent)) {
+    streakTextX = 350;  // New x-coordinate for mobile (adjust as needed)
+    streakTextY = 310;  // New y-coordinate for mobile (adjust as needed)
+}
+
+// Create the streak text using the calculated coordinates.
+this.streakText = this.add.bitmapText(streakTextX, streakTextY, 'pixelfont', '', 28)
+    .setOrigin(-2, 0)
+    .setDepth(102);
+
 
         // Create a trail texture.
         let trailGraphics = this.make.graphics({ x: 0, y: 0, add: false });
@@ -79,29 +96,40 @@ class GameScene extends Phaser.Scene {
 
         // UI: Display Score and Timer.
 // Create score text.
-this.scoreText = this.add.bitmapText(20, 20, 'pixelfont', 'Score: 0', 32);
+// Determine default score text position.
+let scoreTextX = 20;
+let scoreTextY = 20;
+
+// If on mobile, update the position.
+if (/Mobi|Android/i.test(navigator.userAgent)) {
+    scoreTextX = 250;  // New x-coordinate for mobile
+    scoreTextY = 250;  // New y-coordinate for mobile
+}
+
+// Create score text at the determined position.
+this.scoreText = this.add.bitmapText(scoreTextX, scoreTextY, 'pixelfont', 'Score: 0', 32);
 this.scoreText.setDepth(10);
 
-// Calculate bounds and define padding/extra width.
+// Calculate text bounds and define padding/extra width.
 let bounds = this.scoreText.getTextBounds();
 let paddingX = 10;
 let paddingY = 5;
 let extraWidth = 100; // Updated extra width value
 
-// Create a graphics object to draw the rounded rectangle.
+// Create a graphics object to draw the rounded rectangle background.
 this.scoreBg = this.add.graphics();
 
-// Draw the filled rectangle.
+// Draw the filled rounded rectangle.
 this.scoreBg.fillStyle(0xffc107, 1);
 this.scoreBg.fillRoundedRect(
     this.scoreText.x - paddingX,
     this.scoreText.y - paddingY,
     bounds.global.width + 2 * paddingX + extraWidth,
     bounds.global.height + 2 * paddingY,
-    10 // corner radius
+    10 // Corner radius
 );
 
-// Draw the black boundary.
+// Draw the black boundary around the rectangle.
 this.scoreBg.lineStyle(3, 0x000000, 1);
 this.scoreBg.strokeRoundedRect(
     this.scoreText.x - paddingX,
@@ -111,8 +139,9 @@ this.scoreBg.strokeRoundedRect(
     10
 );
 
-// Place the rectangle behind the score text.
+// Ensure the background appears behind the score text.
 this.scoreBg.setDepth(this.scoreText.depth - 1);
+
 
 
         
@@ -149,12 +178,22 @@ this.timerText.setDepth(this.timerBg.depth + 1);
 
 
         // **** Add Progress Bar UI with Rounded Corners ****
-        this.progressBarWidth = 400;
-        this.progressBarHeight = 30; // Increased height
-        this.progressBarX = (this.width - this.progressBarWidth) / 2;
-        this.progressBarY = 20; // Top center
-        
-// Create a graphics object for the progress bar background.
+// For desktop (default)
+this.progressBarWidth = 500;  // Increased width
+this.progressBarHeight = 30;  // Increased height
+this.progressBarY = 20;       // Top center
+
+// For mobile devices, you might want different values
+if (/Mobi|Android/i.test(navigator.userAgent)) {
+    this.progressBarWidth = 550;  // Even wider for mobile
+    this.progressBarHeight = 70;  // Taller for mobile
+    this.progressBarY = 60;       // And moved lower
+}
+
+// Recalculate the x position so that the progress bar remains centered.
+this.progressBarX = (this.width - this.progressBarWidth) / 2;
+
+// Create the progress bar background with a black boundary.
 this.progressBarBg = this.add.graphics();
 this.progressBarBg.fillStyle(0x666666, 1);
 this.progressBarBg.fillRoundedRect(
@@ -162,10 +201,9 @@ this.progressBarBg.fillRoundedRect(
     this.progressBarY - this.progressBarHeight / 2,
     this.progressBarWidth,
     this.progressBarHeight,
-    10 // Corner radius
+    10  // corner radius
 );
 
-// Draw the black boundary around the progress bar.
 this.progressBarBg.lineStyle(3, 0x000000, 1);
 this.progressBarBg.strokeRoundedRect(
     this.progressBarX,
@@ -175,18 +213,17 @@ this.progressBarBg.strokeRoundedRect(
     10
 );
 
-        
-        // Create a graphics object for the progress bar fill.
-        this.progressBarFill = this.add.graphics();
-        this.progressBarFill.fillStyle(0x00ff00, 1);
-        // Reset fill (0 progress)
-        this.progressBarFill.fillRoundedRect(
-            this.progressBarX,
-            this.progressBarY - this.progressBarHeight / 2,
-            0,
-            this.progressBarHeight,
-            10
-        );
+// Create the progress bar fill (green) with updated dimensions.
+this.progressBarFill = this.add.graphics();
+this.progressBarFill.fillStyle(0x00ff00, 1);
+this.progressBarFill.fillRoundedRect(
+    this.progressBarX,
+    this.progressBarY - this.progressBarHeight / 2,
+    0,  // Initially 0 progress
+    this.progressBarHeight,
+    10
+);
+
         
         // Text to display numeric progress.
         this.progressText = this.add.bitmapText(
@@ -207,14 +244,24 @@ this.progressBarBg.strokeRoundedRect(
             handlePauseGame.call(this);
         });
         
-        // Grid Setup: 8 columns x 7 rows with fixed tile size (80).
-        this.tileTypes = ['candy_1', 'candy_2', 'candy_3'];
-        this.numCols = 8;
-        this.numRows = 7;
-        this.tileWidth = 80;
-        this.tileHeight = 80;
-        this.gridOffsetX = (this.width - (this.numCols * this.tileWidth)) / 2;
-        this.gridOffsetY = 100;
+// Grid Setup: 8 columns x 7 rows with fixed tile size (80).
+this.tileTypes = ['candy_1', 'candy_2', 'candy_3'];
+this.numCols = 8;
+this.numRows = 7;
+this.tileWidth = 80;
+this.tileHeight = 80;
+this.gridOffsetX = (this.width - (this.numCols * this.tileWidth)) / 2;
+this.gridOffsetY = 100; // default value
+
+// Adjust the grid offset for mobile devices.
+if (/Mobi|Android/i.test(navigator.userAgent)) {
+    this.gridOffsetY += 300; // Increase the offset by 80 pixels on mobile
+}
+
+// Now, when you draw the grid, it will use the updated this.gridOffsetY.
+this.drawChessBoard();
+this.drawGridLines();
+
         
         // Create 2D tile array.
         this.tileGrid = [];
@@ -468,32 +515,47 @@ this.progressBarBg.strokeRoundedRect(
     }
     
     // Helper function to display a match message overlay.
-    displayMatchMessage(message) {
-        const defaultMessages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
-        let msg = message || Phaser.Utils.Array.GetRandom(defaultMessages);
-        // Set a larger font size for "Sugar Crush", "Tasty", "Sweet" and "You Win!"
-        const biggerMessages = ["Sugar Crush", "Tasty", "Sweet", "You Win!"];
-        let fontSize = biggerMessages.includes(msg) ? 150 : 64;
-        let duration = biggerMessages.includes(msg) ? 2500 : 1500;
-        
-        let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', msg, fontSize)
-                             .setOrigin(0.5)
-                             .setDepth(102);
-        if (message) {
-            overlayText.setTint(0xffaa00);
-        }
-        
-        this.tweens.add({
-            targets: overlayText,
-            y: overlayText.y - 50,
-            alpha: 0,
-            duration: duration,
-            ease: 'Linear',
-            onComplete: () => {
-                overlayText.destroy();
-            }
-        });
+displayMatchMessage(message) {
+    const defaultMessages = ["Nice!", "Good!", "Excellent!", "Crazy!", "Oof!!"];
+    let msg = message || Phaser.Utils.Array.GetRandom(defaultMessages);
+    
+    // Define special messages.
+    const biggerMessages = ["Sugar Crush", "Tasty", "Sweet", "You Win!"];
+    
+    // Detect mobile device.
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    
+    // Determine font size based on message and device.
+    let fontSize;
+    if (biggerMessages.includes(msg)) {
+        fontSize = isMobile ? 100 : 150; // Smaller on mobile, larger on PC.
+    } else {
+        fontSize = isMobile ? 70 : 100; // Adjust as needed for non-special messages.
     }
+    
+    let duration = biggerMessages.includes(msg) ? 2500 : 1500;
+    
+    // Use your new font if needed, or keep "pixelfont"
+    let overlayText = this.add.bitmapText(this.width / 2, this.height / 2, 'pixelfont', msg, fontSize)
+                           .setOrigin(0.5)
+                           .setDepth(102);
+    
+    if (message) {
+        overlayText.setTint(0xffaa00);
+    }
+    
+    this.tweens.add({
+        targets: overlayText,
+        y: overlayText.y - 50,
+        alpha: 0,
+        duration: duration,
+        ease: 'Linear',
+        onComplete: () => {
+            overlayText.destroy();
+        }
+    });
+}
+
     
     // Draw a chessboard-style background.
     drawChessBoard() {
@@ -685,9 +747,10 @@ this.progressBarBg.strokeRoundedRect(
         if (matches.length > 0) {
             this.chainCount++;
             this.streakText.setText(this.chainCount + "x");
-            if (this.chainCount < 2) {
-                this.displayMatchMessage();
-            }
+    
+            // Show random match messages during each pop
+            this.displayMatchMessage();
+    
             this.removeTileGroup(matches);
             this.time.delayedCall(800, () => {
                 this.resetTiles();
@@ -696,29 +759,25 @@ this.progressBarBg.strokeRoundedRect(
                 this.checkMatch();
             });
         } else {
+            // When all matches stop, show the final streak message.
             if (this.chainCount >= 8) {
                 this.displayMatchMessage("Sugar Crush");
                 this.time.delayedCall(500, () => {
-                    if (this.sounds.streak) {
-                        this.sounds.streak.play();
-                    }
+                    if (this.sounds.streak) this.sounds.streak.play();
                 });
             } else if (this.chainCount >= 5) {
                 this.displayMatchMessage("Tasty");
                 this.time.delayedCall(500, () => {
-                    if (this.sounds.tasty) {
-                        this.sounds.tasty.play();
-                    }
+                    if (this.sounds.tasty) this.sounds.tasty.play();
                 });
             } else if (this.chainCount >= 2) {
                 this.displayMatchMessage("Sweet");
                 this.time.delayedCall(500, () => {
-                    if (this.sounds.sweet) {
-                        this.sounds.sweet.play();
-                    }
+                    if (this.sounds.sweet) this.sounds.sweet.play();
                 });
             }
-            this.streakText.setText("");
+    
+            this.streakText.setText(""); // Reset streak text
             if (this.chainCount === 0) {
                 this.swapTiles();
             }
@@ -729,6 +788,7 @@ this.progressBarBg.strokeRoundedRect(
             });
         }
     }
+    
     
     getMatches() {
         let matches = [];

@@ -20,6 +20,7 @@
   },
   "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
   "phaserVersion": "3.80.1",
+  "mobile_portrait": true,
   "soundsLoader": {
     "background": "https://files.catbox.moe/lu8qwo.mp3",
     "collect1": "https://files.catbox.moe/eedq3y.mp3",
