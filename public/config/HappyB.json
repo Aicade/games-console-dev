@@ -1,31 +1,46 @@
 {
-    "description": "Throw Blades.",
-    "deviceOrientation": "landscape",
+    "title": "Cake Splatter",
+    "description": "Hold the cake to aim at the birthday boy",
+    "instructions": "Instructions: 1. Tap to throw darts.",
+    "deviceOrientation": "portrait",
     "imageLoader": {
-        "background": "background",
-        "enemy": "enemy",
-        "player": "player",
-        "collectible": "collectible"
+      "background": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/image_0_background.webp",
+      "player": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/images/new_asset_5.png",
+      "cake": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/image_2_projectile.webp",
+      "aimLine": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/history/iteration/fsOQCtGV3Tql.webp",
+      "new_asset_5": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/image_1_((()))_player.webp",
+      "playerWithCake": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/images/new_asset_6.png",
+      "birthdayMessage300": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/images/new_asset_7.png",
+      "birthdayMessage600": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/images/new_asset_8.png",
+      "birthdayMessage1000": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/images/new_asset_9.png",
+      "confetti": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/images/new_asset_10.png",
+      "powerUp": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YZDJN1U9XPjeiZ8v/assets/images/new_asset_11.png"
     },
-    "instructions": "Instructions:  1.Tap to Throw Blades.",
+    "soundsLoader": {
+      "background": "https://files.catbox.moe/cwap0h.mp3",
+      "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
+      "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3"
+    },
     "deviceOrientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
+      "landscape": {  
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
     },
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
-    "soundsLoader": {
-        "background": "background",
-        "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
-        "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav",
-        "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/slice.flac",
-        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3"
-    },
-    "title": "Happy Bday game"
-}
+    "orientationSizes": {
+      "landscape": {
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
+    }
+  }

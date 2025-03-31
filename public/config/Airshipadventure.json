@@ -25,5 +25,7 @@
             "height": 1280
         }
     },
-    "phaserVersion": "3.80.1"
+    "phaserVersion": "3.80.1",
+    "mobile_portrait": true
+
 }

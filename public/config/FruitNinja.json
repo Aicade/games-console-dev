@@ -1,29 +1,61 @@
 {
-    "title": "Fruit and Meat Slasher",
-    "description": "A game where the player slices through various fruits and meats to earn points and progress through levels.",
-    "deviceOrientation": "auto",
-    "imageLoader": {
-        "background": "background",
-        "collectible": "collectible",
-        "avoidable": "avoidable"
+  "title": "Fruit Ninja",
+  "description": "<p>In Berlin Wall Breaker, players take control of a cannon to aim and shoot at the right time to break down the Berlin Wall. The gameplay is focused on precision and timing to progress through the levels.</p>",
+  "instructions": "Instructions:1. Tap to shoot. 2. Destroy all obstacles.",
+  "deviceOrientation": "landscape",
+  "imageLoader": {
+    "background": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/360_F_302312313_qbLQYom8uLPpthrty1KVHhrkI8WO0SEg.png?t=1743177010425",
+    "watermelon": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/watermelon.png?t=1743006857035",
+    "apple": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/apple.png?t=1743006916895",
+    "orange": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/orange.png?t=1743006960452",
+    "pineapple": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/pineapple.png?t=1743006999938",
+    "X cross": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x%20cross.png?t=1743356011821",
+    "orange_half": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/orange_half.png?t=1743074382429",
+    "apple_half": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/apple_half.png?t=1743074383076",
+    "watermelon_half": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/watermelon_half.png?t=1743074383195",
+    "pineapple_half": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/pineapple_half.png?t=1743074383242",
+    "newAsset_12": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/history/iteration/HpyFcUemF4Xd.webp",
+    "newAsset_13": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/history/iteration/GgBguVUHedV0.webp",
+    "Bomb_FNPIB": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/Bomb_FNPIB.png?t=1743096817209",
+    "x2": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x2.png?t=1743322813406",
+    "x3": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x3.png?t=1743322844976",
+    "x4": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x4.png?t=1743322867926",
+    "slice_trail": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/slice_trail.png?t=1743356935488",
+    "orange_splash": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/orange_splash.png?t=1743356658935"
+  },
+  "soundsLoader": {
+    "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/34-music-menu-101soundboards_cc998252-f8e6-4f32-bd24-fd7704a1cb92.mp3?t=1743319454827",
+    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
+    "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_2.mp3",
+    "steel-blade-slice-1-188213": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/steel-blade-slice-1-188213_b39adf1f-a242-449b-a007-e0d4d2643f9c.mp3?t=1743319546494",
+    "bomb_blast": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/explosion-47821_159cdab1-b536-448f-840e-ec7ca980987a.mp3?t=1743323514376"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "instructions": "Instructions: 1. Slice collectibles 2. Avoid enemies 3. Collect Timers",
-    "deviceOrientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
-    "phaserVersion": "3.80.1",
-    "soundsLoader": {
-        "background": "background",
-        "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
-        "slice": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/slice.flac"
-    },
-    "orientationFallback": true
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "mobile_portrait": false,
+  "libLoader": {
+    "x2": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x2.png?t=1743322813406",
+    "x3": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x3.png?t=1743322844976",
+    "x4": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x4.png?t=1743322867926"
+  }
 }

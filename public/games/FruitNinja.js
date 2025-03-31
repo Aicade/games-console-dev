@@ -1,757 +1,738 @@
-var difficulty = 1;
-var difficultyDelay = 5000;
-var spawnTimeDelay = 1000 * difficulty;
-var bombTimeDelay = 2000 * difficulty;
-var timerTimeDelay = 2500 * difficulty;
-const startDelay = 4000;
-
-// Enhanced orientation handling
-const orientationSizes = {
-    "landscape": {
-        "width": 1280,
-        "height": 720,
-    },
-    "portrait": {
-        "width": 720,
-        "height": 1280,
-    }
-};
-
-// Helper function to scale UI elements based on device orientation
-function getScaleFactor(scene) {
-    const isPortrait = scene.game.config.height > scene.game.config.width;
-    const baseWidth = isPortrait ? 720 : 1280;
-    const baseHeight = isPortrait ? 1280 : 720;
-    
-    // Calculate scale based on current game dimensions vs base dimensions
-    const widthScale = scene.game.config.width / baseWidth;
-    const heightScale = scene.game.config.height / baseHeight;
-    
-    // Use the smaller of the two to ensure everything fits
-    return Math.min(widthScale, heightScale);
-}
-
-// Utility function to position elements proportionally
-function positionElement(scene, xPercent, yPercent) {
-    return {
-        x: scene.game.config.width * xPercent,
-        y: scene.game.config.height * yPercent
-    };
-}
-
-class SliceEffect {
-    constructor(scene) {
-        // slicing lines
-        this.scene = scene;
-        this.lines = []; // For the slice lines
-        this.maxLifetime = 300; // Increased lifetime for better visibility
-        this.lastX = null; // Track last position for continuous line
-        this.lastY = null;
-        this.lineHistory = []; // Store recent points to create a trail
-        this.maxHistoryLength = 10; // Maximum number of points to store
-        
-        // Create particle emitter for the slice effect
-        this.emitter = scene.add.particles('collectible', {
-            speed: 50,
-            scale: { start: 0.05 * scene.scaleFactor, end: 0 },
-            alpha: { start: 0.8, end: 0 },
-            lifespan: 300,
-            blendMode: 'ADD',
-            tint: 0xFFFFFF,
-            frequency: -1 // Manual emission
-        });
-    }
-
-    addSlice(x1, y1, x2, y2) {
-        // Scale line thickness based on device
-        const scale = getScaleFactor(this.scene);
-        const lineWidth = Math.max(3, Math.floor(5 * scale));
-
-        // Check for valid coordinates - sometimes touch events can return NaN or undefined
-        if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
-            return;
-        }
-        
-        // If this is a continuation of a previous slice, use the last point as the start
-        if (this.lastX !== null && this.lastY !== null) {
-            // Calculate distance to previous point - if too large, treat as new slice
-            const distToPrev = Phaser.Math.Distance.Between(this.lastX, this.lastY, x2, y2);
-            if (distToPrev < 100) { // Only connect if reasonably close
-                x1 = this.lastX;
-                y1 = this.lastY;
-            }
-        }
-        
-        // Save current end position for next slice segment
-        this.lastX = x2;
-        this.lastY = y2;
-        
-        // Add to line history
-        this.lineHistory.push({x: x2, y: y2, time: this.scene.time.now});
-        if (this.lineHistory.length > this.maxHistoryLength) {
-            this.lineHistory.shift();
-        }
-        
-        // Create a graphics object for the line
-        let graphics = this.scene.add.graphics({ 
-            lineStyle: { 
-                width: lineWidth, 
-                color: 0xffffff,
-                alpha: 0.8
-            } 
-        });
-        
-        // Draw the line
-        graphics.strokeLineShape(new Phaser.Geom.Line(x1, y1, x2, y2));
-        
-        // Add glow effect
-        let glowGraphics = this.scene.add.graphics({
-            lineStyle: {
-                width: lineWidth + 4,
-                color: 0x00ffff,
-                alpha: 0.3
-            }
-        });
-        glowGraphics.strokeLineShape(new Phaser.Geom.Line(x1, y1, x2, y2));
-        
-        // Store the line with its creation time
-        this.lines.push({ 
-            graphics, 
-            glowGraphics,
-            createdAt: this.scene.time.now,
-            alpha: 1.0
-        });
-
-        // Create particles along the line
-        this.createParticlesAlongLine(x1, y1, x2, y2);
-
-        // Play slice sound with randomized pitch for variety (if frequent slices)
-        if (this.scene.sounds && this.scene.sounds.slice && Math.random() < 0.3) {
-            this.scene.sounds.slice.setVolume(0.15).setRate(0.8 + Math.random() * 0.4).play();
-        }
-
-        // Destroy old lines
-        this.scene.time.delayedCall(this.maxLifetime, () => {
-            if (graphics && graphics.active) {
-                graphics.clear();
-                graphics.destroy();
-            }
-            if (glowGraphics && glowGraphics.active) {
-                glowGraphics.clear();
-                glowGraphics.destroy();
-            }
-        }, [], this);
-    }
-
-    createParticlesAlongLine(x1, y1, x2, y2) {
-        // Calculate distance between points
-        const distance = Phaser.Math.Distance.Between(x1, y1, x2, y2);
-        
-        // If points are too close, just emit at one position
-        if (distance < 5) {
-            this.emitter.emitParticleAt(x1, y1, 2);
-            return;
-        }
-        
-        // Calculate how many particles to emit based on distance
-        const particleCount = Math.max(3, Math.ceil(distance / 10));
-        
-        // Emit particles along the line
-        for (let i = 0; i < particleCount; i++) {
-            const t = i / particleCount;
-            const x = Phaser.Math.Linear(x1, x2, t);
-            const y = Phaser.Math.Linear(y1, y2, t);
-            
-            // Add some random offset for more natural look
-            const offsetX = (Math.random() - 0.5) * 5;
-            const offsetY = (Math.random() - 0.5) * 5;
-            
-            this.emitter.emitParticleAt(x + offsetX, y + offsetY, 1);
-        }
-    }
-
-    // Reset the slice (call this when pointer is released)
-    resetSlice() {
-        this.lastX = null;
-        this.lastY = null;
-        this.lineHistory = [];
-    }
-
-    update() {
-        // Fade out existing lines for a smoother disappearance
-        const currentTime = this.scene.time.now;
-        
-        for (let i = this.lines.length - 1; i >= 0; i--) {
-            const line = this.lines[i];
-            const elapsed = currentTime - line.createdAt;
-            
-            if (elapsed < this.maxLifetime) {
-                // Calculate fade out
-                const newAlpha = Phaser.Math.Linear(0.8, 0, elapsed / this.maxLifetime);
-                if (line.graphics && line.graphics.active) {
-                    line.graphics.alpha = newAlpha;
-                }
-                if (line.glowGraphics && line.glowGraphics.active) {
-                    line.glowGraphics.alpha = newAlpha * 0.5;
-                }
-            } else {
-                // Remove from array if past lifetime
-                this.lines.splice(i, 1);
-            }
-        }
-        
-        // Clean up old history points
-        const cutoffTime = currentTime - this.maxLifetime;
-        this.lineHistory = this.lineHistory.filter(point => point.time > cutoffTime);
-    }
-    
-    // Draw the entire trail (alternative approach)
-    drawTrail() {
-        if (this.lineHistory.length < 2) return;
-        
-        const scale = getScaleFactor(this.scene);
-        const lineWidth = Math.max(3, Math.floor(5 * scale));
-        
-        // Create graphics for the trail
-        let trailGraphics = this.scene.add.graphics({ 
-            lineStyle: { 
-                width: lineWidth, 
-                color: 0xffffff,
-                alpha: 0.8
-            } 
-        });
-        
-        // Begin path
-        trailGraphics.beginPath();
-        trailGraphics.moveTo(this.lineHistory[0].x, this.lineHistory[0].y);
-        
-        // Draw line through all points
-        for (let i = 1; i < this.lineHistory.length; i++) {
-            trailGraphics.lineTo(this.lineHistory[i].x, this.lineHistory[i].y);
-        }
-        
-        // Stroke the path
-        trailGraphics.strokePath();
-        
-        // Add the trail to lines for cleanup
-        this.lines.push({
-            graphics: trailGraphics,
-            glowGraphics: null,
-            createdAt: this.scene.time.now,
-            alpha: 1.0
-        });
-    }
-}
-function detectDeviceAndOrientation() {
-    // Check if the device is mobile
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Set orientation based on device type
-    if (isMobile) {
-        return "portrait";
-    } else {
-        return "landscape";
-    }
-}
-
-// Set the device orientation in the config
-_CONFIG.deviceOrientation = detectDeviceAndOrientation();
-// Game Scene
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.score = 0;
-        this.timerText = null; // Text object to display the timer
-        this.timeLeft = 25; // Time in seconds given to answer each question
-        this.timerEvent = null; // Phaser timer event
+        this.lives = 3;
+        this.fruits = [];
+        this.splashes = []; // Track active splash effects
+        this.isGameOver = false; // Renamed from this.gameOver
+        this.sliceTimes = []; // Array to store timestamps of slices
+        this.comboImage = null; // Track current combo image
+        this.fruitTypes = [{
+            name: 'watermelon',
+            halfName: 'watermelon_half',
+            juiceName: 'juice_red',
+            scale: 0.15,
+            points: 10,
+            shortid: 'QosS',
+            halfShortid: 'JVEe',
+            juiceShortid: 'OF0j',
+            splashImage: 'splash_red'
+        }, {
+            name: 'apple',
+            halfName: 'apple_half',
+            juiceName: 'juice_red',
+            scale: 0.15,
+            points: 15,
+            shortid: 'f6Yz',
+            halfShortid: 'io2N',
+            juiceShortid: 'OF0j',
+            splashImage: 'splash_white'
+        }, {
+            name: 'orange',
+            halfName: 'orange_half',
+            juiceName: 'juice_orange',
+            scale: 0.2,
+            points: 20,
+            shortid: '0UYb',
+            halfShortid: 'mAyh',
+            juiceShortid: '1USA',
+            splashImage: 'splash_orange'
+        }, {
+            name: 'pineapple',
+            halfName: 'pineapple_half',
+            juiceName: 'juice_yellow',
+            scale: 0.12,
+            points: 25,
+            shortid: 'JODv',
+            halfShortid: 'Qa5j',
+            juiceShortid: 'qpqQ',
+            splashImage: 'splash_white'
+        }];
     }
 
     preload() {
-        difficulty = 1;
-        
+
+        // this.isGameOver = false;
+
         addEventListenersPhaser.bind(this)();
 
         for (const key in _CONFIG.imageLoader) {
-            this.load.image(key, _CONFIG.imageLoader[key]);
+            try {
+                console.log(`Attempting to load image: ${key} from ${_CONFIG.imageLoader[key]}`);
+                this.load.image(key, _CONFIG.imageLoader[key]);
+            } catch (error) {
+                console.error(`Failed to load image: ${key}, ${error}`);
+            }
         }
+        
+
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
-
         this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-        this.load.image("newAsset_4","https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/5EcOUaGOzDpaqm0s/history/iteration/DtMfxFkl1c52.webp");
+        const fontName = 'pix';
+        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
+        this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
 
-        this.load.bitmapFont('pixelfont',
-            'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.png',
-            'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.xml');
         displayProgressLoader.call(this);
+
+        // Load fruits
+        this.load.image('watermelon', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/watermelon.png?t=1743006857035');
+        this.load.image('apple', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/apple.png?t=1743006916895');
+        this.load.image('orange', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/orange.png?t=1743006960452');
+        this.load.image('pineapple', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/pineapple.png?t=1743006999938');
+
+        // Load fruit halves
+        this.load.image('watermelon_half', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/watermelon_half.png?t=1743074383195');
+        this.load.image('apple_half', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/apple_half.png?t=1743074383076');
+        this.load.image('orange_half', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/orange_half.png?t=1743074382429');
+        this.load.image('pineapple_half', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/pineapple_half.png?t=1743074383242');
+
+        // Load fruit splashes
+        this.load.image('splash_red', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/history/iteration/HpyFcUemF4Xd.webp');
+        this.load.image('splash_white', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/history/iteration/GgBguVUHedV0.webp');
+        this.load.image('splash_orange', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/orange_splash.png?t=1743356658935');
+
+        // Load juice effects
+        this.load.image('juice_red', 'https://play.rosebud.ai/assets/juice_red.png?OF0j');
+        this.load.image('juice_orange', 'https://play.rosebud.ai/assets/juice_orange.png?1USA');
+        this.load.image('juice_yellow', 'https://play.rosebud.ai/assets/juice_yellow.png?qpqQ');
+
+        // Load other assets
+        this.load.image('bomb', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/Bomb_FNPIB.png?t=1743096817209');
+        this.load.audio('bomb_blast', 'https://aicade-user-store.s3.amazonaws.com/GameAssets/music/explosion-47821_159cdab1-b536-448f-840e-ec7ca980987a.mp3?t=1743323514376');
+
+        // Load background and effects
+        this.load.image('background', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/360_F_302312313_qbLQYom8uLPpthrty1KVHhrkI8WO0SEg.png?t=1743177010425');
+        this.load.image('slice_trail', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/slice_trail.png?t=1743356935488');
+        this.load.image('heart', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x%20cross.png?t=1743356011821');
+        this.load.image('2_fruits', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x2.png?t=1743322656371');
+        this.load.image('3_fruits', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x3.png?t=1743322632815');
+        this.load.image('4_fruits', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/x4.png?t=1743322602044');
+
+        // Audio
+        this.load.audio('blade', 'https://aicade-user-store.s3.amazonaws.com/GameAssets/music/steel-blade-slice-1-188213_b39adf1f-a242-449b-a007-e0d4d2643f9c.mp3?t=1743319546494');
+    }
+
+    resizeAssets() {
+        const baseWidth = 800;
+        const baseHeight = 600;
+        const scaleX = this.game.config.width / baseWidth;
+        const scaleY = this.game.config.height / baseHeight;
+        const scale = Math.min(scaleX, scaleY);
+
+        // Resize background
+        this.bg.setDisplaySize(this.game.config.width, this.game.config.height);
+
+        // Resize UI elements
+        this.scoreText.setFontSize(45 * scale);
+        this.scoreText.setPosition(this.game.config.width / 2 - 200, 15 * scale);
+        this.scoreText.setOrigin(0.5, 0);
+        this.pauseButton.setScale(2 * scale);
+        this.pauseButton.setPosition(this.game.config.width - 60 * scale, 60 * scale);
+
+        this.clock.setPosition(0, 0); // Reset position (relative to graphics)
+        this.clockHand.setPosition(0, 0);
+        this.drawClock(); // Redraw clock at new scale
+
+        // Resize hearts
+        const heartSize = 20 * scale;
+        const baseScale = 0.12; // Base scale factor
+        this.hearts.forEach((heart, index) => {
+            if (heart.active) {
+                const sizeMultiplier = [1, 1.5, 2][index]; // 1x, 1.5x, 2x for hearts 0, 1, 2
+                heart.setScale(scale * baseScale * sizeMultiplier);
+                heart.setPosition(16 * scale + index * (heartSize + 20 * scale), 56 * scale);
+            }
+        });
+
+        // Resize fruits and bombs
+        this.fruits.forEach(fruit => {
+            if (fruit.fruitType) {
+                fruit.setScale(fruit.fruitType.scale * scale);
+            } else if (fruit.isBomb) {
+                fruit.setScale(0.2 * scale); // Scale bomb image consistently
+            }
+        });
+
+        // Resize active splashes
+        this.splashes.forEach(splash => {
+            if (splash.active) {
+                const fruitScale = splash.scale / 0.3; // Reverse-engineer base fruit scale
+                splash.setScale(fruitScale * scale * 0.3); // Apply scaled size
+            }
+        });
     }
 
     create() {
-        this.timeLeft = 25;
-        this.cam = this.cameras.main;
-        this.width = this.game.config.width;
-        this.height = this.game.config.height;
-        
-        // Detect current orientation based on actual dimensions
-        this.isPortrait = this.height > this.width;
-        
-        // Update physics based on orientation
-        this.physics.world.gravity.y = this.isPortrait ? 250 : 200;
-        
-        this.scaleFactor = getScaleFactor(this);
-        
-        // Setup sounds
-        this.setupSounds();
-        
-        // Setup particle effects
-        this.setupParticleEffects();
-        
-        this.pointerDown = false;
-        this.gameSceneBackground();
-        this.gameOverFlag = false;
-    
-        // Create UI elements based on orientation
-        this.createUIElements();
-    
-        // Add input listeners
-        this.setupInputListeners();
-
-        this.score = 0;
-        this.fruits = this.physics.add.group({});
-        this.timer = this.physics.add.group({});
-        this.bombs = this.physics.add.group({});
-
-        // Position and scale center text based on orientation
-        const centerPos = positionElement(this, 0.5, 0.5);
-        const centerTextSize = this.isPortrait ? 60 : 70;
-        this.centerText = this.add.bitmapText(centerPos.x, centerPos.y, 'pixelfont', '', centerTextSize)
-            .setOrigin(0.5, 0.5)
-            .setVisible(true)
-            .setDepth(100);
-
-        this.sliceEffect = new SliceEffect(this);
-
-        this.setupGameStart();
-        
-        // Set initial spawn timings
-        spawnTimeDelay = this.time.now + (2500 * difficulty);
-        bombTimeDelay = this.time.now + (3000 * difficulty);
-        timerTimeDelay = this.time.now + (4000 * difficulty);
-        this.scale.on('resize', this.handleResize, this);
-    }
-    handleResize(gameSize) {
-        // Get new dimensions
-        this.width = gameSize.width;
-        this.height = gameSize.height;
-        
-        // Update orientation flag
-        const wasPortrait = this.isPortrait;
-        this.isPortrait = this.height > this.width;
-        
-        // Only recreate UI if orientation actually changed
-        if (wasPortrait !== this.isPortrait) {
-            // Update physics
-            if (this.physics && this.physics.world) {
-                this.physics.world.gravity.y = this.isPortrait ? 250 : 200;
-            }
-            
-            // Update scale factor
-            this.scaleFactor = getScaleFactor(this);
-            
-            // Clear existing UI elements
-            if (this.scoreText) this.scoreText.destroy();
-            if (this.timerText) this.timerText.destroy();
-            if (this.instructionText) this.instructionText.destroy();
-            
-            // Recreate UI
-            this.createUIElements();
-        }
-    }
-    
-    setupSounds() {
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
             this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
         }
-        this.sounds.background.setVolume(1).setLoop(true).play();
-    }
-    
-    setupParticleEffects() {
-        this.explosionEmitter = this.add.particles('avoidable', {
-            speed: 150,
-            scale: { start: 0.025 * this.scaleFactor, end: 0 },
-            alpha: { start: 1, end: 0 },
-            lifespan: 5000,
-            on: false
-        });
-    }
-    
-    createUIElements() {
-        // Position elements based on detected orientation
-        let scoreIconScale, scoreTextSize, timerTextSize, instructionTextSize;
-        let scoreIconX, scoreIconY, scoreTextX, scoreTextY, timerTextX, timerTextY;
-        let pauseButtonX, pauseButtonY, pauseButtonScale;
-        
-        if (this.isPortrait) {
-            // Portrait mode positions (relative to screen)
-            scoreIconScale = 0.22;
-            scoreTextSize = 35;
-            timerTextSize = 24;
-            instructionTextSize = 20;
-            
-            // Move score to right side in portrait
-            scoreIconX = this.width/2;
-            scoreIconY = this.height * 0.05;
-            scoreTextX = this.width/2 + 30;
-            scoreTextY = this.height * 0.05 - 15;
-            
-            // Position timer at top left corner
-            timerTextX = this.width * 0.05;
-            timerTextY = this.height * 0.05;
-            
-            pauseButtonX = this.width * 0.85;
-            pauseButtonY = this.height * 0.05;
-            pauseButtonScale = 1.8;
-        } else {
-            // Landscape mode positions (original)
-            scoreIconScale = 0.25;
-            scoreTextSize = 40;
-            timerTextSize = 28;
-            instructionTextSize = 25;
-            
-            scoreIconX = this.width / 2 - 70;
-            scoreIconY = 55;
-            scoreTextX = this.width / 2 - 40;
-            scoreTextY = 15;
-            
-            timerTextX = 50;
-            timerTextY = 30;
-            
-            pauseButtonX = this.width * 0.9;
-            pauseButtonY = this.height * 0.1;
-            pauseButtonScale = 2;
-        }
-        
-        // Create UI elements with appropriate scaling
-        let fruitLabel = this.add.sprite(scoreIconX, scoreIconY, 'collectible').setScale(scoreIconScale);
-        this.scoreText = this.add.bitmapText(scoreTextX, scoreTextY, 'pixelfont', 'x 0', scoreTextSize);
-        this.scoreText.setTint(0xff9900).setDepth(11);
-        
-        this.timerText = this.add.bitmapText(timerTextX, timerTextY, 'pixelfont', `Time left : ${this.timeLeft}s`, timerTextSize).setTint(0xffffff);
-        
-        // Instruction text - centered regardless of orientation
-        this.instructionText = this.add.bitmapText(
-            this.width * 0.5, 
-            this.height * 0.3, 
-            'pixelfont', 
-            `BEST OF LUCK SCORING IN ${this.timeLeft} SECONDS`, 
-            instructionTextSize
-        ).setOrigin(0.5, 0.5).setScrollFactor(0).setDepth(11).setTint(0xabe810);
-        
-        // Pause button
-        const pauseButton = this.add.sprite(pauseButtonX, pauseButtonY, "pauseButton")
-            .setOrigin(0.5, 0.5)
-            .setScale(pauseButtonScale);
-        pauseButton.setInteractive({ cursor: 'pointer' });
-        pauseButton.on('pointerdown', () => this.pauseGame());
-    }
-    
-    setupInputListeners() {
+
+        this.sounds.background.setVolume(0.1).setLoop(true).play();
+
+        this.vfx = new VFXLibrary(this)
+
+        this.add.image(0, 0, 'background').setOrigin(0, 0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+
+        this.width = this.game.config.width;
+        this.height = this.game.config.height;
+        this.bg = this.add.sprite(0, 0, 'background').setOrigin(0, 0);
+        this.bg.setScrollFactor(0);
+        this.bg.displayHeight = this.game.config.height;
+        this.bg.displayWidth = this.game.config.width;
+
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
-        
-        // Track previous pointer position for more accurate slicing
-        this.prevPointerX = 0;
-        this.prevPointerY = 0;
-        
-        this.input.on("pointerdown", (pointer) => {
-            this.preScore = this.score;
-            this.pointerDown = true;
-            this.prevPointerX = pointer.x;
-            this.prevPointerY = pointer.y;
-            
-            // Reset the slice effect when starting a new slice
-            this.sliceEffect.resetSlice();
-        });
-        
-        this.input.on("pointermove", (pointer) => {
-            if (this.pointerDown) {
-                // Only create a slice if there's enough movement
-                const minDistance = 5;
-                const distance = Phaser.Math.Distance.Between(
-                    this.prevPointerX, this.prevPointerY, pointer.x, pointer.y
-                );
-                
-                if (distance >= minDistance) {
-                    this.sliceEffect.addSlice(
-                        this.prevPointerX, this.prevPointerY, 
-                        pointer.x, pointer.y
-                    );
-                    
-                    this.prevPointerX = pointer.x;
-                    this.prevPointerY = pointer.y;
-                }
-            }
-        });
-        
-        this.input.on("pointerup", () => {
-            this.postScore = this.score;
-            const combo = this.postScore - this.preScore;
-            if (combo > 1 && !this.gameOverFlag) {
-                this.centerText.setText("COMBO x" + (this.postScore - this.preScore).toString());
-                this.centerText.setVisible(true);
-                this.time.delayedCall(500, () => {
-                    this.centerText.setVisible(false);
+
+        this.pauseButton = this.add.sprite(this.game.config.width - 60, 60, "pauseButton").setOrigin(0.5, 0.5).setDepth(1);
+        this.pauseButton.setInteractive({ cursor: 'pointer' });
+        this.pauseButton.setScale(3);
+        this.pauseButton.on('pointerdown', () => this.pauseGame());
+
+        // Score text
+        this.scoreText = this.add.bitmapText(this.game.config.width / 2 - 200, 20, 'pixelfont', '0', 32);
+        this.scoreText.setOrigin(0.5, 0); // Center horizontally, align top
+        this.scoreText.setDepth(1); // Ensure it’s above other elements
+        this.scoreText.setDropShadow(2, 2, 0x000000, 0.8); // Add a shadow for better contrast
+
+        // Lives text
+        this.hearts = [];
+        const baseScale = 0.1; // Current size of first heart
+        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale).setDepth(2)); // First heart (same size)
+        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale * 1.5).setDepth(2)); // Second heart (50% bigger)
+        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale * 2).setDepth(2)); // Third heart (100% bigger)
+
+        // Trail effect for slice
+        this.input.on('pointermove', (pointer) => {
+            if (pointer.isDown) {
+                const trail = this.add.image(pointer.x, pointer.y, 'slice_trail');
+                trail.setScale(0.2);
+                trail.setAlpha(0.8);
+                trail.angle = Phaser.Math.Between(0, 360);
+
+                this.tweens.add({
+                    targets: trail,
+                    alpha: 0,
+                    scale: 0.1,
+                    duration: 200,
+                    onComplete: () => {
+                        trail.destroy();
+                    }
                 });
             }
-            this.pointerDown = false;
-            
-            // Reset the slice effect when ending a slice
-            this.sliceEffect.resetSlice();
-        });
-        
-        this.input.keyboard.disableGlobalCapture();
-    }
-    
-    setupGameStart() {
-        this.startDelayTimer = this.time.delayedCall(startDelay - 2000, () => {
-            this.instructionText.setAlpha(0);
-            this.startTimer();
-        });
-    }
-    
-    update() {
-        if (this.gameOverFlag) return;
-        
-        if (this.pointerDown) {
-            this.sliceEffect.addSlice(this.input.x, this.input.y, this.input.activePointer.prevPosition.x, this.input.activePointer.prevPosition.y);
-        }
-        
-        // Handle spawning objects with appropriate timing
-        this.sliceEffect.update();
-    
-    // Handle spawning objects with appropriate timing
-    const currentTime = this.time.now;
-    if (currentTime > spawnTimeDelay && currentTime > startDelay) {
-        this.spawnFruit();
-        spawnTimeDelay = currentTime + (2500 * difficulty);
-    }
-
-    if (currentTime > bombTimeDelay && currentTime > startDelay) {
-        this.spawnBomb();
-        bombTimeDelay = currentTime + (3000 * difficulty);
-    }
-
-    if (currentTime > timerTimeDelay && currentTime > startDelay) {
-        this.spawnTimer();
-        timerTimeDelay = currentTime + (4000 * (difficulty - 0.08));
-    }
-
-    // Gradually decrease difficulty
-    if (currentTime > difficultyDelay && difficulty > 0.1) {
-        difficulty -= 0.05;
-        difficultyDelay = currentTime + 10000;
-    }
-    }
-
-    createParticles(x, y, type = "collectible") {
-        // Scale particles based on detected orientation
-        const particleScale = this.isPortrait ? 0.022 : 0.025;
-        
-        const emitter = this.add.particles(x, y, type, {
-            speed: 100,
-            scale: { start: particleScale * this.scaleFactor, end: 0 },
-            blendMode: 'ADD',
-            lifespan: 400,
-            on: false
         });
 
-        emitter.explode(20);
-        this.time.delayedCall(1000, () => {
-            emitter.destroy();
+        // Slice detection
+        this.input.on('pointermove', (pointer) => {
+            if (pointer.isDown) {
+                this.fruits.forEach(fruit => {
+                    if (!fruit.sliced && fruit.getBounds().contains(pointer.x, pointer.y)) {
+                        this.sliceFruit(fruit);
+                    }
+                });
+            }
         });
-    }
 
-    startTimer() {
-        this.timerEvent = this.time.addEvent({
-            delay: 1000, // 1 second
-            callback: this.updateTimer,
+        this.spawnDelay = 1000; // Start with 1 second delay
+        this.minSpawnDelay = 200; // Minimum delay (e.g., 0.2 seconds)
+
+        // Spawn fruits periodically
+        // Store the spawn timer event so we can destroy it later
+        this.spawnTimer = this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                if (!this.isGameOver) { // Use isGameOver
+                    if (Phaser.Math.Between(1, 100) <= 15) {
+                        this.spawnBomb();
+                    } else {
+                        this.spawnFruit();
+                    }
+                }
+            },
             callbackScope: this,
             loop: true
         });
-    }
-    
-    updateTimer() {
-        this.timeLeft--;
-        this.timerText.setText(`Time left: ${this.timeLeft}s`);
 
-        if (this.timeLeft <= 0) {
-            this.gameOver();
+        this.time.addEvent({
+            delay: 10000, // Adjust every 10 seconds
+            callback: () => {
+                if (!this.isGameOver && this.spawnDelay > this.minSpawnDelay) {
+                    this.spawnDelay = Math.max(this.minSpawnDelay, this.spawnDelay - 100); // Decrease by 100 ms, cap at min
+                    this.spawnTimer.delay = this.spawnDelay; // Update the spawn timer delay
+                    // console.log(`Spawn delay reduced to: ${this.spawnDelay} ms`); // Debug log (optional)
+                }
+            },
+            callbackScope: this,
+            loop: true
+        });
+
+        // Clock UI
+        this.totalTime = 60; // Total game time in seconds (adjust as needed)
+        this.timeRemaining = this.totalTime; // Current time remaining
+
+        // Clock graphics
+        this.clockRadius = 30; // Radius of the clock
+        this.clock = this.add.graphics({ x: 0, y: 0 }); // Graphics object for clock
+        this.clockHand = this.add.graphics({ x: 0, y: 0 }); // Graphics object for clock hand
+
+        // Initial clock draw (updated in resizeAssets)
+        this.drawClock();
+
+        // Timer event to update clock
+        this.timerEvent = this.time.addEvent({
+            delay: 1000, // Update every second
+            callback: () => {
+                this.timeRemaining--;
+                this.updateClock();
+                if (this.timeRemaining <= 0) {
+                    this.gameOver();
+                }
+            },
+            callbackScope: this,
+            loop: true
+        });
+
+        this.resizeAssets();
+        this.scale.on('resize', () => this.resizeAssets(), this);
+
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.input.keyboard.disableGlobalCapture();
+
+    }
+
+    drawClock() {
+        this.clock.clear();
+        this.clockHand.clear();
+
+        const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
+        const centerX = this.game.config.width / 2;
+        const centerY = 60 * scale;
+        
+        // Draw outer glow
+        const glowSize = 5 * scale;
+        this.clock.lineStyle(glowSize * scale, 0xFFFFFF, 0.3);
+        this.clock.strokeCircle(centerX, centerY, (this.clockRadius + glowSize/2) * scale);
+        
+        // Draw fancy clock face
+        // Dark outer circle
+        this.clock.fillStyle(0x1A237E, 1); // Dark blue
+        this.clock.fillCircle(centerX, centerY, this.clockRadius * scale);
+        
+        // Lighter inner circle for gradient effect
+        this.clock.fillStyle(0x303F9F, 1); // Lighter blue
+        this.clock.fillCircle(centerX - 5 * scale, centerY - 5 * scale, this.clockRadius * 0.7 * scale);
+        
+        // Add metallic border
+        this.clock.lineStyle(3 * scale, 0xE0E0E0);
+        this.clock.strokeCircle(centerX, centerY, this.clockRadius * scale);
+        
+        // Add inner ring
+        this.clock.lineStyle(1 * scale, 0xFFFFFF, 0.6);
+        this.clock.strokeCircle(centerX, centerY, (this.clockRadius - 3) * scale);
+        
+        // Add hour markers
+        for (let i = 0; i < 12; i++) {
+            const angle = (Math.PI * 2 * (i / 12)) - (Math.PI / 2);
+            const innerRadius = this.clockRadius * 0.8 * scale;
+            const outerRadius = this.clockRadius * 0.95 * scale;
+            
+            this.clock.lineStyle(i % 3 === 0 ? 2 * scale : 1 * scale, 0xFFFFFF, 0.8);
+            this.clock.beginPath();
+            this.clock.moveTo(
+                centerX + Math.cos(angle) * innerRadius,
+                centerY + Math.sin(angle) * innerRadius
+            );
+            this.clock.lineTo(
+                centerX + Math.cos(angle) * outerRadius,
+                centerY + Math.sin(angle) * outerRadius
+            );
+            this.clock.strokePath();
+        }
+        
+        // Add center dot
+        this.clock.fillStyle(0xFFFFFF);
+        this.clock.fillCircle(centerX, centerY, 2 * scale);
+        
+        // Draw initial clock hand (updated in updateClock)
+        this.updateClock();
+        
+        // Add dynamic time text
+        if (this.timeText) {
+            this.timeText.destroy();
+        }
+        
+        const minutes = Math.floor(this.timeRemaining / 60);
+        const seconds = this.timeRemaining % 60;
+        const timeString = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        this.timeText = this.add.text(
+            centerX, 
+            centerY + (this.clockRadius + 15) * scale,
+            timeString,
+            { 
+                fontFamily: 'Arial',
+                fontSize: 16 * scale,
+                color: '#FFFFFF',
+                stroke: '#000000',
+                strokeThickness: 2 * scale
+            }
+        ).setOrigin(0.5);
+    }
+
+    updateClock() {
+        this.clockHand.clear();
+
+        const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
+        const centerX = this.game.config.width / 2;
+        const centerY = 60 * scale;
+
+        // Get percentage of time remaining
+        const timePercent = this.timeRemaining / this.totalTime;
+        
+        // Change color based on remaining time
+        let handColor;
+        if (timePercent > 0.6) {
+            handColor = 0x4CAF50; // Green when plenty of time
+        } else if (timePercent > 0.3) {
+            handColor = 0xFFC107; // Yellow/amber when time is getting low
+        } else {
+            handColor = 0xFF0000; // Red when time is critical
+            
+            // Use alpha for pulsing effect instead of color changes
+            const pulseRate = 0.5 + Math.sin(this.time.now / 200) * 0.5;
+            this.clockHand.alpha = 0.5 + pulseRate * 0.5;
+        }
+
+        // Calculate angle based on remaining time (0° at top, clockwise)
+        const angle = (Math.PI * 2 * timePercent) - (Math.PI / 2);
+        const handLength = this.clockRadius * 0.75 * scale;
+
+        // Draw hand
+        this.clockHand.lineStyle(2 * scale, handColor);
+        this.clockHand.beginPath();
+        this.clockHand.moveTo(centerX, centerY);
+        this.clockHand.lineTo(
+            centerX + Math.cos(angle) * handLength,
+            centerY + Math.sin(angle) * handLength
+        );
+        this.clockHand.strokePath();
+        
+        // Add arrowhead to hand
+        const arrowSize = 3 * scale;
+        const arrowAngle1 = angle + Math.PI * 0.85;
+        const arrowAngle2 = angle - Math.PI * 0.85;
+        
+        this.clockHand.beginPath();
+        this.clockHand.moveTo(
+            centerX + Math.cos(angle) * handLength,
+            centerY + Math.sin(angle) * handLength
+        );
+        this.clockHand.lineTo(
+            centerX + Math.cos(angle) * handLength + Math.cos(arrowAngle1) * arrowSize,
+            centerY + Math.sin(angle) * handLength + Math.sin(arrowAngle1) * arrowSize
+        );
+        this.clockHand.lineTo(
+            centerX + Math.cos(angle) * handLength + Math.cos(arrowAngle2) * arrowSize,
+            centerY + Math.sin(angle) * handLength + Math.sin(arrowAngle2) * arrowSize
+        );
+        this.clockHand.closePath();
+        this.clockHand.fillStyle(handColor);
+        this.clockHand.fillPath();
+        
+        // Draw arc showing remaining time
+        this.clock.lineStyle(3 * scale, handColor, 0.7);
+        this.clock.beginPath();
+        this.clock.arc(
+            centerX, centerY,
+            (this.clockRadius + 3) * scale,
+            -Math.PI/2, // Start at top
+            -Math.PI/2 + (Math.PI * 2 * timePercent), // End at current position
+            false
+        );
+        this.clock.strokePath();
+        
+        // Update time text
+        if (this.timeText) {
+            const minutes = Math.floor(this.timeRemaining / 60);
+            const seconds = this.timeRemaining % 60;
+            const timeString = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            this.timeText.setText(timeString);
         }
     }
 
-    addTimer() {
-        this.timeLeft = this.timeLeft + 2;
+    spawnFruit() {
+        const groupSize = Phaser.Math.Between(1, 4); // Randomly spawn 2 or 3 fruits
+        const baseX = Phaser.Math.Between(100, this.game.config.width - 100); // Base spawn X position
+        const y = this.game.config.height + 50; // Start below screen
+        const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
+
+        for (let i = 0; i < groupSize; i++) {
+            const fruitType = this.fruitTypes[Phaser.Math.Between(0, this.fruitTypes.length - 1)];
+            const xOffset = i * 30 * scale; // Offset each fruit horizontally (adjustable)
+            const fruit = this.add.image(baseX + xOffset, y, fruitType.name);
+            fruit.setScale(fruitType.scale * scale);
+
+            this.physics.add.existing(fruit);
+            const velocityX = Phaser.Math.Between(-200 * scale, 200 * scale) + (i * 50 * scale); // Vary X velocity slightly
+            fruit.body.setVelocity(velocityX, -900 * scale); // Upward toss
+            fruit.body.setGravityY(980 * scale); // Gravity pulls down
+
+            fruit.fruitType = fruitType;
+            fruit.sliced = false;
+            this.fruits.push(fruit);
+
+            this.time.addEvent({
+                delay: 5000,
+                callback: () => {
+                    if (!fruit.sliced && this.fruits.includes(fruit)) {
+                        this.fruits = this.fruits.filter(f => f !== fruit);
+                        fruit.destroy();
+                    }
+                }
+            });
+        }
+
+        // Optional: Chance to spawn a bomb with the group (e.g., 20% chance)
+        if (Phaser.Math.Between(0, 100) < 20) {
+            this.spawnBomb(baseX + (groupSize * 30 * scale), y);
+        }
     }
 
-    updateScore(points) {
-        this.score += points;
-        this.updateScoreText();
+    sliceFruit(fruit) {
+        if (fruit.sliced || this.isGameOver) return;
+        this.sound.play('blade');
+
+        if (fruit.isBomb) {
+            fruit.sliced = true; // Prevent multiple triggers
+            this.isGameOver = true;
+            // this.sound.play('bomb_blast');
+            if (this.spawnTimer) {
+                this.spawnTimer.destroy(); // Stop spawning
+            }
+            this.fruits.forEach(f => {
+                if (f.body) {
+                    f.body.setVelocity(0, 0); // Freeze all objects
+                    f.body.setGravityY(0);
+                }
+            });
+            // Use VFXLibrary for white rays
+        this.vfx.addCircleTexture('whiteRay', 0xffffff, 1, 800); // Larger white circle texture, radius 30
+        const emitter = this.vfx.createEmitter(
+            'whiteRay',           // Texture key
+            fruit.x,              // X position (bomb location)
+            fruit.y,              // Y position (bomb location)
+            0.5,                  // Scale start (larger particles)
+            0.2,                  // Scale end (still shrink, but bigger)
+            2000                  // Lifespan matches 2-second duration
+        );
+
+        // Emit a single burst to cover screen and end after 2 seconds
+        // emitter.setSpeed({ min: 300, max: 600 }); // Faster particles to cover screen
+        emitter.explode(800); // Burst 100 particles at once for full coverage
+
+        // Stop particles and clean up after 2 seconds
+        this.time.delayedCall(2000, () => {
+            emitter.stop();       // Stop emitting
+            emitter.destroy();    // Destroy the emitter itself
+            // Start fade-to-white after rays
+            this.cameras.main.fadeOut(3000, 255, 255, 255); // 3-second fade
+        }, [], this);
+
+        // Call gameOver after total 5 seconds (2s rays + 3s fade)
+        this.time.delayedCall(5000, () => {
+            this.gameOver();
+        }, [], this);
+        return;
     }
 
-    updateScoreText() {
-        this.scoreText.setText(`x ${this.score}`);
+        fruit.sliced = true;
+
+        // Splash Effect
+        const splash = this.add.image(fruit.x, fruit.y, fruit.fruitType.splashImage);
+        splash.setScale(fruit.fruitType.scale * 1.0); // Increase from 0.3 to 1.0 for visibility
+        splash.setAlpha(0.8);
+        splash.setDepth(10); // Ensure it’s above fruits and halves
+        this.splashes.push(splash); // Add to tracking array
+        console.log(`Splash added for ${fruit.fruitType.name} with texture: ${fruit.fruitType.splashImage}`); // Debug log
+        this.tweens.add({
+            targets: splash,
+            alpha: 0,
+            scale: fruit.fruitType.scale * 5, // Grow to 1.5x fruit scale
+            duration: 2000,
+            onComplete: () => {
+                this.splashes = this.splashes.filter(s => s !== splash); // Remove from array
+                splash.destroy();
+            }
+        });
+
+
+        // Update score
+        this.score += fruit.fruitType.points;
+        this.scoreText.setText(this.score);
+
+        const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
+
+        // Track slice time
+        const currentTime = this.time.now;
+        this.sliceTimes.push(currentTime);
+
+        // Filter slices within the last 1 second
+        this.sliceTimes = this.sliceTimes.filter(time => currentTime - time <= 1000);
+        const comboCount = this.sliceTimes.length;
+
+        // Display combo image if combo is 2, 3, or 4
+        let comboImage = null; // Local variable to avoid reassignment issues
+        const padding = 100 * scale; // Padding from edges
+        const randomX = Phaser.Math.Between(padding, this.game.config.width - padding);
+        const randomY = Phaser.Math.Between(padding, this.game.config.height - padding);
+        if (comboCount === 2) {
+            comboImage = this.add.image(randomX, randomY, '2_fruits');
+        } else if (comboCount === 3) {
+            comboImage = this.add.image(randomX, randomY, '3_fruits');
+        } else if (comboCount === 4) {
+            comboImage = this.add.image(randomX, randomY, '4_fruits');
+        }
+
+        if (comboImage) {
+            comboImage.setScale(0.1 * scale);
+            comboImage.setAngle(45);
+            comboImage.setDepth(10);
+            comboImage.setAlpha(1);
+            this.tweens.add({
+                targets: comboImage,
+                alpha: 0,
+                scale: 0.2 * scale,
+                duration: 1000,
+                onComplete: () => {
+                    comboImage.destroy(); // Destroy the local reference
+                }
+            });
+        }
+
+        // Reset combo after 1 second from the first slice
+        if (this.sliceTimes.length === 1) {
+            this.time.delayedCall(1000, () => {
+                this.sliceTimes = [];
+            }, [], this);
+        }
+        
+        const leftHalf = this.add.image(fruit.x - 10 * scale, fruit.y, fruit.fruitType.halfName);
+        const rightHalf = this.add.image(fruit.x + 10 * scale, fruit.y, fruit.fruitType.halfName);
+
+        leftHalf.setScale(fruit.fruitType.scale * scale);
+        rightHalf.setScale(fruit.fruitType.scale * scale);
+
+        this.physics.add.existing(leftHalf);
+        this.physics.add.existing(rightHalf);
+
+        leftHalf.body.setVelocity(-100 * scale, -200 * scale);
+        rightHalf.body.setVelocity(100 * scale, -200 * scale);
+        leftHalf.body.setGravityY(980 * scale);
+        rightHalf.body.setGravityY(980 * scale);
+
+        this.tweens.add({
+            targets: leftHalf,
+            angle: -180,
+            duration: 1000
+        });
+        this.tweens.add({
+            targets: rightHalf,
+            angle: 180,
+            duration: 1000
+        });
+
+        this.fruits = this.fruits.filter(f => f !== fruit);
+        fruit.destroy();
+
+        this.time.delayedCall(2000, () => {
+            leftHalf.destroy();
+            rightHalf.destroy();
+        });
+    }
+
+    spawnBomb() {
+        const x = Phaser.Math.Between(100, this.game.config.width - 100);
+        const y = this.game.config.height + 50; // Start just below the screen
+        const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
+        const bomb = this.add.image(x, y, 'bomb'); // Use the bomb image
+        bomb.setScale(0.2 * scale); // Match fruit scale (e.g., watermelon scale is 0.15)
+
+        this.physics.add.existing(bomb);
+        bomb.body.setVelocity(Phaser.Math.Between(-200 * scale, 200 * scale), -800 * scale); // Move upward
+        bomb.body.setGravityY(980 * scale); // Gravity pulls downward
+
+        // Add properties
+        bomb.sliced = false;
+        bomb.isBomb = true;
+        this.fruits.push(bomb);
+
+        // Remove bomb if it hasn't been sliced after a timeout
+        this.time.addEvent({
+            delay: 5000,
+            callback: () => {
+                if (!bomb.sliced) {
+                    this.fruits = this.fruits.filter(f => f !== bomb);
+                    bomb.destroy();
+                }
+            }
+        });
     }
 
     gameOver() {
+        if (this.timerEvent) {
+            this.timerEvent.remove();
+        }
+        this.sounds.background.stop();
         initiateGameOver.bind(this)({
-            "score": this.score,
-            "Time left": this.timeLeft,
+            score: this.score
         });
     }
 
-    pauseGame() {
-        handlePauseGame.bind(this)();
-    }
-    
-    gameSceneBackground() {
-        let bg = this.add.image(this.width / 2, this.height / 2, "background").setOrigin(0.5);
+    // endGame() {
+    //     this.gameOver();
+    // }
 
-        // Scale differently based on orientation
-        const scale = Math.max(this.width / bg.displayWidth, this.height / bg.displayHeight);
-        bg.setScale(scale);
-    }
-
-    cutFruit(fruit) {
-        if (!this.pointerDown) return;
-        this.sounds.slice.setVolume(0.3).play();
-        this.createParticles(fruit.x, fruit.y);
-        fruit.setAlpha(0);
-        this.time.delayedCall(500, () => {
-            this.fruits.remove(fruit, true, true);
-        });
-        this.updateScore(1);
-    }
-
-    cutBomb(bomb) {
-        if (this.pointerDown) {
-            this.centerText.alpha = 0;
-            this.gameOverFlag = true;
-            this.timerEvent.destroy();
-            this.physics.pause();
-            this.cam.shake(100, 0.1);
-            this.sounds.background.pause();
-
-            this.time.delayedCall(500, () => {
-                this.cam.flash(200);
-                this.sounds.destroy.setVolume(0.3).play();
-                this.createParticles(bomb.x, bomb.y, "avoidable");
-                bomb.setAlpha(0);
-                this.bombs.remove(bomb, true, true);
-                this.time.delayedCall(2000, () => {
-                    this.gameOver();
-                });
+    update() {
+        if (!this.isGameOver) {
+            this.fruits = this.fruits.filter(fruit => {
+                if (fruit.y > this.game.config.height + 50 && !fruit.sliced) {
+                    if (!fruit.isBomb) {
+                        this.lives = Math.max(0, this.lives - 1);
+                        if (this.hearts.length > 0) {
+                            const heart = this.hearts.pop();
+                            heart.destroy();
+                        }
+                        if (this.lives <= 0) {
+                            this.isGameOver = true; // Stop gameplay
+                            if (this.spawnTimer) {
+                                this.spawnTimer.destroy(); // Stop spawning
+                            }
+                            this.fruits.forEach(f => {
+                                if (f.body) {
+                                    f.body.setVelocity(0, 0); // Freeze all objects
+                                    f.body.setGravityY(0);
+                                }
+                            });
+                            this.gameOver(); // Call gameOver immediately
+                        }
+                    }
+                    fruit.destroy();
+                    return false;
+                }
+                return true;
             });
         }
     }
 
-    cutTimer(timer) {
-        if (!this.pointerDown) return;
-        this.sounds.slice.play();
-        this.createParticles(timer.x, timer.y, "newAsset_4");
-        timer.setAlpha(0);
-        this.time.delayedCall(100, () => {
-            this.timer.remove(timer, true, true);
-        });
-        this.addTimer();
-        this.centerText.setText("Time + 2");
-        this.centerText.setVisible(true);
-        this.time.delayedCall(500, () => {
-            this.centerText.setVisible(false);
-        });
-    }
+    
 
-    // Spawn methods with orientation-based adjustments
-    spawnFruit() {
-        // Adjust spawn count and velocity based on detected orientation
-        const spawnCount = Phaser.Math.Between(2, this.isPortrait ? 4 : 5);
-        const yVelocityMin = this.isPortrait ? -500 : -350;
-        const yVelocityMax = this.isPortrait ? -650 : -500;
-        
-        for (var i = 0; i < spawnCount; i++) {
-            const fruit = this.fruits.create(
-                Phaser.Math.Between(150, this.width - 150), 
-                this.height, 
-                'collectible'
-            );
-            
-            // Scale based on orientation
-            fruit.setScale(0.25 * this.scaleFactor);
-            fruit.setVelocity(
-                Phaser.Math.Between(-100, 100),
-                Phaser.Math.Between(yVelocityMin, yVelocityMax)
-            );
-            fruit.setAngularVelocity(Phaser.Math.Between(-200, 200));
-
-            fruit.setInteractive();
-            fruit.on("pointerover", function(pointer) {
-                this.cutFruit(fruit);
-            }, this);
-        }
-    }
-
-    spawnBomb() {
-        // Adjust velocity based on detected orientation
-        const yVelocityMin = this.isPortrait ? -500 : -350;
-        const yVelocityMax = this.isPortrait ? -650 : -500;
-        
-        const bomb = this.bombs.create(
-            Phaser.Math.Between(150, this.width - 150), 
-            this.height, 
-            'avoidable'
-        );
-        
-        // Scale based on orientation
-        bomb.setScale(0.25 * this.scaleFactor);
-        bomb.setVelocity(
-            Phaser.Math.Between(-100, 100),
-            Phaser.Math.Between(yVelocityMin, yVelocityMax)
-        );
-        bomb.setAngularVelocity(Phaser.Math.Between(-200, 200));
-
-        bomb.setInteractive();
-        bomb.on("pointerover", function(pointer) {
-            this.cutBomb(bomb);
-        }, this);
-    }
-
-    spawnTimer() {
-        // Adjust velocity based on detected orientation
-        const yVelocityMin = this.isPortrait ? -500 : -350;
-        const yVelocityMax = this.isPortrait ? -650 : -500;
-        
-        const timer = this.timer.create(
-            Phaser.Math.Between(150, this.width - 150), 
-            this.height, 
-            'newAsset_4'
-        );
-        
-        // Scale based on orientation
-        timer.setScale(0.25 * this.scaleFactor);
-        timer.setVelocity(
-            Phaser.Math.Between(-200, 200),
-            Phaser.Math.Between(yVelocityMin, yVelocityMax)
-        );
-        timer.setAngularVelocity(Phaser.Math.Between(-300, 300));
-
-        timer.setInteractive();
-        timer.on("pointerover", function(pointer) {
-            this.cutTimer(timer);
-        }, this);
+    pauseGame() {
+        handlePauseGame.bind(this)();
     }
 }
 
-// Modified loader to be orientation aware
 function displayProgressLoader() {
     let width = 320;
     let height = 50;
@@ -771,12 +752,16 @@ function displayProgressLoader() {
             fill: '#ffffff'
         }
     }).setOrigin(0.5, 0.5);
+    loadingText.setOrigin(0.5, 0.5);
 
     const progressBar = this.add.graphics();
     this.load.on('progress', (value) => {
         progressBar.clear();
         progressBar.fillStyle(0x364afe, 1);
         progressBar.fillRect(x, y, width * value, height);
+    });
+    this.load.on('fileprogress', function (file) {
+        
     });
     this.load.on('complete', function () {
         progressBar.destroy();
@@ -785,21 +770,21 @@ function displayProgressLoader() {
     });
 }
 
-// Updated configuration object with responsive handling
 const config = {
     type: Phaser.AUTO,
-    width: _CONFIG.deviceOrientationSizes[_CONFIG.deviceOrientation].width,
-    height: _CONFIG.deviceOrientationSizes[_CONFIG.deviceOrientation].height,
+    width: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width,
+    height: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].height,
     scene: [GameScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
+        orientation: Phaser.Scale.Orientation.LANDSCAPE
     },
     pixelArt: true,
     physics: {
         default: "arcade",
         arcade: {
-            gravity: { y: _CONFIG.deviceOrientation === "portrait" ? 250 : 200 }, // Adjust gravity based on orientation
+            gravity: { y: 0 },
             debug: false,
         },
     },
@@ -807,5 +792,6 @@ const config = {
         name: _CONFIG.title,
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
-    }
+    },
+    deviceOrientation: _CONFIG.deviceOrientation==="landscape"
 };
