@@ -338,8 +338,8 @@ class GameScene extends Phaser.Scene {
         this.time.addEvent({
             delay: 150, // Adjust delay as needed
             callback: () => {
-                const spacingX = 10; // horizontal distance between circles
-                const spacingY = 10; // vertical distance between rows
+                const spacingX = 8; // horizontal distance between circles
+                const spacingY = 11; // vertical distance between rows
 
                 for (let row = -1; row <= 2; row++) {
                     let colStart, colEnd;
@@ -364,7 +364,7 @@ class GameScene extends Phaser.Scene {
                             alpha: 0,
                             scale: 0,
                             duration: 800,
-                            ease: 'Cubic.easeOut',
+                            ease: 'easeinoutbounce',
                             onComplete: () => {
                                 circle.destroy();
                             }
@@ -588,7 +588,7 @@ class GameScene extends Phaser.Scene {
         }
         const xPosition = this.playerXPositions[laneIndex];
         // Spawn the train asset a little lower (so it appears earlier)
-        const enemy = this.enemies.create(xPosition, -50, 'train');
+        const enemy = this.enemies.create(xPosition, -10, 'train');
         enemy.setData("lane", laneIndex);
         
         let speed = 1.4;
