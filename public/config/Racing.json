@@ -1,33 +1,34 @@
 {
-    "description": "Highway racing",
-    "deviceOrientation": "landscape",
-    "imageLoader": {
-      "background": "background_1",
-      "player": "player",
-      "enemy": "https://media-hosting.imagekit.io/ca871ac6db29492e/train.png?Expires=1838029696&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=SNJFSoD-uR8jglr5vrJ2rkqmOi5hZvfv~Vc-7SAHmN1yIeuqIiCyvEtfogm5vKOQDZ6BpkP7mnpgmG1VAuXCgyardNEzUHbmOJSCV9PfACitIOiCvUh5K90qH2b0wmQE4yPCrkzgAJxEKRsp1ufOT7SjRxjC8Jkgc1m7did9B-6UQEGhfws-MtpBBVA05BOC7RkAiHRJbbxwDU0dUu1qnhw-x7d6CPIaJSrpYUHooT27ct6-Z138nmUI82IePRLRN8T3G72e5~iS7uAxQtO8K590rTtTSB~DDVWWrx6i6TxsXQeU2bHeKHzgY57rMLuOK0wYdP5xV1~toeBp6zsV4w__",
-      "collectible": "collectible",
-      "avoidable": "enemy_1",
-      "obstacle": "https://media-hosting.imagekit.io/6f09521380b841b4/slazzer-edit-image.png?Expires=1838090935&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=SNJFSoD-uR8jglr5vrJ2rkqmOi5hZvfv~Vc-7SAHmN1yIeuqIiCyvEtfogm5vKOQDZ6BpkP7mnpgmG1VAuXCgyardNEzUHbmOJSCV9PfACitIOiCvUh5K90qH2b0wmQE4yPCrkzgAJxEKRsp1ufOT7SjRxjC8Jkgc1m7did9B-6UQEGhfws-MtpBBVA05BOC7RkAiHRJbbxwDU0dUu1qnhw-x7d6CPIaJSrpYUHooT27ct6-Z138nmUI82IePRLRN8T3G72e5~iS7uAxQtO8K590rTtTSB~DDVWWrx6i6TxsXQeU2bHeKHzgY57rMLuOK0wYdP5xV1~toeBp6zsV4w__"
+  "description": "Highway racing",
+  "deviceOrientation": "landscape",
+  "imageLoader": {
+    "background": "background_1",
+    "player": "player",
+    "enemy": "https://media-hosting.imagekit.io/ca871ac6db29492e/train.png?Expires=1838029696&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=SNJFSoD-uR8jglr5vrJ2rkqmOi5hZvfv~Vc-7SAHmN1yIeuqIiCyvEtfogm5vKOQDZ6BpkP7mnpgmG1VAuXCgyardNEzUHbmOJSCV9PfACitIOiCvUh5K90qH2b0wmQE4yPCrkzgAJxEKRsp1ufOT7SjRxjC8Jkgc1m7did9B-6UQEGhfws-MtpBBVA05BOC7RkAiHRJbbxwDU0dUu1qnhw-x7d6CPIaJSrpYUHooT27ct6-Z138nmUI82IePRLRN8T3G72e5~iS7uAxQtO8K590rTtTSB~DDVWWrx6i6TxsXQeU2bHeKHzgY57rMLuOK0wYdP5xV1~toeBp6zsV4w__",
+    "collectible": "collectible",
+    "avoidable": "enemy_1",
+    "obstacle": "https://media-hosting.imagekit.io/6f09521380b841b4/slazzer-edit-image.png?Expires=1838090935&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=SNJFSoD-uR8jglr5vrJ2rkqmOi5hZvfv~Vc-7SAHmN1yIeuqIiCyvEtfogm5vKOQDZ6BpkP7mnpgmG1VAuXCgyardNEzUHbmOJSCV9PfACitIOiCvUh5K90qH2b0wmQE4yPCrkzgAJxEKRsp1ufOT7SjRxjC8Jkgc1m7did9B-6UQEGhfws-MtpBBVA05BOC7RkAiHRJbbxwDU0dUu1qnhw-x7d6CPIaJSrpYUHooT27ct6-Z138nmUI82IePRLRN8T3G72e5~iS7uAxQtO8K590rTtTSB~DDVWWrx6i6TxsXQeU2bHeKHzgY57rMLuOK0wYdP5xV1~toeBp6zsV4w__"
+  },
+  "instructions": "Dodge against the cars",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "instructions": "Dodge against the cars",
-    "orientationSizes": {
-      "landscape": {
-        "height": 720,
-        "width": 1280
-      },
-      "portrait": {
-        "height": 1280,
-        "width": 720
-      }
-    },
-    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
-    "phaserVersion": "3.80.1",
-    "soundsLoader": {
-      "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Subway%20Surfers%20Main%20Theme%20Music%20%5BOFFICIAL%5D%20%28mp3cut.net%29_86b0f264-dd25-49ce-b57a-0421765f0db9.mp3?t=1743521798820",
-      "move": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/swipe-132084_75988342-d603-4758-a3f9-1e757ef8ebf3.mp3?t=1743521947556",
-      "collect": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Subway%20Suffer%20Coin%20Collect%20Sound%20Effect%20%28mp3cut.net%29_c060d5f6-1d87-4d1d-af68-d99d804f857a.mp3?t=1743521910347",
-      "lose": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/train-horn-fades-25194%20%28mp3cut.net%29_f7eee70c-08d3-4e90-9a17-4e5d2c909516.mp3?t=1743521876089",
-      "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3"
-    },
-    "title": "Car Racing"
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "mobile_portrait": true,
+  "soundsLoader": {
+    "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Subway%20Surfers%20Main%20Theme%20Music%20%5BOFFICIAL%5D%20%28mp3cut.net%29_86b0f264-dd25-49ce-b57a-0421765f0db9.mp3?t=1743521798820",
+    "move": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/swipe-132084_75988342-d603-4758-a3f9-1e757ef8ebf3.mp3?t=1743521947556",
+    "collect": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Subway%20Suffer%20Coin%20Collect%20Sound%20Effect%20%28mp3cut.net%29_c060d5f6-1d87-4d1d-af68-d99d804f857a.mp3?t=1743521910347",
+    "lose": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/train-horn-fades-25194%20%28mp3cut.net%29_f7eee70c-08d3-4e90-9a17-4e5d2c909516.mp3?t=1743521876089",
+    "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3"
+  },
+  "title": "Car Racing"
 }
