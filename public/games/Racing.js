@@ -587,6 +587,7 @@ class GameScene extends Phaser.Scene {
             laneIndex = Phaser.Math.Between(0, this.lanes - 1);
         }
         const xPosition = this.playerXPositions[laneIndex];
+        // Spawn the train asset a little lower (so it appears earlier)
         const enemy = this.enemies.create(xPosition, -50, 'train');
         enemy.setData("lane", laneIndex);
         
@@ -686,7 +687,8 @@ class GameScene extends Phaser.Scene {
             this.enemies.children.iterate((enemy) => {
                 if (enemy) {
                     enemy.y += enemy.getData('speed');
-                    if (enemy.y > this.scale.height - 90 && !enemy.getData('fading')) {
+                    // Despawn a little later by checking for a lower position threshold
+                    if (enemy.y > this.scale.height + 50 && !enemy.getData('fading')) {
                         enemy.setData('fading', true);
                         this.tweens.add({
                             targets: enemy,
