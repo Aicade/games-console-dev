@@ -1,3 +1,4 @@
+// Updated Racing.js with improved spawn logic to avoid overlapping objects
 // Updated SubwaySurfer.js with Manual Hitbox Settings (debug hitbox removed)
 
 var isMobile = false;
@@ -79,6 +80,26 @@ class GameScene extends Phaser.Scene {
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
 
         displayProgressLoader.call(this);
+    }
+
+    // Helper method to get available lanes in which no object is present in the spawn region.
+    // We check enemies, obstacles, and powerUps for objects with y < 150.
+    getAvailableLanes() {
+        let available = [];
+        for (let i = 0; i < this.lanes; i++) {
+            let occupied = false;
+            [this.enemies, this.obstacles, this.powerUps].forEach(group => {
+                group.getChildren().forEach(child => {
+                    if (child.getData("lane") === i && child.y < 150) {
+                        occupied = true;
+                    }
+                });
+            });
+            if (!occupied) {
+                available.push(i);
+            }
+        }
+        return available;
     }
 
     create() {
@@ -305,6 +326,55 @@ class GameScene extends Phaser.Scene {
         // Visual effects.
         this.vfx = new VFXLibrary(this);
 
+        // ***** Create Grey Circle Texture and Trail Effect *****
+        // Create a grey circle texture using the VFXLibrary (radius is 15)
+        this.vfx.addCircleTexture('greyCircle', 0x808080, 1, 15);
+
+        // Create a timed event that spawns a 5x3 grid (plus an extra middle row) of grey circles relative to the player's position.
+        // Grid layout:
+        //   Rows -1 and 0: 5 circles each (columns -2 through 2)
+        //   Row 1: 3 circles (columns -1 through 1)
+        //   Row 2: 1 circle (column 0)
+        this.time.addEvent({
+            delay: 150, // Adjust delay as needed
+            callback: () => {
+                const spacingX = 10; // horizontal distance between circles
+                const spacingY = 10; // vertical distance between rows
+
+                for (let row = -1; row <= 2; row++) {
+                    let colStart, colEnd;
+                    if (row === -1 || row === 0) {
+                        colStart = -2;
+                        colEnd = 2;
+                    } else if (row === 1) {
+                        colStart = -1;
+                        colEnd = 1;
+                    } else if (row === 2) {
+                        colStart = 0;
+                        colEnd = 0;
+                    }
+                    for (let col = colStart; col <= colEnd; col++) {
+                        const offsetX = col * spacingX;
+                        const offsetY = row * spacingY + 60;
+                        let circle = this.add.image(this.player.x + offsetX, this.player.y + offsetY, 'greyCircle');
+                        circle.setScale(0.5);
+                        circle.setAlpha(0.7);
+                        this.tweens.add({
+                            targets: circle,
+                            alpha: 0,
+                            scale: 0,
+                            duration: 800,
+                            ease: 'Cubic.easeOut',
+                            onComplete: () => {
+                                circle.destroy();
+                            }
+                        });
+                    }
+                }
+            },
+            loop: true
+        });
+        
         this.isGameOver = false;
         this.input.keyboard.disableGlobalCapture();
 
@@ -507,8 +577,15 @@ class GameScene extends Phaser.Scene {
         this.setupEnemySpawn();
     }
 
+    // Updated spawnEnemy method
     spawnEnemy() {
-        const laneIndex = Phaser.Math.Between(0, this.lanes - 1);
+        let availableLanes = this.getAvailableLanes();
+        let laneIndex;
+        if (availableLanes.length > 0) {
+            laneIndex = Phaser.Utils.Array.GetRandom(availableLanes);
+        } else {
+            laneIndex = Phaser.Math.Between(0, this.lanes - 1);
+        }
         const xPosition = this.playerXPositions[laneIndex];
         const enemy = this.enemies.create(xPosition, -50, 'train');
         enemy.setData("lane", laneIndex);
@@ -519,7 +596,6 @@ class GameScene extends Phaser.Scene {
         }
         enemy.setData('speed', speed);
         
-        // Use the sprite's width and height as before.
         const originalWidth = enemy.width;
         const originalHeight = enemy.height;
         let scaleFactor = 0.3;
@@ -549,26 +625,15 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    // Updated spawnObstacle method
     spawnObstacle() {
-        let availableLanes = [];
-        for (let i = 0; i < this.lanes; i++) {
-            let laneOccupied = false;
-            this.enemies.getChildren().forEach((enemy) => {
-                if (enemy.getData("lane") === i && enemy.y < 100) {
-                    laneOccupied = true;
-                }
-            });
-            if (!laneOccupied) {
-                availableLanes.push(i);
-            }
-        }
+        let availableLanes = this.getAvailableLanes();
         let laneIndex;
         if (availableLanes.length > 0) {
-            laneIndex = Phaser.Math.Between(0, availableLanes.length - 1);
+            laneIndex = Phaser.Utils.Array.GetRandom(availableLanes);
         } else {
             laneIndex = Phaser.Math.Between(0, this.lanes - 1);
         }
-        
         const xPosition = this.playerXPositions[laneIndex];
         const obstacle = this.obstacles.create(xPosition, -50, 'obstacle');
         obstacle.setData("lane", laneIndex);
@@ -593,14 +658,25 @@ class GameScene extends Phaser.Scene {
             targets: obstacle,
             alpha: 1,
             duration: 500,
-            ease: 'Linear'
+            ease: 'Linear',
+            onComplete: () => {
+                // Optionally remove obstacle after tween completes
+            }
         });
     }
 
+    // Updated spawnPowerUp method
     spawnPowerUp() {
-        const laneIndex = Phaser.Math.Between(0, this.lanes - 1);
+        let availableLanes = this.getAvailableLanes();
+        let laneIndex;
+        if (availableLanes.length > 0) {
+            laneIndex = Phaser.Utils.Array.GetRandom(availableLanes);
+        } else {
+            laneIndex = Phaser.Math.Between(0, this.lanes - 1);
+        }
         const xPosition = this.playerXPositions[laneIndex];
         const powerUp = this.powerUps.create(xPosition, -50, 'collectible');
+        powerUp.setData("lane", laneIndex);
         powerUp.setScale(0.2);
         powerUp.alpha = 1;
     }
