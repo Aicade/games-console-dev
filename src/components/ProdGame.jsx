@@ -20,6 +20,7 @@ const ProdGame = () => {
     const [gameState, setGameState] = useState(GameState.KILLED);
     const [game, setGame] = useState(null);
     const [gameOverDetails, setGameOverDetails] = useState({});
+    const [loadError, setLoadError] = useState(null);
     const gameRef = useRef();
     gameRef.current = game;
 
@@ -27,12 +28,10 @@ const ProdGame = () => {
     const [textAreaValue, setTextAreaValue] = useState("");
 
     useEffect(() => {
-
         window.addEventListener("pauseGame", handlePauseEvent);
         window.addEventListener("gameOver", handleGameOverEvent);
 
         const gatherCode = async () => {
-
             const phaserUrl =
                 "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js";
             const sdkUrl =
@@ -43,20 +42,42 @@ const ProdGame = () => {
                 `/config/${name}.json`
             const gameUrl =
                 `/games/${name}.js`
-            const assetsUrl =
-                `/assetsList.js`
-            const soundsUrl =
-                `/soundsList.js`
 
             try {
                 const phaserScript = await fetch(phaserUrl);
                 const sdkScript = await fetch(sdkUrl);
                 const vfxScript = await fetch(vfxUrl);
-                const assetsScript = await fetch(assetsUrl);
-                const soundsScript = await fetch(soundsUrl);
-                const gameScriptJson = await fetch(gameJson);
                 
-                const gameScript = await fetch(gameUrl);
+                // Fetch game JSON first and check if it loaded successfully
+                const gameScriptJsonResponse = await fetch(gameJson);
+                
+                if (!gameScriptJsonResponse.ok) {
+                    console.log(`Failed to load game configuration: ${gameJson}`);
+                    setLoadError(`Failed to load game configuration: ${gameJson}`);
+                    return "error";
+                }
+                
+                const gameScriptJsonText = await gameScriptJsonResponse.text();
+                
+                // Validate that JSON is properly formed
+                try {
+                    JSON.parse(gameScriptJsonText);
+                    console.log("Game JSON config loaded successfully:", name);
+                } catch (jsonError) {
+                    console.log(`Invalid JSON in game configuration: ${jsonError.message}`);
+                    setLoadError(`Invalid JSON in game configuration: ${jsonError.message}`);
+                    return "error";
+                }
+                
+                // Now fetch the game script
+                const gameScriptResponse = await fetch(gameUrl);
+                if (!gameScriptResponse.ok) {
+                    console.log(`Failed to load game script: ${gameUrl}`);
+                    setLoadError(`Failed to load game script: ${gameUrl}`);
+                    return "error";
+                }
+                
+                const gameScript = await gameScriptResponse.text();
 
                 const compiledScript =
                     (await phaserScript.text()) +
@@ -67,35 +88,46 @@ const ProdGame = () => {
                         .replaceAll("export default VFXLibrary;", "")
                         .replaceAll("export", "") +
                     "\n\n" +
-                    "let _CONFIG = " + (await gameScriptJson.text()) +
+                    "let _CONFIG =" + gameScriptJsonText +
                     "\n\n" +
-                    (await gameScript.text()) +
-                    "\n\n" +
-                    (await assetsScript.text()) +
-                    "\n\n" +
-                    (await soundsScript.text());
+                    gameScript 
                 return compiledScript;
             } catch (error) {
+                console.log("Error loading game resources:", error);
+                setLoadError(`Error loading game resources: ${error.message}`);
                 return "error";
             }
         }
 
         const runCode = (code) => {
+            if (code === "error") {
+                return {};
+            }
+            
             try {
                 const config = new Function(
                     code + "\n\nreturn config"
                 )();
                 return config;
-            } catch {
+            } catch (error) {
+                console.log("Error running game code:", error);
+                setLoadError(`Error running game code: ${error.message}`);
                 return {}
             }
         }
 
         gatherCode().then((response) => {
-            console.log(response);
+            console.log("Code gathering complete");
             const config = runCode(response);
+            
+            if (Object.keys(config).length === 0) {
+                console.log("Empty game configuration, game cannot start");
+                return;
+            }
+            
             config.parent = "game-container";
-            setGameConfig(config)
+            setGameConfig(config);
+            setLoadError(null);
         });
 
         return () => {
@@ -104,9 +136,14 @@ const ProdGame = () => {
             if (gameRef.current) gameRef.current.destroy(true, false);
         }
 
-    }, []);
+    }, [name]);
 
     const createGameInstance = () => {
+        if (Object.keys(gameConfig).length === 0) {
+            console.log("Cannot create game: empty configuration");
+            setLoadError("Cannot create game: empty configuration");
+            return;
+        }
         setGame(new Phaser.Game(gameConfig));
     }
 
