@@ -42,26 +42,54 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        // Load image assets using direct URL strings, except for player and enemy
 
-        for (const key in _CONFIG.imageLoader) {
-            this.load.image(key, _CONFIG.imageLoader[key]);
-        }
+        this.load.image("background", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233355-Photoroom.png?t=1743617430629");
+        
+        // Load player and enemy using the old method
+        this.load.image("player", _CONFIG.imageLoader.player);
+        this.load.image("enemy", _CONFIG.imageLoader.enemy);
+    
+        this.load.image("collectible", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_12.png?t=1743665247183");
+        this.load.image("collectible_1", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_8.png?t=1743665381909");
+        this.load.image("projectile", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_10.png?t=1743668862744");
+        this.load.image("platform", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233410.png?t=1743617599903");
+        this.load.image("platformGlow", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233422.png?t=1743617757767");
 
-        for (const key in _CONFIG.soundsLoader) {
-            this.load.audio(key, [_CONFIG.soundsLoader[key]]);
-        }
-
-        if (joystickEnabled) this.load.plugin('rexvirtualjoystickplugin', rexJoystickUrl, true);
-        if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
-
+        
+        // Load additional UI assets
         this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
         this.load.bitmapFont('pixelfont',
-            'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.png',
-            'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.xml');
+            "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.png",
+            "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.xml"
+        );
+        
+        // Load audio assets using direct URL strings
+        this.load.audio("background", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Super%20Mario%20Bros.%20Theme%20Song_6dcc911a-75bd-4e82-9f53-e542146ff9c9.mp3?t=1743667399595"]);
+        this.load.audio("lose", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20lose_8c4b4d4d-a4a1-4943-ada5-417b192f6ab6.mp3?t=1743675830252"]);
+        this.load.audio("damage", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/damage_1.mp3"]);
+        this.load.audio("jump", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20jump_8eec73f2-5531-4f0e-a301-f53b99846ee4.mp3?t=1743675889691"]);
+        this.load.audio("destroy", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav"]);
+        this.load.audio("upgrade_1", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_1.mp3"]);
+        this.load.audio("upgrade_2", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20upgrade_cdd0775d-ba78-4e15-b7de-26d086dc686d.mp3?t=1743675886252"]);
+        this.load.audio("collect", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3"]);
+        this.load.audio("shoot", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20fireball_be569211-d077-4267-8306-122b34da14f1.mp3?t=1743675865122"]);
+        this.load.audio("stretch", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_1.mp3"]);
+        this.load.audio("success", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20win_6f2168d3-b74c-461d-bf77-35104ec0dfff.mp3?t=1743675851396"]);
+        
+        // Load plugins if enabled
+        if (joystickEnabled) {
+            this.load.plugin('rexvirtualjoystickplugin', "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js", true);
+        }
+        if (buttonEnabled) {
+            this.load.plugin('rexbuttonplugin', "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js", true);
+        }
+        
+        // Attach additional event listeners and display the progress loader
         addEventListenersPhaser.bind(this)();
         displayProgressLoader.call(this);
     }
-
+    
     create() {
         this.sounds = {};
         for (const key in _CONFIG.soundsLoader) {
@@ -70,7 +98,8 @@ class GameScene extends Phaser.Scene {
         isMobile = !this.sys.game.device.os.desktop;
         this.vfx = new VFXLibrary(this);
 
-        this.sounds.background.setVolume(2).setLoop(true).play();
+        this.sounds.background.setVolume(0.1).setLoop(true).play();
+
         this.input.addPointer(3);
         this.score = 0;
         this.meter = 0;
@@ -78,7 +107,18 @@ class GameScene extends Phaser.Scene {
         this.playerState = PLAYER_STATE.SMALL; // 0 : small | 1 : Big | 2 : Big + Bullets
         this.brickSize = 50;
 
-        this.bg = this.add.tileSprite(0, 0, this.finishPoint + 200, this.game.config.height, 'background').setOrigin(0, 0);
+        // Create a tileSprite that covers more vertical space so it repeats the background image
+        this.bg = this.add.tileSprite(
+            0,
+            0,
+            this.finishPoint + 200,
+            this.game.config.height * 1.5,
+            'background'
+        ).setOrigin(0, 0.04);
+
+        // Adjust the tile position so that the bottom of the repeated image aligns with the bottom of the screen
+        this.bg.tilePositionY = this.bg.height - this.game.config.height;
+
         this.bg.setScrollFactor(1);
 
         this.endPole = this.add.sprite(this.finishPoint, 100, 'platform').setOrigin(0, 0);
@@ -89,7 +129,7 @@ class GameScene extends Phaser.Scene {
         this.meterText = this.add.bitmapText(10, 7, 'pixelfont', 'Meter: 0m', 28);
         this.meterText.setScrollFactor(0).setDepth(11);
 
-        this.scoreImg = this.add.image(30, 80, 'collectible_1').setScale(0.1, 0.1).setScrollFactor(0).setDepth(11)
+        this.scoreImg = this.add.image(30, 80, 'collectible_1').setScale(0.1, 0.1).setScrollFactor(0).setDepth(11);
         this.scoreText = this.add.bitmapText(60, 50, 'pixelfont', 'x 0', 28);
         this.scoreText.setScrollFactor(0).setDepth(11);
         this.powerUpText = this.add.bitmapText(this.width / 2, 200, 'pixelfont', 'POWER UP', 60).setOrigin(0.5, 0.5);
@@ -106,10 +146,10 @@ class GameScene extends Phaser.Scene {
         this.physics.world.bounds.setTo(0, 0, this.finishPoint + 200, this.game.config.height);
         this.physics.world.setBoundsCollision(true);
 
+        this.player = this.physics.add.sprite(0, 500, 'player').setScale(0.15).setBounce(0.1).setCollideWorldBounds(true);
 
-        this.player = this.physics.add.sprite(0, 0, 'player').setScale(0.2).setBounce(0.1).setCollideWorldBounds(true);
         this.player.body.setSize(this.player.body.width / 1.5, this.player.body.height);
-        this.player.setGravityY(500);
+        this.player.setGravityY(800);
         this.player.power_state = PLAYER_STATE.SMALL;
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -120,30 +160,33 @@ class GameScene extends Phaser.Scene {
             maxSize: 20
         });
 
-        this.ground = this.add.tileSprite(0, this.game.config.height, this.finishPoint + 200, 50, 'platform');
-
-        this.ground.postFX.addShine(0.5);
-        this.physics.add.existing(this.ground);
-        this.ground.body.immovable = true;
-        this.ground.body.allowGravity = false;
-        this.ground.body.setCollideWorldBounds(true);
-        this.ground.setOrigin(0, 0).setDepth(10);
+        // Replace the visible platform asset with an invisible ground rectangle
+        this.ground = this.add.rectangle(
+            0,
+            this.game.config.height - 50,  // Position so that the top of the ground is at (game height - 50)
+            this.finishPoint + 200,
+            50
+        ).setOrigin(0, 0);
+        this.physics.add.existing(this.ground, true);
 
         this.platforms = this.physics.add.staticGroup();
-        let y = this.game.config.height - this.ground.displayHeight - this.player.displayHeight - 100;
+        // First row y is defined as:
+        let firstRowY = this.game.config.height - this.ground.displayHeight - this.player.displayHeight - 100;
+        // Create initial first row platforms
         let x = this.player.x + this.game.config.width / 2 + 100;
-        let platform = this.platforms.create(x, y, 'platform');
+        let platform = this.platforms.create(x, firstRowY, 'platform');
         platform.displayHeight = platform.displayWidth = this.brickSize;
         platform.refreshBody();
         let i = 5;
         while (i) {
             x = x + platform.displayWidth + 1;
-            platform = this.platforms.create(x, y, 'platform');
+            platform = this.platforms.create(x, firstRowY, 'platform');
             platform.displayHeight = platform.displayWidth = this.brickSize;
             platform.refreshBody();
             i--;
         }
 
+        // Later, additional platforms are spawned by spawnBricks (which can be for a second row)
         this.physics.add.collider(this.player, this.platforms, this.hitBrick, null, this);
         this.physics.add.collider(this.player, this.ground);
 
@@ -170,6 +213,9 @@ class GameScene extends Phaser.Scene {
         this.createMobileButtons();
         this.bindWalkingMovementButtons();
         this.input.keyboard.disableGlobalCapture();
+
+        // In create(), add the jump key for spacebar jump
+        this.jumpKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     }
 
     update(time, delta) {
@@ -181,7 +227,8 @@ class GameScene extends Phaser.Scene {
             });
         }
 
-        if ((this.cursors.left.isDown || this.joystickKeys.left.isDown) && this.player.x > this.cameras.main.scrollX) {
+        // Use either keyboard or our mobile left/right flags
+        if ((this.cursors.left.isDown || this.leftPressed) && this.player.x > this.cameras.main.scrollX) {
             this.player.leftShoot = true;
             if (this.canSpawnEnemies) this.canSpawnEnemies = false;
             if (this.playerMovedBackFrom < this.player.x) {
@@ -189,32 +236,30 @@ class GameScene extends Phaser.Scene {
             }
             this.cameras.main.stopFollow();
             this.player.flipX = true;
-            // if(this.player.x > this.game.canvas.width)
             this.player.setVelocityX(-160);
-
-        } else if (this.cursors.right.isDown || this.joystickKeys.right.isDown) {
+        } else if ((this.cursors.right.isDown || this.rightPressed)) {
             this.player.leftShoot = false;
             if (!this.canSpawnEnemies) this.canSpawnEnemies = true;
             if (this.player.x > this.playerMovedBackFrom) {
                 this.cameras.main.startFollow(this.player);
             }
-
             this.player.setVelocityX(160);
             this.player.flipX = false;
-
         } else {
             this.player.setVelocityX(0);
         }
 
-        if ((this.cursors.up.isDown || this.buttonA.button.isDown) && this.player.body.touching.down) {
-            this.sounds.jump.setVolume(1).setLoop(false).play();
-            this.player.setVelocityY(-650);
+        // Use spacebar (or buttonA) for jump
+        if ((this.jumpKey.isDown || this.buttonA.button.isDown) && this.player.body.touching.down) {
+            this.sounds.jump.setVolume(0.2).setLoop(false).play();
+            this.player.setVelocityY(-750);
         }
+        
         if (time > this.nextEnemyTime) {
             this.spawnEnemy();
             this.nextEnemyTime = time + Phaser.Math.Between(2000, 6000);
         }
-        if (this.nextBricksTime && time > this.nextBricksTime && (this.cursors.right.isDown || this.joystickKeys.right.isDown)) {
+        if (this.nextBricksTime && time > this.nextBricksTime && (this.cursors.right.isDown || this.rightPressed)) {
             this.nextBricksTime = time + Phaser.Math.Between(6000, 15000);
             let bricksNum = Phaser.Math.Between(2, 5);
             this.spawnBricks(bricksNum);
@@ -231,7 +276,6 @@ class GameScene extends Phaser.Scene {
             this.meter = Math.abs(Math.round(this.player.x / 100));
             this.meterText.setText('Meter: ' + this.meter + 'm');
         }
-
     }
 
     bindWalkingMovementButtons() {
@@ -239,10 +283,13 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-LEFT', this.walkingAnimationStart, this);
         this.input.keyboard.on('keyup-RIGHT', this.walkingAnimationStop, this);
         this.input.keyboard.on('keyup-LEFT', this.walkingAnimationStop, this);
-        this.joystickKeys.left.on('down', this.walkingAnimationStart, this)
-        this.joystickKeys.right.on('down', this.walkingAnimationStart, this)
-        this.joystickKeys.left.on('up', this.walkingAnimationStop, this)
-        this.joystickKeys.right.on('up', this.walkingAnimationStop, this)
+        // For keyboard-based controls if needed
+        if (this.joystickKeys) {
+            this.joystickKeys.left.on('down', this.walkingAnimationStart, this);
+            this.joystickKeys.right.on('down', this.walkingAnimationStart, this);
+            this.joystickKeys.left.on('up', this.walkingAnimationStop, this);
+            this.joystickKeys.right.on('up', this.walkingAnimationStop, this);
+        }
     }
 
     walkingAnimationStart() {
@@ -270,44 +317,51 @@ class GameScene extends Phaser.Scene {
     }
 
     spawnBricks(numOfBricks = 2, XOffset = 100, YOffset = 0) {
-
         if (!this.canSpawnEnemies) return;
-        console.log(this.player.displayHeight);
         let y = this.game.config.height - this.ground.displayHeight - 215 - YOffset;
         let x = this.player.x + this.game.config.width / 2 + 100 + XOffset;
         let platform = this.platforms.create(x, y, 'platform');
         platform.displayHeight = platform.displayWidth = this.brickSize;
         platform.refreshBody();
-        while (numOfBricks - 1) {
+        let i = numOfBricks - 1;
+        while (i > 0) {
             x = x + platform.displayWidth + 1;
             platform = this.platforms.create(x, y, 'platform');
             let coinProbability = Phaser.Math.Between(1, 10) % 3 === 0; // 33% chance
             let mushroomProbability = Phaser.Math.Between(1, 10) % 5 === 0; // 20% chance
             if (coinProbability) {
-                platform.setTint(0xffff00);
-                platform.coin = Phaser.Math.Between(1, 5)
+                platform.setTexture("platformGlow");
+                platform.coin = Phaser.Math.Between(1, 5);
             } else if (mushroomProbability) {
-                platform.setTint(0x00ff00);
+                platform.setTexture("platformGlow");
                 platform.mushroom = 1;
-
             }
             platform.displayHeight = platform.displayWidth = this.brickSize;
             platform.refreshBody();
-            numOfBricks--
+
+            // If this is a second row (i.e. YOffset > 0) and a collectible brick was spawned,
+            // spawn an extra platform in the first row (at firstRowY) with the normal asset.
+            if (YOffset > 0 && (coinProbability || mushroomProbability)) {
+                let firstRowY = this.game.config.height - this.ground.displayHeight - this.player.displayHeight - 100;
+                let extraBrick = this.platforms.create(x, firstRowY, 'platform');
+                extraBrick.displayHeight = extraBrick.displayWidth = this.brickSize;
+                extraBrick.refreshBody();
+            }
+            i--;
         }
     }
 
     hitBrick(player, brick) {
         if (player.body.touching.up && brick.body.touching.down) {
-            this.sounds.stretch.setVolume(1).setLoop(false).play();
+            this.sounds.stretch.setVolume(0.2).setLoop(false).play();
 
             this.tweens.add({
                 targets: this.cameras.main,
-                y: this.cameras.main.worldView.y - 5, // Adjust value for desired intensity
-                duration: 50, // Adjust timing as needed
+                y: this.cameras.main.worldView.y - 5,
+                duration: 50,
                 ease: 'Power1',
-                yoyo: true, // Automatically returns to starting position
-                repeat: 0 // Number of times to repeat the effect
+                yoyo: true,
+                repeat: 0
             });
             this.tweens.add({
                 targets: brick,
@@ -315,11 +369,12 @@ class GameScene extends Phaser.Scene {
                 duration: 50,
                 ease: 'Linear',
                 yoyo: true
-            })
+            });
             if (brick.mushroom) {
                 delete brick.mushroom;
-                brick.setTint(0xffffff);
-                let powerUp = this.powerUps.create(brick.x, brick.y - 70, 'collectible_2').setScale(0.3 );
+                // Revert brick texture back to normal platform after power-up is collected
+                brick.setTexture("platform");
+                let powerUp = this.powerUps.create(brick.x, brick.y - 70, 'collectible').setScale(0.3);
                 this.tweens.add({
                     targets: powerUp,
                     scaleY: 0.14,
@@ -329,16 +384,17 @@ class GameScene extends Phaser.Scene {
                     onComplete: () => {
                         powerUp.setVelocityX(50);
                     }
-                })
+                });
             }
+            
             if (brick.coin) {
                 brick.coin--;
-                this.sounds.collect.setVolume(1).setLoop(false).play();
+                this.sounds.collect.setVolume(0.2).setLoop(false).play();
 
                 this.updateScore(1);
                 if (!brick.coin) {
-                    delete brick.mushroom;
-                    brick.setTint(0xffffff);
+                    // Revert brick texture back to normal platform when coins run out
+                    brick.setTexture("platform");
                 }
                 let powerUp = this.powerUps.create(brick.x, brick.y - brick.displayHeight, 'collectible_1').setScale(0.2);
                 this.tweens.add({
@@ -351,33 +407,30 @@ class GameScene extends Phaser.Scene {
                     onComplete: (tween, targets) => {
                         targets[0].destroy();
                     },
-                })
+                });
             }
         }
     }
 
     spawnEnemy() {
-
         if (!this.canSpawnEnemies) return;
         let x = this.player.x + this.game.config.width / 2;
-        let y = Phaser.Math.Between(70, this.game.config.height / 1.5);
-
-        let enemy = this.enemies.create(x, y, 'enemy').setScale(.18);
+        let fixedY = 650; // Set the enemy's fixed y-axis spawn position (adjust as needed)
+    
+        let enemy = this.enemies.create(x, fixedY, 'enemy').setScale(0.18);
         let speed = -150;
         if (this.player.power_state === PLAYER_STATE.BIG) {
-            speed = -200
+            speed = -200;
         } else if (this.player.power_state === PLAYER_STATE.BULLETS) {
-            speed = -250
+            speed = -250;
         }
         enemy.setVelocityX(speed);
         enemy.setGravityY(100);
-        // enemy.setCollideWorldBounds(true);
         enemy.setBounceX(1);
-        //for touching the enemy to the ground
         enemy.body.setSize(enemy.width * 0.8, enemy.height * 0.7);
         enemy.body.setOffset(enemy.width * 0.2, enemy.height * 0.1);
     }
-
+    
     blinkEffect(object = this.powerUpText, duration = 300, blinks = 3) {
         this.blinkTween && this.blinkTween.stop();
         object.setAlpha(0);
@@ -394,7 +447,7 @@ class GameScene extends Phaser.Scene {
             onStop: () => {
                 object.setAlpha(0);
             }
-        })
+        });
     }
 
     collectPowerUp(player, powerUp) {
@@ -404,28 +457,32 @@ class GameScene extends Phaser.Scene {
             this.powerUpText.text = "SIZE POWER UP";
             this.blinkEffect(this.powerUpText, 200, 5);
             player.power_state++;
-            this.sounds.upgrade_1.setVolume(1).setLoop(false).play();
+            // When collecting the size power-up:
+            this.sounds.upgrade_1.setVolume(0.1).setLoop(false).play();
 
+            // When collecting the bullet power-up:
+            this.sounds.upgrade_2.setVolume(0.001).setLoop(false).play();
+
+            // Multiply the current dimensions by a factor (e.g., 1.5x increase)
             this.tweens.add({
                 targets: this.player,
                 y: player.y - 30,
-                scaleY: player.scaleX + 0.035,
-                scaleX: player.scaleY + 0.035,
+                scaleX: this.player.scaleX * 1.5,
+                scaleY: this.player.scaleY * 1.5,
                 duration: 100,
-                ease: 'Power1',
-            })
+                ease: 'Power1'
+            });
         } else if (player.power_state === PLAYER_STATE.BIG) {
-            this.powerUpText.text = "BULLET POWER UP"
+            this.powerUpText.text = "BULLET POWER UP";
             this.blinkEffect(this.powerUpText, 200, 5);
             player.power_state++;
             this.sounds.upgrade_2.setVolume(1).setLoop(false).play();
             player.setTint(0xff00ff);
-            this.input.keyboard.on('keydown-SPACE', this.shootBullet, this);
+            this.input.keyboard.on('keydown-Z', this.shootBullet, this);
             this.colorAnimation(true, this.player);
         } else {
             this.updateScore(10);
         }
-
     }
 
     colorAnimation(startColorAnimation, obj) {
@@ -438,12 +495,11 @@ class GameScene extends Phaser.Scene {
         const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff];
         let currentIndex = 0;
 
-        // Change color every 500 milliseconds
+        // Change color every 100 milliseconds
         this.colorAnimEvent = this.time.addEvent({
             delay: 100,
             callback: () => {
                 obj.setTint(colors[currentIndex]);
-                // Move to the next color
                 currentIndex++;
                 if (currentIndex >= colors.length) {
                     currentIndex = 0;
@@ -455,23 +511,24 @@ class GameScene extends Phaser.Scene {
 
     shootBullet() {
         if (this.player.power_state === PLAYER_STATE.BULLETS) {
-            this.sounds.shoot.setVolume(1).setLoop(false).play();
+            this.sounds.shoot.setVolume(0.2).setLoop(false).play();
             let bullet = this.bullets.get(this.player.x, this.player.y);
             if (bullet) {
-                bullet.setActive(true).setVisible(true).setScale(0.08).setVelocityX(this.player.leftShoot ? -300 : 300)
-                this.time.delayedCall(3000, () => {
-                    bullet.destroy();
-                    if (bullet.active) {
-                        bullet.setActive(false).setVisible(false);
-                        bullet.body.stop();
-                    }
-                });
+                bullet.setActive(true)
+                      .setVisible(true)
+                      .setScale(0.08)
+                      .setVelocityX(this.player.leftShoot ? -300 : 300)
+                      .setVelocityY(-200)            // Initial upward velocity for bounce effect
+                      .setCollideWorldBounds(true);  // Enable collision with the world bounds
+                bullet.body.setBounce(0.8);         // Bounce value (adjust this value to increase or decrease the bounce)
+                // Removed the delayedCall so the bullet bounces indefinitely until destroyed
             }
         }
     }
-
+    
     bulletHit(bullet, enemy) {
-        this.sounds.destroy.setVolume(1).setLoop(false).play();
+        this.sounds.destroy.setVolume(0.2).setLoop(false).play();
+
         bullet.setActive(false);
         bullet.setVisible(false);
         bullet.body.stop();
@@ -484,22 +541,35 @@ class GameScene extends Phaser.Scene {
 
     onPlayerEnemyCollision(player, enemy) {
         if (player.body.touching.down && enemy.body.touching.up) {
-            this.sounds.destroy.setVolume(1).setLoop(false).play();
-            enemy._scaleY = 0.01;
-            enemy.refreshBody();
+            // Play stomp sound
+            this.sounds.destroy.setVolume(0.2).setLoop(false).play();
+
+            // Bounce the player upward (adjust this value as desired)
+            player.setVelocityY(-300);
+
+            // Adjustable parameters for enemy movement:
+            const ENEMY_BOUNCE_UP = 20;     // How far enemy moves up when stomped
+            const ENEMY_FALL_DISTANCE = 150; // How far enemy falls down before destruction
+
+            // First tween: enemy bounces upward
             this.tweens.add({
-                targets: this.cameras.main,
-                y: this.cameras.main.worldView.y + 10, // Adjust value for desired intensity
-                duration: 50, // Adjust timing as needed
+                targets: enemy,
+                y: enemy.y - ENEMY_BOUNCE_UP,
+                duration: 200,
                 ease: 'Power1',
-                yoyo: true, // Automatically returns to starting position
-                repeat: 0 // Number of times to repeat the effect
-            });
-            this.time.delayedCall(
-                300, () => {
-                    enemy.destroy();
+                onComplete: () => {
+                    // Second tween: enemy falls down and then is destroyed
+                    this.tweens.add({
+                        targets: enemy,
+                        y: enemy.y + ENEMY_FALL_DISTANCE,
+                        duration: 300,
+                        ease: 'Bounce.easeOut',
+                        onComplete: () => {
+                            enemy.destroy();
+                        }
+                    });
                 }
-            )
+            });
         } else {
             this.input.keyboard.off('keydown-SPACE', this.shootBullet, this);
             if (player.power_state === PLAYER_STATE.BULLETS) {
@@ -515,7 +585,6 @@ class GameScene extends Phaser.Scene {
                 enemy.destroy();
             } else if (player.power_state === PLAYER_STATE.BIG) {
                 this.sounds.damage.setVolume(1).setLoop(false).play();
-
                 player.power_state--;
                 player.setAngularVelocity(-900);
                 this.time.delayedCall(500, () => {
@@ -527,8 +596,8 @@ class GameScene extends Phaser.Scene {
                     scaleY: player.scaleX - 0.03,
                     scaleX: player.scaleY - 0.03,
                     duration: 100,
-                    ease: 'Power1',
-                })
+                    ease: 'Power1'
+                });
                 this.cameras.main.shake(100);
                 enemy.destroy();
             } else {
@@ -538,40 +607,44 @@ class GameScene extends Phaser.Scene {
                 this.cameras.main.shake(200);
 
                 this.sound.stopAll();
-                this.sounds.lose.setVolume(1).setLoop(false).play();
+                this.sounds.lose.setVolume(0.2).setLoop(false).play();
+
                 this.sounds.lose.on('complete', () => {
                     this.gameOver();
                 });
-
             }
         }
     }
 
     createMobileButtons() {
-        const joyStickRadius = 80;
+        // Remove joystick and add left/right buttons on bottom left
+        // Left button
+        this.leftButton = this.add.rectangle(80, this.height - 60, 100, 100, 0xcccccc, 0.5)
+            .setScrollFactor(0)
+            .setInteractive();
+        // Right button
+        this.rightButton = this.add.rectangle(200, this.height - 60, 100, 100, 0xcccccc, 0.5)
+            .setScrollFactor(0)
+            .setInteractive();
 
-        if (joystickEnabled) {
-            this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-                x: joyStickRadius * 1.5,
-                y: this.height - (joyStickRadius * 1.6),
-                radius: 80,
-                base: this.add.circle(0, 0, 80, 0x888888, 0.5),
-                thumb: this.add.circle(0, 0, 40, 0xcccccc, 0.5),
-                // dir: '8dir',   // 'up&down'|0|'left&right'|1|'4dir'|2|'8dir'|3
-                // forceMin: 16,
-            });
+        // Set up pointer events to toggle movement flags
+        this.leftButton.on('pointerdown', () => { this.leftPressed = true; });
+        this.leftButton.on('pointerup', () => { this.leftPressed = false; });
+        this.leftButton.on('pointerout', () => { this.leftPressed = false; });
 
-            this.joystickKeys = this.joyStick.createCursorKeys();
-        }
+        this.rightButton.on('pointerdown', () => { this.rightPressed = true; });
+        this.rightButton.on('pointerup', () => { this.rightPressed = false; });
+        this.rightButton.on('pointerout', () => { this.rightPressed = false; });
 
+        // Also create the standard mobile buttons on the bottom right
         if (buttonEnabled) {
-            this.buttonA = this.add.rectangle(this.width - 60, this.height - 60, 100, 100, 0xcccccc, 0.5)
+            this.buttonA = this.add.rectangle(this.width - 60, this.height - 60, 100, 100, 0xcccccc, 0.5);
             this.buttonA.button = this.plugins.get('rexbuttonplugin').add(this.buttonA, {
                 mode: 1,
                 clickInterval: 10,
             });
             this.buttonA.setDepth(11).setScrollFactor(0);
-            this.buttonB = this.add.circle(this.width - 60, this.height - 220, 60, 0xcccccc, 0.5)
+            this.buttonB = this.add.circle(this.width - 60, this.height - 220, 60, 0xcccccc, 0.5);
             this.buttonB.button = this.plugins.get('rexbuttonplugin').add(this.buttonB, {
                 mode: 1,
                 clickInterval: 5,
@@ -579,15 +652,20 @@ class GameScene extends Phaser.Scene {
             this.buttonB.setDepth(11).setScrollFactor(0);
             this.buttonB.button.on('down', this.shootBullet, this);
         }
-
-        this.toggleControlsVisibility(isMobile)
+        // Hide any joystick if present
+        if (this.joyStick) {
+            this.joyStick.destroy();
+        }
+        // Toggle controls visibility if needed
+        this.toggleControlsVisibility(isMobile);
     }
 
     toggleControlsVisibility(visibility) {
-        this.joyStick.base.visible = visibility;
-        this.joyStick.thumb.visible = visibility;
-        this.buttonA.visible = visibility;
-        this.buttonB.visible = visibility;
+        // For mobile, our buttons are always visible; if needed, you can hide them via this method.
+        if(this.leftButton) this.leftButton.visible = visibility;
+        if(this.rightButton) this.rightButton.visible = visibility;
+        if(this.buttonA) this.buttonA.visible = visibility;
+        if(this.buttonB) this.buttonB.visible = visibility;
     }
 
     updateScore(points) {
@@ -641,9 +719,7 @@ function displayProgressLoader() {
         progressBar.fillStyle(0x364afe, 1);
         progressBar.fillRect(x, y, width * value, height);
     });
-    this.load.on('fileprogress', function (file) {
-         
-    });
+    this.load.on('fileprogress', function (file) {});
     this.load.on('complete', function () {
         progressBar.destroy();
         progressBox.destroy();

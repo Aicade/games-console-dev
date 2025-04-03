@@ -2,13 +2,14 @@
     "description": "A Platformer game where you collect powerups and kill enemies by \n stomping them. Game ends after you reach 500m",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "background",
+        "background": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233355-Photoroom.png?t=1743617430629",
         "player": "player",
         "enemy": "enemy",
         "collectible": "collectible",
         "collectible_1": "collectible_1",
         "projectile": "projectile",
-        "platform": "platform"
+        "platform": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233410.png?t=1743617599903",
+        "platformGlow": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233422.png?t=1743617757767"
     },
     "instructions": "Instructions: 1. Use LEFT / RIGHT arrow key to move. 2. Use UP arrow / Square button to jump 3. Use SPACE/ round button to shoot and destroy enemies",
     "orientationSizes": {
@@ -24,17 +25,17 @@
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
     "soundsLoader": {
-        "background": "background",
-    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
-    "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/damage_1.mp3",
-    "jump": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_1.mp3",
-    "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav",
-    "upgrade_1": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_1.mp3",
-    "upgrade_2": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3",
-    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3",
-    "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_3.mp3",
-    "stretch": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_1.mp3",
-    "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav"
+        "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Super%20Mario%20Bros.%20Theme%20Song_6dcc911a-75bd-4e82-9f53-e542146ff9c9.mp3?t=1743667399595",
+        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
+        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/damage_1.mp3",
+        "jump": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_1.mp3",
+        "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav",
+        "upgrade_1": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_1.mp3",
+        "upgrade_2": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3",
+        "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3",
+        "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_3.mp3",
+        "stretch": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_1.mp3",
+        "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav"
     },
     "title": "Mariobros"
-  }
+}
