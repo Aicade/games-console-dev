@@ -125,15 +125,70 @@ class GameScene extends Phaser.Scene {
         this.endPole.setScrollFactor(1);
         this.endPole.displayHeight = this.game.config.height;
         this.endPole.displayWidth = 40;
-        // Add UI elements
-        this.meterText = this.add.bitmapText(10, 7, 'pixelfont', 'Meter: 0m', 28);
-        this.meterText.setScrollFactor(0).setDepth(11);
+        
+        // UI Block Configurations for Meter and Coin UI
+        const meterBlockConfig = {
+            x: 10,               // X position for meter block
+            y: 10,               // Y position for meter block
+            width: 220,          // Width of meter block
+            height: 40,          // Height of meter block
+            borderThickness: 4,  // Thickness of the white boundary
+            borderColor: 0xffffff, // White border color
+            fillColor: 0x000000,   // Black fill color
+            fillAlpha: 0.5       // Translucency (0.5 means 50% opacity)
+        };
 
-        this.scoreImg = this.add.image(30, 80, 'collectible_1').setScale(0.1, 0.1).setScrollFactor(0).setDepth(11);
-        this.scoreText = this.add.bitmapText(60, 50, 'pixelfont', 'x 0', 28);
-        this.scoreText.setScrollFactor(0).setDepth(11);
-        this.powerUpText = this.add.bitmapText(this.width / 2, 200, 'pixelfont', 'POWER UP', 60).setOrigin(0.5, 0.5);
-        this.powerUpText.setScrollFactor(0).setAlpha(0).setDepth(11);
+        const coinBlockConfig = {
+            x: 10,               // X position for coin block
+            y: 60,               // Y position for coin block
+            width: 150,          // Width of coin block
+            height: 60,          // Height of coin block
+            borderThickness: 4,  // Thickness of the white boundary
+            borderColor: 0xffffff, // White border color
+            fillColor: 0x000000,   // Black fill color
+            fillAlpha: 0.5       // Translucency
+        };
+
+        // Create Phaser Graphics for UI blocks
+        this.meterBlock = this.add.graphics();
+        this.coinBlock = this.add.graphics();
+
+        // Function to draw a block using a configuration object
+        function drawBlock(graphics, config) {
+            graphics.clear();
+            // Draw the translucent filled rectangle
+            graphics.fillStyle(config.fillColor, config.fillAlpha);
+            graphics.fillRect(config.x, config.y, config.width, config.height);
+            // Draw the bold white border
+            graphics.lineStyle(config.borderThickness, config.borderColor);
+            graphics.strokeRect(config.x, config.y, config.width, config.height);
+        }
+
+        // Draw the blocks
+        drawBlock(this.meterBlock, meterBlockConfig);
+        drawBlock(this.coinBlock, coinBlockConfig);
+
+        // Make the blocks fixed to the camera
+        this.meterBlock.setScrollFactor(0);
+        this.coinBlock.setScrollFactor(0);
+
+        // Add the UI elements on top of the blocks
+        this.meterText = this.add.bitmapText(40, 2, 'pixelfont', 'Meter: 0m', 28)
+            .setScrollFactor(0)
+            .setDepth(11);
+
+        this.scoreImg = this.add.image(40, 87, 'collectible_1')
+            .setScale(0.1)
+            .setScrollFactor(0)
+            .setDepth(11);
+        this.scoreText = this.add.bitmapText(60, 60, 'pixelfont', 'x 0', 28)
+            .setScrollFactor(0)
+            .setDepth(11);
+
+        // Initialize powerUpText for displaying power-up messages
+        this.powerUpText = this.add.bitmapText(200, 100, 'pixelfont', '', 30)
+            .setScrollFactor(0)
+            .setDepth(11);
 
         this.finishText = this.add.bitmapText(this.finishPoint - 30, 50, 'pixelfont', 'FINISH', 30).setScrollFactor(1);
         // Add input listeners
@@ -250,7 +305,7 @@ class GameScene extends Phaser.Scene {
         }
 
         // Use spacebar (or buttonA) for jump
-        if ((this.jumpKey.isDown || this.buttonA.button.isDown) && this.player.body.touching.down) {
+        if ((this.jumpKey.isDown || (this.buttonA && this.buttonA.button.isDown)) && this.player.body.touching.down) {
             this.sounds.jump.setVolume(0.2).setLoop(false).play();
             this.player.setVelocityY(-750);
         }
@@ -293,7 +348,9 @@ class GameScene extends Phaser.Scene {
     }
 
     walkingAnimationStart() {
-        this.animEvent && this.animEvent.destroy();
+        if (this.animEvent) {
+            this.animEvent.destroy();
+        }
         this.animEvent = this.time.addEvent({
             delay: 200,
             callback: () => {
@@ -313,7 +370,7 @@ class GameScene extends Phaser.Scene {
 
     walkingAnimationStop() {
         this.player.setAngle(0);
-        this.animEvent.destroy();
+        if(this.animEvent) this.animEvent.destroy();
     }
 
     spawnBricks(numOfBricks = 2, XOffset = 100, YOffset = 0) {
@@ -432,7 +489,7 @@ class GameScene extends Phaser.Scene {
     }
     
     blinkEffect(object = this.powerUpText, duration = 300, blinks = 3) {
-        this.blinkTween && this.blinkTween.stop();
+        if (this.blinkTween) this.blinkTween.stop();
         object.setAlpha(0);
         this.blinkTween = this.tweens.add({
             targets: object,
@@ -674,13 +731,13 @@ class GameScene extends Phaser.Scene {
     }
 
     updateScoreText() {
-        this.scoreText.setText(`x ${this.score}`);
+        this.scoreText.setText("x " + this.score);
     }
 
     gameOver() {
         this.sound.stopAll();
         // this.scene.stop();
-        initiateGameOver.bind(this)({
+        initiateGameOver.bind(this)( {
             meter: this.meter,
             coins: this.score,
         });
@@ -754,3 +811,4 @@ const config = {
     },
     deviceOrientation: _CONFIG.deviceOrientation==="landscape"
 };
+
