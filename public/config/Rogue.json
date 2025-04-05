@@ -2,32 +2,33 @@
     "description": "A thrilling shooting and survival game.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "background_1",
-        "player": "player",
-        "enemy": "enemy",
-        "collectible": "collectible",
-        "projectile": "projectile"
+      "background": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/clearoff.png?t=1743741485907",
+      "player": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/1743742149949.png?t=1743742159771",
+      "enemy": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/1743742565030.png?t=1743742710700",
+      "collectible": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/diamond1.png?t=1743743504633",
+      "projectile": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_1.png?t=1743741208412"
     },
-    "instructions": "Instructions:1. Use arrow keys OR joystick to move. 2. Collect power ups to upgrade weapons and regenrated health.",
+    "instructions": "Instructions:1. Use arrow keys OR joystick to move. 2. Collect power ups to upgrade weapons and regenerated health.",
     "orientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
+      "landscape": {
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
     },
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
     "soundsLoader": {
-        "background": "https://files.catbox.moe/tq2d3l.mp3",
-        "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_3.mp3",
-        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/damage_1.mp3",
-        "upgrade": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_1.mp3",
-        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
-        "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3"
+      "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/026491_pixel-song-8-72675_5c5cf064-40cc-416c-85e2-2012e2833dbd.mp3?t=1743740692668",
+      "shoot": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/shoot-1-81135%20%28mp3cut.net%29_830cfc58-fee2-406c-bc43-d638aadbf6ab.mp3?t=1743746961440",
+      "damage": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/male_hurt7-48124%20%28mp3cut.net%29_4555c4c9-cac0-4f2c-8f8d-b5db6e86df46.mp3?t=1743747122821",
+      "upgrade": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/bonus-points-190035_6512bab0-5dc5-4a26-bd0b-e0f8a1538507.mp3?t=1743747267360",
+      "lose": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/086398_game-die-81356_d1e7dc4f-c7d8-4b36-9b75-a61df8cea98c.mp3?t=1743747225314",
+      "collect": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/scale-e6-14577%20%28mp3cut.net%29_63dd4f34-0d49-4f1f-a8b9-4029389e2b51.mp3?t=1743746562434"
     },
     "title": "Rogue"
-}
+  }
+  

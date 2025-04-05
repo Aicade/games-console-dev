@@ -59,6 +59,13 @@ class GameScene extends Phaser.Scene {
             .setScrollFactor(1);
         this.cameras.main.setBounds(this.minCoverage, this.minCoverage, this.maxCoverage, this.maxCoverage);
 
+        // NEW: Configurable flash duration for red damage flash (in ms)
+        this.flashDuration = 100; 
+
+        // NEW: Configurable magnet attraction variables
+        this.magnetRange = 150; // Adjust how far collectibles will be attracted from
+        this.magnetSpeed = 200; // Adjust the speed at which collectibles are pulled
+
         const joyStickRadius = 50;
         if (joystickEnabled) {
             this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
@@ -87,18 +94,17 @@ class GameScene extends Phaser.Scene {
             this.sounds.background.stop();
         }
         // Adjust background volume as needed
-        this.sounds.background.setVolume(0.05).setLoop(true).play();
+        this.sounds.background.setVolume(0.5).setLoop(true).play();
 
         // Initialize game state variables
-        this.player;
         this.enemies;
         this.bullets;
         this.lastFired = 0;
         this.lastFiredDelay = 800;
         this.score = 0;
         this.scoreText;
-        this.playerHealth = 100;
         this.playerSpeed = 100;
+        this.playerHealth = 100;
         this.healthRegenPoints = 0;
         this.healthRegenPointsRequired = 15;
         this.bulletAddPoints = 0;
@@ -107,17 +113,35 @@ class GameScene extends Phaser.Scene {
         this.enemySpeed = 30;
         this.gameOverTrigerred = false;
 
-        // New variables for coin collector powerup and orbiting bullets
+        // Variables for coin collector powerup and orbiting bullets
         this.coinCount = 0;
         this.coinRequired = 20;
-        // Use an array to hold multiple orbiting bullets
         this.orbitingBullets = [];
         this.orbitBaseAngle = 0; // Global rotation base
 
-        // Create player
-        this.player = this.physics.add.sprite(this.width / 2, this.height / 2, 'player')
-            .setScale(0.2);
-        this.player.preFX.addShadow(0, 0, 0.1, 1, 0x000000, 6, 1);
+        // --- Create player using a container ---
+        // Create a container and enable physics on it.
+        this.playerContainer = this.add.container(this.width / 2, this.height / 2);
+        this.physics.world.enable(this.playerContainer);
+        // Create the actual sprite and add it to the container.
+        this.playerSprite = this.add.sprite(0, 0, 'player').setScale(0.2);
+        // Apply visual effects on the sprite.
+        this.playerSprite.preFX.addShadow(0, 0, 0.1, 1, 0x000000, 6, 1);
+        this.playerContainer.add(this.playerSprite);
+
+        // Add bounce tween to the child sprite (relative to the container)
+        // These values control the bounce effect.
+        this.bounceAmplitude = 10;   // Bounce height (pixels)
+        this.bounceDuration = 300;   // Bounce speed (milliseconds for half cycle)
+        this.bounceTween = this.tweens.add({
+            targets: this.playerSprite,
+            y: -this.bounceAmplitude, // negative so it moves upward relative to container
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1,
+            duration: this.bounceDuration
+        });
+
         this.healthBar = this.add.graphics();
         this.updateHealthBar();
 
@@ -126,8 +150,8 @@ class GameScene extends Phaser.Scene {
         this.bullets = this.physics.add.group();
         this.collectibles = this.physics.add.group();
 
-        // Set up camera
-        this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
+        // Set up camera to follow the player container
+        this.cameras.main.startFollow(this.playerContainer, true, 0.03, 0.03);
 
         // Set up arrow key input
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -149,17 +173,13 @@ class GameScene extends Phaser.Scene {
             .setAngle(-50);
 
         // UI Bars in Top Left Corner
-        // 1. Weapon Speed Bar (for bullet upgrade progress)
         this.weaponBar = this.createBar(20, 20, 200, 30, 'WEAPON SPEED', 0x0000ff);
         this.weaponBar.graphics.setScrollFactor(0);
-        // 2. Health Bar (for health upgrade progress)
         this.rehealthBar = this.createBar(20, 60, 200, 30, 'HEALTH', 0x00ff00);
         this.rehealthBar.graphics.setScrollFactor(0);
-        // 3. Weapon Upgrade Bar (for orbiting bullet powerup)
         this.coinBar = this.createBar(20, 100, 200, 30, 'WEAPON UPGRADE', 0xffd700);
         this.coinBar.graphics.setScrollFactor(0);
 
-        // Create text overlays for each bar (centered on the bar)
         this.weaponBarText = this.add.text(20 + 200 / 2, 20 + 30 / 2, this.bulletAddPoints + "/" + this.bulletAddPointsRequired, { 
             fontSize: '20px', 
             fill: '#ffffff',
@@ -187,7 +207,6 @@ class GameScene extends Phaser.Scene {
         .setScrollFactor(0)
         .setDepth(101);
 
-        // Place the icons to the right of each bar (fixed to the UI)
         const margin = 10;
         this.weaponSpeedIcon = this.add.text(20 + 200 + margin, 20 + 15, "🔫", { fontSize: '32px', fill: '#ffffff' })
             .setOrigin(0, 0.5)
@@ -214,15 +233,14 @@ class GameScene extends Phaser.Scene {
         this.vfx.addCircleTexture('orange', 0xFFA500, 1, 10);
         this.vfx.addCircleTexture('yellow', 0xFFFF00, 1, 10);
 
-        // Set up collisions
-        this.physics.add.collider(this.player, this.enemies, this.playerEnemyCollision, null, this);
+        // Set up collisions (using the container’s position for the player)
+        this.physics.add.collider(this.playerContainer, this.enemies, this.playerEnemyCollision, null, this);
         this.physics.add.collider(this.bullets, this.enemies, this.bulletEnemyCollision, null, this);
-        this.physics.add.collider(this.player, this.collectibles, this.collectCollectible, null, this);
+        this.physics.add.collider(this.playerContainer, this.collectibles, this.collectCollectible, null, this);
         this.input.keyboard.disableGlobalCapture();
         this.toggleControlsVisibility(isMobile);
 
-        // --- Orientation Enforcement ---
-        // Create an overlay text for orientation prompt (fixed to UI)
+        // Orientation Enforcement
         this.orientationText = this.add.text(this.width / 2, this.height / 2, "Please rotate your device to landscape", { 
             font: '32px Arial', 
             fill: '#ffffff',
@@ -233,7 +251,6 @@ class GameScene extends Phaser.Scene {
         .setDepth(200)
         .setVisible(false);
 
-        // Listen for orientation changes
         this.scale.on('orientationchange', (orientation) => {
             if (orientation === Phaser.Scale.PORTRAIT) {
                 this.orientationText.setVisible(true);
@@ -283,27 +300,41 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        // Player Movement
+        // --- Player Movement using the container ---
         if (this.cursors.left.isDown || this.joystickKeys.left.isDown) {
-            this.player.setVelocityX(-this.playerSpeed);
-            this.player.flipX = true;
+            this.playerContainer.body.setVelocityX(-this.playerSpeed);
+            this.playerSprite.flipX = true;
         } else if (this.cursors.right.isDown || this.joystickKeys.right.isDown) {
-            this.player.setVelocityX(this.playerSpeed);
-            this.player.flipX = false;
+            this.playerContainer.body.setVelocityX(this.playerSpeed);
+            this.playerSprite.flipX = false;
         } else {
-            this.player.setVelocityX(0);
+            this.playerContainer.body.setVelocityX(0);
         }
         if (this.cursors.up.isDown || this.joystickKeys.up.isDown) {
-            this.player.setVelocityY(-this.playerSpeed);
+            this.playerContainer.body.setVelocityY(-this.playerSpeed);
         } else if (this.cursors.down.isDown || this.joystickKeys.down.isDown) {
-            this.player.setVelocityY(this.playerSpeed);
+            this.playerContainer.body.setVelocityY(this.playerSpeed);
         } else {
-            this.player.setVelocityY(0);
+            this.playerContainer.body.setVelocityY(0);
         }
 
-        // Enemies move towards the player
+        // --- Toggle Bounce Animation Only While Moving ---
+        const moving = (this.playerContainer.body.velocity.x !== 0 || this.playerContainer.body.velocity.y !== 0);
+        if (moving) {
+            if (this.bounceTween.paused) {
+                this.bounceTween.resume();
+            }
+        } else {
+            if (!this.bounceTween.paused) {
+                this.bounceTween.pause();
+                // Reset child sprite to its original position when not moving
+                this.playerSprite.y = 0;
+            }
+        }
+
+        // Enemies move toward the player container
         this.enemies.getChildren().forEach(enemy => {
-            this.physics.moveToObject(enemy, this.player, this.enemySpeed);
+            this.physics.moveToObject(enemy, this.playerContainer, this.enemySpeed);
         });
 
         // Automatic shooting
@@ -312,21 +343,30 @@ class GameScene extends Phaser.Scene {
             this.lastFired = this.time.now + this.lastFiredDelay;
         }
 
-        // Update health bar position
-        this.healthBar.setPosition(this.player.x - 50, this.player.y - 60);
+        // Update health bar position relative to the container
+        this.healthBar.setPosition(this.playerContainer.x - 50, this.playerContainer.y - 60);
         this.scoreText.setText(': ' + this.score);
 
         // Update orbiting bullets positions (if any exist)
         if (this.orbitingBullets.length > 0) {
-            this.orbitBaseAngle += 0.02; // Adjust rotation speed as needed
-            const radius = 50; // Distance from the player
+            this.orbitBaseAngle += 0.05; // Adjust rotation speed as needed
+            const radius = 100; // Distance from the player
             const total = this.orbitingBullets.length;
             this.orbitingBullets.forEach((bullet, index) => {
                 const angle = this.orbitBaseAngle + (2 * Math.PI * index / total);
-                bullet.x = this.player.x + radius * Math.cos(angle);
-                bullet.y = this.player.y + radius * Math.sin(angle);
+                bullet.x = this.playerContainer.x + radius * Math.cos(angle);
+                bullet.y = this.playerContainer.y + radius * Math.sin(angle);
             });
         }
+
+        // NEW: Magnet effect for collectibles
+        this.collectibles.getChildren().forEach(collectible => {
+            const dist = Phaser.Math.Distance.Between(collectible.x, collectible.y, this.playerContainer.x, this.playerContainer.y);
+            if (dist < this.magnetRange) {
+                const angle = Phaser.Math.Angle.Between(collectible.x, collectible.y, this.playerContainer.x, this.playerContainer.y);
+                collectible.body.setVelocity(Math.cos(angle) * this.magnetSpeed, Math.sin(angle) * this.magnetSpeed);
+            }
+        });
     }
 
     updateHealthMeterBar() {
@@ -369,20 +409,20 @@ class GameScene extends Phaser.Scene {
         let x, y;
         switch (edge) {
             case 1:
-                x = Phaser.Math.Between(this.player.x - this.width / 2, this.player.x + this.width / 2);
-                y = this.player.y - this.height / 2;
+                x = Phaser.Math.Between(this.playerContainer.x - this.width / 2, this.playerContainer.x + this.width / 2);
+                y = this.playerContainer.y - this.height / 2;
                 break;
             case 2:
-                x = this.player.x + this.width / 2;
-                y = Phaser.Math.Between(this.player.y - this.height / 2, this.player.y + this.height / 2);
+                x = this.playerContainer.x + this.width / 2;
+                y = Phaser.Math.Between(this.playerContainer.y - this.height / 2, this.playerContainer.y + this.height / 2);
                 break;
             case 3:
-                x = Phaser.Math.Between(this.player.x - this.width / 2, this.player.x + this.width / 2);
-                y = this.player.y + this.height / 2;
+                x = Phaser.Math.Between(this.playerContainer.x - this.width / 2, this.playerContainer.x + this.width / 2);
+                y = this.playerContainer.y + this.height / 2;
                 break;
             case 4:
-                x = this.player.x - this.width / 2;
-                y = Phaser.Math.Between(this.player.y - this.height / 2, this.player.y + this.height / 2);
+                x = this.playerContainer.x - this.width / 2;
+                y = Phaser.Math.Between(this.playerContainer.y - this.height / 2, this.playerContainer.y + this.height / 2);
                 break;
         }
         const numEnemies = Phaser.Math.Between(1, 3);
@@ -399,16 +439,15 @@ class GameScene extends Phaser.Scene {
                 repeat: -1,
                 delay: i * 200
             });
-            this.physics.moveToObject(enemy, this.player, this.enemySpeed);
+            this.physics.moveToObject(enemy, this.playerContainer, this.enemySpeed);
         }
     }
 
     shootBullet() {
-        const closestEnemy = this.findClosestEnemy(this.player.x, this.player.y);
+        const closestEnemy = this.findClosestEnemy(this.playerContainer.x, this.playerContainer.y);
         if (closestEnemy) {
-            const bullet = this.bullets.create(this.player.x, this.player.y, 'projectile').setScale(0.05);
+            const bullet = this.bullets.create(this.playerContainer.x, this.playerContainer.y, 'projectile').setScale(0.05);
             this.physics.moveToObject(bullet, closestEnemy, 500);
-            // Reduced shoot sound volume to 0.15
             this.sounds.shoot.setVolume(0.15).setLoop(false).play();
         }
     }
@@ -426,10 +465,13 @@ class GameScene extends Phaser.Scene {
         return closestEnemy;
     }
 
-    playerEnemyCollision(player, enemy) {
+    playerEnemyCollision(playerContainer, enemy) {
+        // Play damage sound and camera shake
         this.sounds.damage.setVolume(1).setLoop(false).play();
         this.vfx.shakeCamera(200, 0.015);
-        this.vfx.createEmitter('heart', player.x, player.y, 0.025, 0, 1000).explode(10);
+        // NEW: Flash red effect on damage. Adjust flash time via this.flashDuration.
+        this.cameras.main.flash(this.flashDuration, 255, 0, 0);
+        this.vfx.createEmitter('heart', playerContainer.x, playerContainer.y, 0.025, 0, 1000).explode(10);
         this.playerHealth -= 10;
         this.updateHealthBar();
         enemy.destroy();
@@ -477,36 +519,33 @@ class GameScene extends Phaser.Scene {
 
     createCollectible(x, y) {
         const collectible = this.physics.add.image(x, y, 'collectible').setScale(0.1);
+        // Allow collectible to have physics movement for magnet effect
+        collectible.body.setAllowGravity(false);
         this.vfx.addShine(collectible, 500);
         this.vfx.scaleGameObject(collectible);
         this.collectibles.add(collectible);
     }
 
-    collectCollectible(player, collectible) {
-        // Increase progress on bars
+    collectCollectible(playerContainer, collectible) {
         this.increaseBar(this.weaponBar, 10);
         this.increaseBar(this.rehealthBar, 7);
         collectible.destroy();
         this.sounds.collect.setVolume(1).setLoop(false).play();
         
-        // Increase the underlying counters
         this.healthRegenPoints += 1;
         this.bulletAddPoints += 1;
         this.coinCount += 1;
         
-        // Update the coin (weapon upgrade) bar percentage and overlay text
         this.coinBar.value = (this.coinCount / this.coinRequired) * 100;
         this.coinBar.update();
         
-        // Update the overlay texts for all bars
         this.weaponBarText.setText(this.bulletAddPoints + "/" + this.bulletAddPointsRequired);
         this.rehealthBarText.setText(this.healthRegenPoints + "/" + this.healthRegenPointsRequired);
         this.coinProgressText.setText(this.coinCount + "/" + this.coinRequired);
         
-        // Check for health upgrade
         if (this.healthRegenPoints >= this.healthRegenPointsRequired) {
             this.sounds.upgrade.setVolume(1).setLoop(false).play();
-            this.vfx.createEmitter('plus', player.x, player.y, 1, 0, 1000).explode(10);
+            this.vfx.createEmitter('plus', playerContainer.x, playerContainer.y, 1, 0, 1000).explode(10);
             this.healthRegenPoints = 0;
             this.playerHealth = 100;
             this.updateHealthBar();
@@ -517,16 +556,13 @@ class GameScene extends Phaser.Scene {
             this.time.delayedCall(1000, () => {
                 this.centerTextHealth.destroy();
             });
-            // Update the health bar text overlay too
             this.rehealthBarText.setText(this.healthRegenPoints + "/" + this.healthRegenPointsRequired);
         }
         
-        // Check for weapon speed upgrade
         if (this.bulletAddPoints >= this.bulletAddPointsRequired) {
             this.sounds.upgrade.setVolume(1).setLoop(false).play();
-            this.vfx.createEmitter('projectile', player.x, player.y, 0.025, 0, 1000).explode(10);
+            this.vfx.createEmitter('projectile', playerContainer.x, playerContainer.y, 0.025, 0, 1000).explode(10);
             this.bulletAddPoints = 0;
-            this.lastFiredDelay *= 0.9;
             this.centerTextWeapon = this.add.bitmapText(this.width / 2, this.height / 2 + 100, 'pixelfont', "WEAPON SPEED UPGRADED!", 64)
                 .setOrigin(0.5, 0.5)
                 .setDepth(100)
@@ -534,11 +570,9 @@ class GameScene extends Phaser.Scene {
             this.time.delayedCall(1000, () => {
                 this.centerTextWeapon.destroy();
             });
-            // Update the weapon speed bar text overlay
             this.weaponBarText.setText(this.bulletAddPoints + "/" + this.bulletAddPointsRequired);
         }
         
-        // When enough coins are collected, spawn an additional orbiting bullet and reset the coin counter/bar.
         if (this.coinCount >= this.coinRequired) {
             this.spawnOrbitingBullet();
             this.coinCount = 0;
@@ -551,18 +585,14 @@ class GameScene extends Phaser.Scene {
     }
     
     spawnOrbitingBullet() {
-        // Create a new orbiting bullet sprite
-        const bullet = this.physics.add.sprite(this.player.x, this.player.y, 'projectile').setScale(0.05);
-        // Set up collision between this bullet and enemies
+        const bullet = this.physics.add.sprite(this.playerContainer.x, this.playerContainer.y, 'projectile').setScale(0.05);
         this.physics.add.overlap(bullet, this.enemies, (bullet, enemy) => {
             enemy.destroy();
             this.vfx.createEmitter('red', enemy.x, enemy.y, 1, 0, 500).explode(10);
             this.score += 10;
         }, null, this);
-        // Add the new bullet to the orbiting bullets array
         this.orbitingBullets.push(bullet);
         
-        // Show upgrade message
         this.centerTextWeapon = this.add.bitmapText(this.width / 2, this.height / 2 + 100, 'pixelfont', "WEAPON UPGRADE!", 64)
             .setOrigin(0.5, 0.5)
             .setDepth(100)
