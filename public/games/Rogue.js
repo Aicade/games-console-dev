@@ -64,12 +64,13 @@ class GameScene extends Phaser.Scene {
 
         // NEW: Configurable magnet attraction variables
         this.magnetRange = 150; // Adjust how far collectibles will be attracted from
-        this.magnetSpeed = 200; // Adjust the speed at which collectibles are pulled
+        this.magnetSpeed = 400; // Adjust the speed at which collectibles are pulled
 
         const joyStickRadius = 50;
         if (joystickEnabled) {
             this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-                x: this.width - (joyStickRadius * 2),
+                x: joyStickRadius * 2,
+
                 y: this.height - (joyStickRadius * 2),
                 radius: 50,
                 base: this.add.circle(0, 0, 80, 0x888888, 0.5),
