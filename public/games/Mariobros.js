@@ -47,8 +47,8 @@ class GameScene extends Phaser.Scene {
         this.load.image("background", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233355-Photoroom.png?t=1743617430629");
         
         // Load player and enemy using the old method
-        this.load.image("player", _CONFIG.imageLoader.player);
-        this.load.image("enemy", _CONFIG.imageLoader.enemy);
+        this.load.image("player", "https://media-hosting.imagekit.io/1d1ce86f3c99446f/player.png?Expires=1838456896&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Yh9R0ufjTZxeVCrlo8dNsb2RoDsbQruw1wTjfKeXR~U5kQcqPWuZZwTp8fZoxTG~uPpCCKtKV2-Wrh4LII-kiTH9KmD1i0AfleqsEN3kvHhRI5DvNULhmL7o0Kb1UNq-yonCMIj9UFsko0kEcncsJ0YiVxLDVDTtEMAe-aYHcJQEFqiR2hJGtdUYuxWHUaVQXUYy0u76sHqZ8D1cIycT2umZEtVyDwRruodY2-i7-Ki6xUtJaXtYznMtPgzRTfdTUjrYwFJ6Avblgv02HbW~7aKmdMG6gz9K5WT8V3fKs4jcj88CpY45u81fBg8GZimKqDug7CpfBkqcUomnCiUx4w__");
+        this.load.image("enemy", "https://media-hosting.imagekit.io/a289561ec2ca47dc/enemy.png?Expires=1838457153&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=dAPmc6zh-S3qyLwUMIWgQWky1-0O02KqxGXoqWueughg6-A7NKgHm7cZcczUQ~ZAalscBhWTyvWYh2YE0r~woamTDmuvaNFS4TLbiYIq8V7LXmhvJaADTHa~cz3SZ4Qz5y28T7dI3t7SHAajtV~wNnDMH4PDaVO5CHZ6sFx6BUyoCPLU0M4uBqDRV59fxkYua2vf7qvTRXzA1X5dNW9yDwVuHH8PHLP7xtMdrN~IxZ14eJySDUKQPTDjqFxF9OL~wgwoMPwOyPKW4JUm8vjqbZ9O2lAbmUneSwYNZIDC8vSE73MhKFVOC1YpzDp9RAEqyzfITzhDzltPOBnvduxNsA__");
     
         this.load.image("collectible", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_12.png?t=1743665247183");
         this.load.image("collectible_1", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_8.png?t=1743665381909");

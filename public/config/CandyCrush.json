@@ -2,10 +2,10 @@
   "description": "Candy Crush style match-3 game. Match candies to score points before time runs out!",
   "deviceOrientation": "landscape",
   "imageLoader": {
-    "background": "background_1",
-    "candy_1": "collectible_1",
-    "candy_2": "collectible_2",
-    "candy_3": "collectible_3"
+    "background": "https://media-hosting.imagekit.io/5b6d4f85627142e2/background_1.png?Expires=1838457658&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=LVfOtXOrl10gXm4oGXK2atV8CHb-HxUNIW0B0EYvg2Ze~U7r9lOEyHKg7BH77v4Sk9QGxboNS-JoCsh6vtaazba6tSlmRbrGgSR-stQxrpKI8FYSVNw4E~SOzzwIvP4IkFU-mMO1PL2WFZr1I5Fk5lmInRshSoXV6CeiSOfIYORbYNhyBq476tK-YaCo~UJfWpMkma~QO6H-3l-XEOhwssh0K0p35J1BRQ6Fk3Z0r2FEvK2zw-IVnki1GOSmVssYTeJZ9eRgbIs20HUXnqlWcYLFC2Ro1r1ABXT1cdsrg6VQFpwYE1z6anhHNobGeETyZVyWcZvyU-ljR~23lTKdWA__",
+    "candy_1": "https://media-hosting.imagekit.io/6b8770932c7f438b/collectible_1.png?Expires=1838457607&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=zgJBkz-wXAnxlt7vH7ZKW-1Z0Eg8lHyCLLM3n61TDJDyzpxXyuWEu0F3yhSjLsog7qJ2wizJnzTcjMv4gP2KKWV65~~YNEDXiQ-5-sC0isVI1ZlIMuDf1lzWeNZ8sJjGN3CLY3C6O79CSD6MP3qDLPzcJEwrISWKF0LfpVL~C94RC6W9LkDLPFzpJ~Rx-hidlW91oLJ18UYfbHTX7bQbFXItCRefX9I7l-vz3Xb~LYxPB-wb9Q9Z2aCg9oL9RDgdfVHYtKfMm-~5xIn~~r3jJAt70CBYcLA99-u9VxwIgj8OnslHQ2Zry8v2Ujh-xQiFQX0eu9hR1TmufatgPHZzRg__",
+    "candy_2": "https://media-hosting.imagekit.io/26c7533d03b84bae/collectible_2.png?Expires=1838457607&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=V3he81vYNkyWhZDD8dwm51tvWv6vAL41dmv0mNAgYFNUkO8rGfr1rn2-XpMxXN2TragLwSEYG5PZ63ZLruml0Ttel~leBGfhLWWHWaM7i1zP7eoyCKotMbloMPOHLis4Hr2IRQaXCXQ6bRlyjfDYfSmHc9XMG4K33yAcPTwgSRD0OxSNVmZCSOY3a9N7Dk-eQSFwjqWVAFYdWyKrqa9k1oeE01BmR9g6gdO0AWdRjHJQlfpDMTcKSQoNncCaZHp2btSuJDpayVB2KSc3vPlOyLa~mm26TkIGYnpZBISQ~TyzqBhi9UlKCinbWvtICucOYnXmkqfH~xpUmuIlev65WA__",
+    "candy_3": "https://media-hosting.imagekit.io/ac59af82e008415c/collectible_3.png?Expires=1838457607&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=KWDMIgFLxuRclDfRnXchyHH3SISF2JIQ4zggKuJ~2KPDJrELZTCprGstNEFM3nGZAfaVucjMq3~8T4xz~vLI1r2rIuvNtEs3dJB7oWmmoxm6yAAlki04sYp7cLSG-kFNjIYpmhX8CppD4SsXDpP-KJ8oz51vQK6nHoJUPnS8-5zpJJpSUogXcESpATf8Izn9wVG1MEYiJYWl~7rKk2XYy3HViH760ofBlA0c5cR-CMD-aK5FV6cUWnLEY-hhod8m~3QgpHCEfZFnhchr5UFcGntwjkV8wMULF26vPgiHejGR6d1-sUsMzrgQ8DKc5e9Ouou5Odj-zA~RAlW9Jn-eYQ__"
   },
   "instructions": "1. Match 3 or more candies to score points.\n2. Swipe to swap adjacent candies.\n3. Beat the timer!\n4. Fill the progress bar to earn stars!",
   "orientationSizes": {

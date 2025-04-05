@@ -59,6 +59,9 @@ class GameScene extends Phaser.Scene {
         // Updated train track asset - using new image URL.
         this.load.image('trainTrack', 'https://media-hosting.imagekit.io/9fd2bad1b4f843cc/2.png?Expires=1838134173&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=ZE1vCDDtffZ7u4WuTmK2HHj8ryPT2pXS~0Py7lppweirJtzqCEbrbIFBczHTrPKaSNdex93Hvzv-4o5BK8grcQCnxU9Md4CORo0zmFOr2oeSKk4~UI5U47yzjY7-jYBQ8dRrfnVwqNXxin~~N1JxWv~d4kJx5Z~yH-1qgXI-566GrO9bFddXs3CM6ZvUGDx7QoUrjbCtX4df~A9x44saWgjtgEaRGHsid1YiFTaEyi95viEidmDrBb01V0PBWaRXdyzjt7l3Vdd4JHUM7zrPgM20JsGMCd8pB5iiy5zStVm9DTgzl-AAFpRbNjyD828AQGmyKO3k3pjY7jYAEVFSMg__');
 
+                // Updated train track asset - using new image URL.
+                this.load.image('player', 'https://media-hosting.imagekit.io/1d1ce86f3c99446f/player.png?Expires=1838456896&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Yh9R0ufjTZxeVCrlo8dNsb2RoDsbQruw1wTjfKeXR~U5kQcqPWuZZwTp8fZoxTG~uPpCCKtKV2-Wrh4LII-kiTH9KmD1i0AfleqsEN3kvHhRI5DvNULhmL7o0Kb1UNq-yonCMIj9UFsko0kEcncsJ0YiVxLDVDTtEMAe-aYHcJQEFqiR2hJGtdUYuxWHUaVQXUYy0u76sHqZ8D1cIycT2umZEtVyDwRruodY2-i7-Ki6xUtJaXtYznMtPgzRTfdTUjrYwFJ6Avblgv02HbW~7aKmdMG6gz9K5WT8V3fKs4jcj88CpY45u81fBg8GZimKqDug7CpfBkqcUomnCiUx4w__');
+
         // Load audio from configuration.
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
