@@ -37,7 +37,7 @@ class GameScene extends Phaser.Scene {
         this.jumpHeight = 100;    // Vertical jump height
 
         // Vertical movement speed for power-ups and obstacles
-        this.powerUpStep = 1.4;
+        this.powerUpStep = 3.5;
     }
 
     preload() {
@@ -59,8 +59,8 @@ class GameScene extends Phaser.Scene {
         // Updated train track asset - using new image URL.
         this.load.image('trainTrack', 'https://media-hosting.imagekit.io/9fd2bad1b4f843cc/2.png?Expires=1838134173&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=ZE1vCDDtffZ7u4WuTmK2HHj8ryPT2pXS~0Py7lppweirJtzqCEbrbIFBczHTrPKaSNdex93Hvzv-4o5BK8grcQCnxU9Md4CORo0zmFOr2oeSKk4~UI5U47yzjY7-jYBQ8dRrfnVwqNXxin~~N1JxWv~d4kJx5Z~yH-1qgXI-566GrO9bFddXs3CM6ZvUGDx7QoUrjbCtX4df~A9x44saWgjtgEaRGHsid1YiFTaEyi95viEidmDrBb01V0PBWaRXdyzjt7l3Vdd4JHUM7zrPgM20JsGMCd8pB5iiy5zStVm9DTgzl-AAFpRbNjyD828AQGmyKO3k3pjY7jYAEVFSMg__');
 
-                // Updated train track asset - using new image URL.
-                this.load.image('player', 'https://media-hosting.imagekit.io/1d1ce86f3c99446f/player.png?Expires=1838456896&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Yh9R0ufjTZxeVCrlo8dNsb2RoDsbQruw1wTjfKeXR~U5kQcqPWuZZwTp8fZoxTG~uPpCCKtKV2-Wrh4LII-kiTH9KmD1i0AfleqsEN3kvHhRI5DvNULhmL7o0Kb1UNq-yonCMIj9UFsko0kEcncsJ0YiVxLDVDTtEMAe-aYHcJQEFqiR2hJGtdUYuxWHUaVQXUYy0u76sHqZ8D1cIycT2umZEtVyDwRruodY2-i7-Ki6xUtJaXtYznMtPgzRTfdTUjrYwFJ6Avblgv02HbW~7aKmdMG6gz9K5WT8V3fKs4jcj88CpY45u81fBg8GZimKqDug7CpfBkqcUomnCiUx4w__');
+        // Updated train track asset - using new image URL.
+        this.load.image('player', 'https://media-hosting.imagekit.io/1d1ce86f3c99446f/player.png?Expires=1838456896&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Yh9R0ufjTZxeVCrlo8dNsb2RoDsbQruw1wTjfKeXR~U5kQcqPWuZZwTp8fZoxTG~uPpCCKtKV2-Wrh4LII-kiTH9KmD1i0AfleqsEN3kvHhRI5DvNULhmL7o0Kb1UNq-yonCMIj9UFsko0kEcncsJ0YiVxLDVDTtEMAe-aYHcJQEFqiR2hJGtdUYuxWHUaVQXUYy0u76sHqZ8D1cIycT2umZEtVyDwRruodY2-i7-Ki6xUtJaXtYznMtPgzRTfdTUjrYwFJ6Avblgv02HbW~7aKmdMG6gz9K5WT8V3fKs4jcj88CpY45u81fBg8GZimKqDug7CpfBkqcUomnCiUx4w__');
 
         // Load audio from configuration.
         for (const key in _CONFIG.soundsLoader) {
@@ -72,7 +72,7 @@ class GameScene extends Phaser.Scene {
         this.load.image("pillar", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png");
         this.load.image("newAsset", "https://media-hosting.imagekit.io/6d0756600a534510/avatar-profile-picture-icon-set-260nw-207369067.png?Expires=1838106862&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=JF42YcfT-YHb7EYN5cbo5NXfgRTMzqO27DL8n0fRajh64BeYuv3~3R9o~9tN2w2rJAi2u2pCcZWlZIuKADSv5Cox8OX7i3IDas4sOzzTmdS3O3HwwIsnqbg3TDGhjqA3F8jqDfUgXTDCjxYKFzWCcz6lJgkCnloYBZaCLJut8OpMDvTSIx6~kmXSqA30UppvHR1YHDWtm6vQzOwL~NcIIToGZqmLTwtBUaKserIfNEFRjmtPVGWQG7jHEHphxd0GLGWvES~Eh7Yw0nKvmjInc7ENWl2LP82Dx-DDzpiSgchUGJjhJJjRAfc1Lih3VDoi7SVXZdeyiWTSfrD2SRB6YQ__");
         // Load the train asset with crossOrigin enabled.
-        this.load.image('train', 
+        this.load.image('train',
             'https://media-hosting.imagekit.io/ca871ac6db29492e/train.png?Expires=1838029696&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=1jYB9fzt0kIoqlVSdVVtkSTLctQuleW~1rM5ynX2CiTNDKIhObxio4dmKicEU7~i5EOXSNzQMPUtorxqhy5KdyHyE4KedahQlwuJ2TVnh1M37VMGShoQmMOnAzXcbYPtree2-1SmSDcR4fz-6865S4K66zuPLdRht1Wg9BPUbcfCqIKjqTvuzHmdK14liDoya5CJ9bXtI1xw0AX8fXzI8x630Tk0Agwx0Z~tk48gWKr0KGQ6yLEiO9J-1ec~zIgrfvgyLrZx5g7JF1q~KWlpa2-TIZ4ZtFL7QVaCFWV9okBsICS7LQAqZTK6IQEA1fjUGeE8ljG0owC28Q8xYgrweQ__',
             { crossOrigin: 'anonymous' }
         );
@@ -291,7 +291,7 @@ class GameScene extends Phaser.Scene {
         }
 
         if (isMobile) {
-            this.powerUpStep = 1.2;
+            this.powerUpStep = 3;
         }
         
         this.distanceTimer = this.time.addEvent({
@@ -326,58 +326,25 @@ class GameScene extends Phaser.Scene {
         }
         this.sounds.background.setVolume(1).setLoop(true).play();
 
-        // Visual effects.
-        this.vfx = new VFXLibrary(this);
+// Visual effects setup (assuming VFXLibrary is already initialized)
+this.vfx = new VFXLibrary(this);
 
-        // ***** Create Grey Circle Texture and Trail Effect *****
-        // Create a grey circle texture using the VFXLibrary (radius is 15)
-        this.vfx.addCircleTexture('greyCircle', 0x808080, 1, 15);
+// Create a grey, visible circle texture for the dust particles
+this.vfx.addCircleTexture('dustParticle', 0xA9A9A9, 0.8, 20);
 
-        // Create a timed event that spawns a 5x3 grid (plus an extra middle row) of grey circles relative to the player's position.
-        // Grid layout:
-        //   Rows -1 and 0: 5 circles each (columns -2 through 2)
-        //   Row 1: 3 circles (columns -1 through 1)
-        //   Row 2: 1 circle (column 0)
-        this.time.addEvent({
-            delay: 150, // Adjust delay as needed
-            callback: () => {
-                const spacingX = 8; // horizontal distance between circles
-                const spacingY = 11; // vertical distance between rows
+// Create the dust emitter with settings for visibility
+this.dustEmitter = this.add.particles(0, 0, 'dustParticle', {
+    speed: { min: 80, max: 90 },      // Speed range for movement
+    angle: { min: 80, max: 100 },     // Angle range for direction
+    scale: { start: 0.3, end: 0.1 },  // Start larger, shrink over time
+    alpha: { start: 0.8, end: 0 },    // Start opaque, fade out
+    lifespan: 1500,                   // 1.5 seconds lifespan
+    frequency: 30,                    // Emit ~33 particles per second
+    blendMode: 'NORMAL'               // Normal blending mode
+});
+this.dustEmitter.startFollow(this.player, 0, 20); // Follow the player with offset
+this.dustEmitter.start();                         // Start emitting particles
 
-                for (let row = -1; row <= 2; row++) {
-                    let colStart, colEnd;
-                    if (row === -1 || row === 0) {
-                        colStart = -2;
-                        colEnd = 2;
-                    } else if (row === 1) {
-                        colStart = -1;
-                        colEnd = 1;
-                    } else if (row === 2) {
-                        colStart = 0;
-                        colEnd = 0;
-                    }
-                    for (let col = colStart; col <= colEnd; col++) {
-                        const offsetX = col * spacingX;
-                        const offsetY = row * spacingY + 60;
-                        let circle = this.add.image(this.player.x + offsetX, this.player.y + offsetY, 'greyCircle');
-                        circle.setScale(0.5);
-                        circle.setAlpha(0.7);
-                        this.tweens.add({
-                            targets: circle,
-                            alpha: 0,
-                            scale: 0,
-                            duration: 800,
-                            ease: 'easeinoutbounce',
-                            onComplete: () => {
-                                circle.destroy();
-                            }
-                        });
-                    }
-                }
-            },
-            loop: true
-        });
-        
         this.isGameOver = false;
         this.input.keyboard.disableGlobalCapture();
 
@@ -547,6 +514,20 @@ class GameScene extends Phaser.Scene {
             duration: 1000,
             onComplete: () => pointsText.destroy()
         });
+    
+        // Create a particle emitter at the coin's position
+        const coinEmitter = this.vfx.createEmitter(
+            'dustParticle',  // Texture for the particles (already defined in your game)
+            powerup.x,       // X position of the coin
+            powerup.y,       // Y position of the coin
+            0.5,             // Starting scale of particles
+            0,               // Ending scale (particles shrink to 0)
+            1000             // Lifespan of particles in milliseconds
+        );
+    
+        // Emit a burst of particles
+        coinEmitter.explode(20);  // Emit 20 particles in a single burst
+    
         powerup.destroy();
         this.updateScore(10);
         if (isMobile) {
@@ -594,9 +575,9 @@ class GameScene extends Phaser.Scene {
         const enemy = this.enemies.create(xPosition, -10, 'train');
         enemy.setData("lane", laneIndex);
         
-        let speed = 1.4;
+        let speed = 3.5;
         if (isMobile) {
-            speed = 1.2;
+            speed = 3;
         }
         enemy.setData('speed', speed);
         
@@ -648,9 +629,9 @@ class GameScene extends Phaser.Scene {
         }
         obstacle.setScale(obstacleScale);
         
-        let obstacleSpeed = 1.4;
+        let obstacleSpeed = 3.5;
         if (isMobile) {
-            obstacleSpeed = 1.2;
+            obstacleSpeed = 3;
         }
         obstacle.setData('speed', obstacleSpeed);
         
@@ -732,7 +713,7 @@ class GameScene extends Phaser.Scene {
                     }
                 }
             });
-            this.track.tilePositionY -= 2;
+            this.track.tilePositionY -= 5;
         }
     }
 
