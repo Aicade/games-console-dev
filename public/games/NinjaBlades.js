@@ -24,6 +24,7 @@ class GameScene extends Phaser.Scene {
         this.isAiming = false;
         this.shootOnRelease = true;
         this.currentWeapon = 'ninja';
+        this.aimStartTime = null;
 
 
         this.playerBulletBounces = 8;
@@ -63,6 +64,9 @@ class GameScene extends Phaser.Scene {
         this.load.image('gunButton', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/assets/image_2_player.webp'); // Replace with your asset path
         this.load.image('rpgButton', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/history/iteration/nwqtwKYwdaON.webp'); // Replace with your asset path
 
+        // this.load.image('player', 'https://files.catbox.moe/jyvtdc.png');
+        // "shoot": "https://files.catbox.moe/b87m5h.mp3",
+
         
 
         const fontName = 'pix';
@@ -94,7 +98,7 @@ class GameScene extends Phaser.Scene {
             'ninja': {
                 sprite: 'projectile',
                 scale: 0.25,
-                speed: 600,
+                speed: 3000,
                 bounces: 8,
                 rotation: true
             },
@@ -314,6 +318,29 @@ class GameScene extends Phaser.Scene {
         this.rpg.setDepth(3); // Above hand
         this.rpg.visible = this.currentWeapon === 'bomb'; // Show if bomb is active
 
+        // Create graphics crosshair
+        this.crosshair = this.add.graphics();
+        this.crosshair.lineStyle(4, 0x000000, 1); // Thicker lines (4px)
+        const size = 20; // Crosshair line length
+        const circleRadius = 12; // Radius of surrounding circle
+
+        // Draw crosshair lines
+        this.crosshair.beginPath();
+        this.crosshair.moveTo(-size / 2, 0);
+        this.crosshair.lineTo(size / 2, 0);
+        this.crosshair.moveTo(0, -size / 2);
+        this.crosshair.lineTo(0, size / 2);
+        this.crosshair.strokePath();
+
+        // Draw circle
+        this.crosshair.lineStyle(2, 0x000000, 1); // Thinner line for circle (2px)
+        this.crosshair.beginPath();
+        this.crosshair.arc(0, 0, circleRadius, 0, Math.PI * 2); // Full circle
+        this.crosshair.strokePath();
+
+        this.crosshair.setDepth(5);
+        this.crosshair.visible = false;
+
         // Add weapon selection buttons
         const buttonSpacing = 60; // Space between buttons
         const bottomY = this.height - 50; // 50 pixels from bottom
@@ -356,6 +383,7 @@ class GameScene extends Phaser.Scene {
                 this.gameStarted = true;
             
             this.isAiming = true;
+            this.aimStartTime = this.time.now;
             this.drawAimLine(pointer);
         }, this);
         
@@ -367,14 +395,18 @@ class GameScene extends Phaser.Scene {
         
         this.input.on('pointerup', function(pointer) {
             if (this.isAiming) {
-                const bounces = this.currentWeapon === 'bomb' ? 2 : this.playerBulletBounces;
-                this.shootPlayerBullet(pointer, bounces, 0, this.currentWeapon);
+                const aimDuration = (this.time.now - this.aimStartTime) / 1000;
+                if (aimDuration >= 1) {
+                    const bounces = this.currentWeapon === 'bomb' ? 2 : this.playerBulletBounces;
+                    this.shootPlayerBullet(pointer, bounces, 0, this.currentWeapon);
+                }
                 this.isAiming = false;
-                
+                this.aimStartTime = null;
                 if (this.aimLine) {
                     this.aimLine.destroy();
                     this.aimLine = null;
                 }
+                this.crosshair.visible = false;
             }
         }, this);
 
@@ -395,7 +427,7 @@ class GameScene extends Phaser.Scene {
         );
         this.aimLine.setOrigin(0, 0);
         this.aimLine.setLineWidth(3);
-        this.aimLine.setDepth(4); // Above weapon
+        this.aimLine.setDepth(4);
     
         const angle = Phaser.Math.Angle.Between(
             this.player.x, this.player.y,
@@ -403,7 +435,6 @@ class GameScene extends Phaser.Scene {
         );
         
         this.hand.setRotation(angle);
-        // Position weapon at hand's tip (assuming hand height is roughly its displayHeight)
         const handHeight = this.hand.displayHeight;
         const weapon = this.currentWeapon === 'ninja' ? this.gun : this.rpg;
         weapon.setRotation(angle);
@@ -411,13 +442,16 @@ class GameScene extends Phaser.Scene {
             this.hand.x + Math.cos(angle) * handHeight / 2,
             this.hand.y + Math.sin(angle) * handHeight / 2
         );
+    
+        // Position graphics crosshair at pointer
+        this.crosshair.setPosition(pointer.x, pointer.y);
+        this.crosshair.visible = true;
     }
 
     update(delta) {
         this.handlePlayerBulletBounce();
         this.checkGameOver();
     
-        // Keep hand and weapon with player
         this.hand.setPosition(this.player.x, this.player.y);
         const handHeight = this.hand.displayHeight;
         const weapon = this.currentWeapon === 'ninja' ? this.gun : this.rpg;
@@ -425,7 +459,8 @@ class GameScene extends Phaser.Scene {
         if (!this.isAiming) {
             this.hand.setRotation(0);
             weapon.setRotation(0);
-            weapon.setPosition(this.hand.x, this.hand.y - handHeight / 2); // Default position above hand
+            weapon.setPosition(this.hand.x, this.hand.y - handHeight / 2);
+            this.crosshair.visible = false;
         } else {
             weapon.setPosition(
                 this.hand.x + Math.cos(this.hand.rotation) * handHeight / 2,

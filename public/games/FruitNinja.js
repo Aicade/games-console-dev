@@ -8,6 +8,7 @@ class GameScene extends Phaser.Scene {
         this.isGameOver = false; // Renamed from this.gameOver
         this.sliceTimes = []; // Array to store timestamps of slices
         this.comboImage = null; // Track current combo image
+    
         this.fruitTypes = [{
             name: 'watermelon',
             halfName: 'watermelon_half',
@@ -195,14 +196,15 @@ class GameScene extends Phaser.Scene {
         this.scoreText = this.add.bitmapText(this.game.config.width / 2 - 200, 20, 'pixelfont', '0', 32);
         this.scoreText.setOrigin(0.5, 0); // Center horizontally, align top
         this.scoreText.setDepth(1); // Ensure it’s above other elements
+        this.scoreText.setTint(0x0000ff);
         this.scoreText.setDropShadow(2, 2, 0x000000, 0.8); // Add a shadow for better contrast
 
         // Lives text
         this.hearts = [];
         const baseScale = 0.1; // Current size of first heart
-        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale).setDepth(2)); // First heart (same size)
-        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale * 1.5).setDepth(2)); // Second heart (50% bigger)
-        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale * 2).setDepth(2)); // Third heart (100% bigger)
+        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale).setDepth(2).setAlpha(1)); // First heart (same size)
+        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale * 1.5).setDepth(2).setAlpha(1)); // Second heart (50% bigger)
+        this.hearts.push(this.add.image(0, 0, 'heart').setScale(baseScale * 2).setDepth(2).setAlpha(1)); // Third heart (100% bigger)
 
         // Trail effect for slice
         this.input.on('pointermove', (pointer) => {
@@ -238,22 +240,34 @@ class GameScene extends Phaser.Scene {
         this.spawnDelay = 1000; // Start with 1 second delay
         this.minSpawnDelay = 200; // Minimum delay (e.g., 0.2 seconds)
 
+        this.countdownText = this.add.text(
+            this.game.config.width / 2,
+            this.game.config.height / 2,
+            '',
+            { fontFamily: 'Arial', fontSize: '64px', color: '#ffffff' }
+        ).setOrigin(0.5, 0.5).setDepth(20).setVisible(false);
+    
+        // Game starts paused until countdown finishes
+        this.gamePaused = true;
+
+        this.startCountdown();
+
         // Spawn fruits periodically
-        // Store the spawn timer event so we can destroy it later
-        this.spawnTimer = this.time.addEvent({
-            delay: 1000,
-            callback: () => {
-                if (!this.isGameOver) { // Use isGameOver
-                    if (Phaser.Math.Between(1, 100) <= 15) {
-                        this.spawnBomb();
-                    } else {
-                        this.spawnFruit();
-                    }
-                }
-            },
-            callbackScope: this,
-            loop: true
-        });
+        // Store the spawn timer event so we can destroy it later (don't use as its being used in countdown)
+        // this.spawnTimer = this.time.addEvent({
+        //     delay: 1000,
+        //     callback: () => {
+        //         if (!this.isGameOver) { // Use isGameOver
+        //             if (Phaser.Math.Between(1, 100) <= 15) {
+        //                 this.spawnBomb();
+        //             } else {
+        //                 this.spawnFruit();
+        //             }
+        //         }
+        //     },
+        //     callbackScope: this,
+        //     loop: true
+        // });
 
         this.time.addEvent({
             delay: 10000, // Adjust every 10 seconds
@@ -280,19 +294,19 @@ class GameScene extends Phaser.Scene {
         // Initial clock draw (updated in resizeAssets)
         this.drawClock();
 
-        // Timer event to update clock
-        this.timerEvent = this.time.addEvent({
-            delay: 1000, // Update every second
-            callback: () => {
-                this.timeRemaining--;
-                this.updateClock();
-                if (this.timeRemaining <= 0) {
-                    this.gameOver();
-                }
-            },
-            callbackScope: this,
-            loop: true
-        });
+        // Timer event to update clock  (don't use as its being used in countdown)
+        // this.timerEvent = this.time.addEvent({
+        //     delay: 1000, // Update every second
+        //     callback: () => {
+        //         this.timeRemaining--;
+        //         this.updateClock();
+        //         if (this.timeRemaining <= 0) {
+        //             this.gameOver();
+        //         }
+        //     },
+        //     callbackScope: this,
+        //     loop: true
+        // });
 
         this.resizeAssets();
         this.scale.on('resize', () => this.resizeAssets(), this);
@@ -300,6 +314,50 @@ class GameScene extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.input.keyboard.disableGlobalCapture();
 
+    }
+
+    startCountdown() {
+        this.countdownText.setVisible(true);
+        const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
+    
+        // "Ready"
+        this.countdownText.setText('Ready');
+        this.countdownText.setFontSize(64 * scale);
+        this.time.delayedCall(1000, () => {
+            // "Set"
+            this.countdownText.setText('Set');
+            this.time.delayedCall(1000, () => {
+                // "Go!"
+                this.countdownText.setText('Go!');
+                this.time.delayedCall(1000, () => {
+                    // Start game
+                    this.countdownText.setVisible(false);
+                    this.gamePaused = false;
+    
+                    // Start timer
+                    this.timerEvent = this.time.addEvent({
+                        delay: 1000,
+                        callback: () => {
+                            this.timeRemaining--;
+                            this.updateClock();
+                            if (this.timeRemaining <= 0) {
+                                this.gameOver();
+                            }
+                        },
+                        callbackScope: this,
+                        loop: true
+                    });
+    
+                    // Start fruit spawning
+                    this.spawnTimer = this.time.addEvent({
+                        delay: 2000,
+                        callback: this.spawnFruit,
+                        callbackScope: this,
+                        loop: true
+                    });
+                }, [], this);
+            }, [], this);
+        }, [], this);
     }
 
     drawClock() {
@@ -382,6 +440,7 @@ class GameScene extends Phaser.Scene {
     }
 
     updateClock() {
+        if (this.gamePaused) return; // Prevent updates during countdown
         this.clockHand.clear();
 
         const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
@@ -501,13 +560,13 @@ class GameScene extends Phaser.Scene {
     }
 
     sliceFruit(fruit) {
-        if (fruit.sliced || this.isGameOver) return;
+        if (this.gamePaused || fruit.sliced || this.isGameOver) return;
         this.sound.play('blade');
 
         if (fruit.isBomb) {
             fruit.sliced = true; // Prevent multiple triggers
             this.isGameOver = true;
-            // this.sound.play('bomb_blast');
+            this.sound.play('bomb_blast');
             if (this.spawnTimer) {
                 this.spawnTimer.destroy(); // Stop spawning
             }
@@ -700,22 +759,24 @@ class GameScene extends Phaser.Scene {
                 if (fruit.y > this.game.config.height + 50 && !fruit.sliced) {
                     if (!fruit.isBomb) {
                         this.lives = Math.max(0, this.lives - 1);
-                        if (this.hearts.length > 0) {
-                            const heart = this.hearts.pop();
-                            heart.destroy();
+                        if (this.lives < 3) { // Only fade if lives are lost
+                            const heartIndex = 2 - this.lives; // Fade from right to left (biggest to smallest)
+                            if (this.hearts[heartIndex]) {
+                                this.hearts[heartIndex].setAlpha(0.3); // Fade to 30% opacity
+                            }
                         }
                         if (this.lives <= 0) {
-                            this.isGameOver = true; // Stop gameplay
+                            this.isGameOver = true;
                             if (this.spawnTimer) {
-                                this.spawnTimer.destroy(); // Stop spawning
+                                this.spawnTimer.destroy();
                             }
                             this.fruits.forEach(f => {
                                 if (f.body) {
-                                    f.body.setVelocity(0, 0); // Freeze all objects
+                                    f.body.setVelocity(0, 0);
                                     f.body.setGravityY(0);
                                 }
                             });
-                            this.gameOver(); // Call gameOver immediately
+                            this.gameOver();
                         }
                     }
                     fruit.destroy();
