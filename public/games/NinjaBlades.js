@@ -58,11 +58,11 @@ class GameScene extends Phaser.Scene {
         this.load.image('bridge_mid_v', `https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Wall/s2+greenish+tile+vertical.png`);
         this.load.image('next_level', `https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/arrow.png`)
         this.load.image('bomb', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/Bomb_FNPIB.png?t=1743096817209');
-        this.load.image('hand', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/history/iteration/y0tUrLJ71tye.webp');
+        this.load.image('hand', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/KgUw0B1xxrz13Vl2/assets/images/newAsset_14.png?t=1743944513822');
         this.load.image('gun', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/assets/image_2_player.webp'); // Replace with your gun asset
-        this.load.image('rpg', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/history/iteration/nwqtwKYwdaON.webp'); // Replace with your RPG asset
+        this.load.image('rpg', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/Bomb_FNPIB.png?t=1743096817209'); // Replace with your RPG asset
         this.load.image('gunButton', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/assets/image_2_player.webp'); // Replace with your asset path
-        this.load.image('rpgButton', 'https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/history/iteration/nwqtwKYwdaON.webp'); // Replace with your asset path
+        this.load.image('rpgButton', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/Bomb_FNPIB.png?t=1743096817209'); // Replace with your asset path
 
         // this.load.image('player', 'https://files.catbox.moe/jyvtdc.png');
         // "shoot": "https://files.catbox.moe/b87m5h.mp3",
@@ -75,40 +75,23 @@ class GameScene extends Phaser.Scene {
     }
 
     shootPlayerBullet(pointer, bulletBounces, offset = 0, weaponType = 'ninja') {
-        this.sounds.shoot.setVolume(1).setLoop(false).play();
+        // this.sounds.shoot.setVolume(1).setLoop(false).play();
     
-        if (this.gameOverC) {
-            return;
-        }
-    
-        // Check ammo based on weapon type
+        if (this.gameOverC) return;
         if (weaponType === 'ninja' && this.playerBulletsRemaining <= 0) return;
         if (weaponType === 'bomb' && this.bombsRemaining <= 0) return;
     
-        // Decrease appropriate ammo count
         if (weaponType === 'ninja') {
             this.playerBulletsRemaining -= 1;
             this.displayBulletsRemaining();
         } else if (weaponType === 'bomb') {
             this.bombsRemaining -= 1;
-            this.displayBombsRemaining(); // New method call
+            this.displayBombsRemaining();
         }
     
         const weaponConfig = {
-            'ninja': {
-                sprite: 'projectile',
-                scale: 0.25,
-                speed: 3000,
-                bounces: 8,
-                rotation: true
-            },
-            'bomb': {
-                sprite: 'bomb',
-                scale: 0.5,
-                speed: 300,
-                bounces: 2,
-                rotation: false
-            }
+            'ninja': { sprite: 'projectile', scale: 0.25, speed: 2000, bounces: 8, rotation: true },
+            'bomb': { sprite: 'bomb', scale: 0.5, speed: 1000, bounces: 2, rotation: false }
         };
     
         const config = weaponConfig[weaponType];
@@ -117,10 +100,10 @@ class GameScene extends Phaser.Scene {
         projectile.setDepth(1);
         this.physics.moveTo(projectile, pointer.x + offset, pointer.y + offset, config.speed);
         projectile.setCollideWorldBounds(true);
-        projectile.setBounce(1);
+        projectile.setBounce(1); // Fully elastic collision
         projectile.body.allowGravity = false;
-        projectile.setData('bounces', bulletBounces || config.bounces);
-        projectile.setData('currentBounces', 0);
+        projectile.setData('bounces', config.bounces); // Ensure correct max bounces
+        projectile.setData('currentBounces', 0); // Reset to 0
         projectile.setData('weaponType', weaponType);
         this.playerBullets.push(projectile);
     
@@ -161,22 +144,27 @@ class GameScene extends Phaser.Scene {
     }
 
     handlePlayerBulletBounce() {
-        this.physics.world.bodies.entries.forEach(function (body) {
-            if (body.gameObject.texture.key === 'projectile' || body.gameObject.texture.key === 'bomb') {
-                if (body.blocked.none === false) {
-                    body.gameObject.setData('currentBounces', body.gameObject.getData('currentBounces') + 1);
-                    body.gameObject.setFlipX(!body.gameObject.flipX);
-                    
-                    if (body.gameObject.getData('currentBounces') >= body.gameObject.getData('bounces')) {
-                        if (body.gameObject.getData('weaponType') === 'bomb') {
-                            this.bombExplosion(body.gameObject);
-                        } else {
-                            body.gameObject.destroy();
-                        }
+        this.playerBullets.forEach((projectile, index) => {
+            if (!projectile.active) return; // Skip inactive projectiles
+    
+            const body = projectile.body;
+            if (body.blocked.up || body.blocked.down || body.blocked.left || body.blocked.right) {
+                let currentBounces = projectile.getData('currentBounces');
+                currentBounces += 1;
+                projectile.setData('currentBounces', currentBounces);
+                projectile.setFlipX(!projectile.flipX);
+    
+                const maxBounces = projectile.getData('bounces');
+                if (currentBounces >= maxBounces) {
+                    if (projectile.getData('weaponType') === 'bomb') {
+                        this.bombExplosion(projectile);
+                    } else {
+                        projectile.destroy();
+                        this.playerBullets.splice(index, 1); // Remove from array
                     }
                 }
             }
-        }, this);
+        });
     }
 
     destroyPlayerBullet(bullet) {
@@ -270,7 +258,7 @@ class GameScene extends Phaser.Scene {
             this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
         }
 
-        this.sounds.background.setVolume(1).setLoop(true).play();
+        this.sounds.background.setVolume(0.1).setLoop(true).play();
         var me = this;
 
         this.bg = this.add.sprite(0, 0, 'background').setOrigin(0, 0).setDepth(-5);
@@ -290,6 +278,8 @@ class GameScene extends Phaser.Scene {
         this.pauseButton.setScale(3);
         this.pauseButton.setDepth(11)
         this.pauseButton.on('pointerdown', () => this.pauseGame());
+
+        // this.physics.world.setBoundsCollision(true, true, true, true);
 
         this.playerDestroyEmitter = this.vfx.createEmitter('enemy', 0, 0, 0.035, 0, 1000).setAlpha(0.5)
         this.bridges = this.physics.add.staticGroup();
@@ -348,7 +338,7 @@ class GameScene extends Phaser.Scene {
 
         // Gun button (ninja star)
         this.gunButton = this.add.sprite(centerX - buttonSpacing / 2, bottomY, 'gunButton');
-        this.gunButton.setScale(0.5); // Adjust scale as needed
+        this.gunButton.setScale(0.2); // Adjust scale as needed
         this.gunButton.setInteractive({ cursor: 'pointer' });
         this.gunButton.on('pointerdown', () => {
             this.currentWeapon = 'ninja';
@@ -358,7 +348,7 @@ class GameScene extends Phaser.Scene {
 
         // RPG button (bomb)
         this.rpgButton = this.add.sprite(centerX + buttonSpacing / 2, bottomY, 'rpgButton');
-        this.rpgButton.setScale(0.5); // Adjust scale as needed
+        this.rpgButton.setScale(0.2); // Adjust scale as needed
         this.rpgButton.setInteractive({ cursor: 'pointer' });
         this.rpgButton.on('pointerdown', () => {
             this.currentWeapon = 'bomb';
@@ -397,7 +387,7 @@ class GameScene extends Phaser.Scene {
             if (this.isAiming) {
                 const aimDuration = (this.time.now - this.aimStartTime) / 1000;
                 if (aimDuration >= 1) {
-                    const bounces = this.currentWeapon === 'bomb' ? 2 : this.playerBulletBounces;
+                    const bounces = this.currentWeapon === 'bomb' ? 2 : 8; // Explicitly set here
                     this.shootPlayerBullet(pointer, bounces, 0, this.currentWeapon);
                 }
                 this.isAiming = false;
@@ -709,7 +699,7 @@ class GameScene extends Phaser.Scene {
         for (let i = 0; i < this.playerBulletsRemaining; i++) {
             let x = startingX + i * 45;
             let image = this.add.image(x, y, "projectile");
-            image.setScale(0.25);
+            image.setScale(0.1);
             this.bulletsRemainingImages.push(image);
         }
     }
@@ -725,7 +715,7 @@ class GameScene extends Phaser.Scene {
         for (let i = 0; i < this.bombsRemaining; i++) {
             let x = startingX + i * 45;
             let image = this.add.image(x, y, "bomb");
-            image.setScale(0.5); // Match bomb scale
+            image.setScale(0.1); // Match bomb scale
             this.bombsRemainingImages.push(image);
         }
     }

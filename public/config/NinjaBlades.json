@@ -2,10 +2,10 @@
     "description": "Throw Blades.",
     "deviceOrientation": "portrait",
     "imageLoader": {
-        "background": "background",
-        "enemy": "enemy",
-        "player": "player",
-        "projectile": "projectile"
+        "background": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/KgUw0B1xxrz13Vl2/assets/images/mr%20bullet%20bg.png?t=1743944091149",
+        "enemy": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/KgUw0B1xxrz13Vl2/assets/image_2_enemy.webp",
+        "player": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/KgUw0B1xxrz13Vl2/assets/images/new_asset_11.png",
+        "projectile": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/KgUw0B1xxrz13Vl2/assets/image_3_collectible.webp"
     },
     "instructions": "Instructions: 1.Tap to destory.",
     "deviceOrientationSizes": {
@@ -21,7 +21,7 @@
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
     "soundsLoader": {
-        "background": "background",
+        "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-2.mp3",
         "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav",
         "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/slice.flac",
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3"
