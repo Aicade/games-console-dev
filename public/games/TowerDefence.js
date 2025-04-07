@@ -45,6 +45,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('healthBarFrame', 'https://play.rosebud.ai/assets/healthBarFrame.png?OeMt');
 
         this.load.image("ow", "https://aicade-user-store.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/assets/images/newAsset_8.png?t=1743945853522");
+        this.load.image("skull", "https://aicade-user-store.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/assets/images/skull.png?t=1744047475314");
     
 
 
@@ -103,7 +104,7 @@ class GameScene extends Phaser.Scene {
                 const next = pathPoints[i + 1];
                 const angle = Phaser.Math.Angle.Between(current.x, current.y, next.x, next.y);
                 const distance = Phaser.Math.Distance.Between(current.x, current.y, next.x, next.y);
-                this.add.tileSprite(current.x, current.y, distance, 40 * baseScale, 'pathTexture')
+                this.add.tileSprite(current.x, current.y, distance, 140 * baseScale, 'pathTexture')
                     .setOrigin(0, 0.5)
                     .setRotation(angle);
             }
@@ -133,15 +134,19 @@ class GameScene extends Phaser.Scene {
         // Wave text
         this.waveText.setPosition(650 * scaleX, 40 * scaleY).setFontSize(24 * baseScale);
 
+        // Resize skull and kill count
+        this.skullImage.setPosition(20 * scaleX, 20 * scaleY).setScale(0.05 * baseScale);
+        this.killCountText.setPosition(80 * scaleX, 40 * scaleY).setFontSize(40 * baseScale);
+
         // Weapons
         this.weapons.forEach((weapon, index) => {
-            const y = (100 + index * 60) * scaleY;
+            const y = (150 + index * 60) * scaleY;
             weapon.button.setPosition(50 * scaleX, y).setScale(0.1 * baseScale);
             weapon.cooldownBar.setPosition(50 * scaleX, y + 25 * scaleY).setScale(baseScale, 1);
             this.add.bitmapText(100 * scaleX, y - 10 * scaleY, 'pixelfont', weapon.name, 14 * baseScale)
                 .setTint(0xffffff);
             // Update availability visuals during resize
-            if (!weapon.isAvailable) {
+            if (this.killCount < weapon.killThreshold) { // Check killCount instead of waveCount
                 weapon.button.disableInteractive().setAlpha(0.5);
                 weapon.cooldownBar.setFillStyle(0x444444);
             } else {
@@ -227,6 +232,12 @@ class GameScene extends Phaser.Scene {
             fill: '#fff'
         });
 
+        // Skull and kill count display
+        this.skullImage = this.add.image(20, 20, 'skull').setOrigin(0).setScale(0.05).setDepth(20);
+        this.killCountText = this.add.bitmapText(80, 40, 'pixelfont', `${this.killCount}`, 40)
+            .setOrigin(0, 0.5)
+            .setDepth(20);
+
         // Wave counter
         this.waveText = this.add.text(650, 40, 'Wave: 1', {
             fontSize: '24px',
@@ -269,7 +280,7 @@ class GameScene extends Phaser.Scene {
             damage: 30,
             cooldown: 1000,
             name: 'Heavy',
-            availableWave: 2 // Available from wave 2
+            killThreshold: 5
         }, {
             texture: 'rapidWeapon',
             icon: 'rapidWeaponIcon',
@@ -277,7 +288,7 @@ class GameScene extends Phaser.Scene {
             damage: 15,
             cooldown: 500,
             name: 'Rapid',
-            availableWave: 1 // Available from wave 1
+            killThreshold: 0
         }, {
             texture: 'superWeapon',
             icon: 'superWeaponIcon',
@@ -285,11 +296,11 @@ class GameScene extends Phaser.Scene {
             damage: 45,
             cooldown: 2000,
             name: 'Super',
-            availableWave: 3 // Available from wave 3
+            killThreshold: 10
         }];
 
         weaponConfigs.forEach((config, index) => {
-            const y = 100 + index * 60;
+            const y = 150 + index * 60;
             const weapon = {
                 button: this.add.image(50, y, config.icon).setScale(0.1).setInteractive(),
                 cooldownBar: this.add.rectangle(50, y + 25, 40, 5, 0x888888),
@@ -298,8 +309,8 @@ class GameScene extends Phaser.Scene {
                 lastFired: 0,
                 name: config.name,
                 projectileTexture: config.projectile,
-                availableWave: config.availableWave, // Track when weapon becomes available
-                isAvailable: this.waveCount >= config.availableWave // Initial availability
+                killThreshold: config.killThreshold, // Number of kills needed to unlock
+                isAvailable: this.killCount >= config.killThreshold // Initially based on killCount
             };
 
             weapon.button.on('pointerdown', () => this.fireWeapon(weapon));
@@ -364,6 +375,16 @@ class GameScene extends Phaser.Scene {
                         if (nearestEnemy.health <= 0) {
                             nearestEnemy.destroy();
                             this.killCount++; // Increment kill count
+                            this.killCountText.setText(`${this.killCount}`);
+
+                            // Check and unlock weapons based on kill count
+                            this.weapons.forEach(w => {
+                                if (this.killCount >= w.killThreshold && !w.isAvailable) {
+                                    w.isAvailable = true;
+                                    w.button.setInteractive().setAlpha(1);
+                                    w.cooldownBar.setFillStyle(0x888888);
+                                }
+                            });
                         }
                     }
                 });
@@ -446,13 +467,13 @@ class GameScene extends Phaser.Scene {
         this.waveText.setText(`Wave: ${this.waveCount}`);
 
         // Update weapon availability
-        this.weapons.forEach(weapon => {
-            if (this.waveCount >= weapon.availableWave && !weapon.isAvailable) {
-                weapon.isAvailable = true;
-                weapon.button.setInteractive().setAlpha(1); // Enable and fully opaque
-                weapon.cooldownBar.setFillStyle(0x888888); // Restore normal cooldown bar color
-            }
-        });
+        // this.weapons.forEach(weapon => {
+        //     if (this.waveCount >= weapon.availableWave && !weapon.isAvailable) {
+        //         weapon.isAvailable = true;
+        //         weapon.button.setInteractive().setAlpha(1); // Enable and fully opaque
+        //         weapon.cooldownBar.setFillStyle(0x888888); // Restore normal cooldown bar color
+        //     }
+        // });
     }
 
     damagePlayer(damage) {
