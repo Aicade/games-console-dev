@@ -26,6 +26,6 @@
         }
     },
     "phaserVersion": "3.80.1",
-    "mobile_portrait": true
+    "mobile_portrait": false
 
 }
