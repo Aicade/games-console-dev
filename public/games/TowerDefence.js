@@ -132,7 +132,14 @@ class GameScene extends Phaser.Scene {
         this.healthText.setPosition(370 * scaleX, 470 * scaleY, 'pixelfont').setFontSize(16 * baseScale).setDepth(1);
 
         // Wave text
-        this.waveText.setPosition(650 * scaleX, 40 * scaleY).setFontSize(24 * baseScale);
+        this.waveText.setPosition(600 * scaleX, 40 * scaleY).setFontSize(24 * baseScale);
+
+        // Resize "NEW WAVE" text if it exists
+        this.children.list.forEach(child => {
+            if (child.type === 'BitmapText' && child.text === 'NEW WAVE') {
+                child.setPosition(640 * scaleX, 300 * scaleY).setFontSize(80 * baseScale);
+            }
+        });
 
         // Resize skull and kill count
         this.skullImage.setPosition(20 * scaleX, 20 * scaleY).setScale(0.05 * baseScale);
@@ -221,7 +228,9 @@ class GameScene extends Phaser.Scene {
         // Draw textures for both paths
         // drawTexturePath(this.path1);
         // drawTexturePath(this.path2);
+        
 
+        this.vfx.addCircleTexture('hitParticle', 0xff0000, 1, 10);
         // Player base
         this.player = this.add.image(400, 550, 'playerBase').setScale(0.2).setDepth(1);
         // Health bar with frame
@@ -256,12 +265,16 @@ class GameScene extends Phaser.Scene {
         this.enemyGroup = this.add.group();
 
         // Start spawning enemies
-        this.time.addEvent({
-            delay: 100,
-            callback: this.updateEnemySpawner,
-            callbackScope: this,
-            loop: true
-        });
+        // this.time.addEvent({
+        //     delay: 100,
+        //     callback: this.updateEnemySpawner,
+        //     callbackScope: this,
+        //     loop: true
+        // });
+
+        // Start the first wave manually
+        this.waveCount = 0;
+        this.startNewWave();
 
         this.cursors = this.input.keyboard.createCursorKeys();
         // this.enemies = this.physics.add.group();
@@ -370,6 +383,12 @@ class GameScene extends Phaser.Scene {
                             this.time.delayedCall(500, () => {
                                 if (owImage.active) owImage.destroy(); // Remove after 0.5s
                             });
+
+                            // Add particle burst VFX
+                            const emitter = this.vfx.createEmitter('hitParticle', nearestEnemy.x, nearestEnemy.y, 0.5 * baseScale, 0, 300);
+                            emitter.explode(50); // Emit 50 particles in a burst
+                            this.time.delayedCall(300, () => emitter.stop()); // Stop after 300ms
+                    
                         }
 
                         if (nearestEnemy.health <= 0) {
@@ -443,21 +462,21 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    updateEnemySpawner() {
-        const currentTime = this.time.now;
+    // updateEnemySpawner() {
+    //     const currentTime = this.time.now;
 
-        if (this.enemiesSpawned < this.enemiesInWave &&
-            currentTime - this.lastSpawnTime >= this.spawnDelay) {
-            this.spawnEnemy();
-            this.enemiesSpawned++;
-            this.lastSpawnTime = currentTime;
-        }
+    //     if (this.enemiesSpawned < this.enemiesInWave &&
+    //         currentTime - this.lastSpawnTime >= this.spawnDelay) {
+    //         this.spawnEnemy();
+    //         this.enemiesSpawned++;
+    //         this.lastSpawnTime = currentTime;
+    //     }
 
-        if (this.enemiesSpawned >= this.enemiesInWave &&
-            this.enemyGroup.getChildren().length === 0) {
-            this.startNewWave();
-        }
-    }
+    //     if (this.enemiesSpawned >= this.enemiesInWave &&
+    //         this.enemyGroup.getChildren().length === 0) {
+    //         this.startNewWave();
+    //     }
+    // }
 
     startNewWave() {
         this.waveCount++;
@@ -465,15 +484,34 @@ class GameScene extends Phaser.Scene {
         this.enemiesInWave += 2;
         this.spawnDelay = Math.max(500, this.spawnDelay - 100);
         this.waveText.setText(`Wave: ${this.waveCount}`);
-
-        // Update weapon availability
-        // this.weapons.forEach(weapon => {
-        //     if (this.waveCount >= weapon.availableWave && !weapon.isAvailable) {
-        //         weapon.isAvailable = true;
-        //         weapon.button.setInteractive().setAlpha(1); // Enable and fully opaque
-        //         weapon.cooldownBar.setFillStyle(0x888888); // Restore normal cooldown bar color
-        //     }
-        // });
+    
+        // Only show "NEW WAVE" and delay if it's not the first wave
+        if (this.waveCount > 1) {
+            const newWaveText = this.add.bitmapText(640, 300, 'pixelfont', 'NEW WAVE', 80)
+                .setOrigin(0.5)
+                .setDepth(20);
+    
+            this.time.delayedCall(2000, () => {
+                if (newWaveText.active) newWaveText.destroy();
+                this.startWaveSpawning(); // Start spawning after delay
+            });
+        } else {
+            this.startWaveSpawning(); // Start spawning immediately for Wave 1
+        }
+    }
+    
+    startWaveSpawning() {
+        this.time.addEvent({
+            delay: this.spawnDelay,
+            callback: () => {
+                if (!this.isGameOver && this.enemiesSpawned < this.enemiesInWave) {
+                    this.spawnEnemy();
+                    this.enemiesSpawned++;
+                }
+            },
+            repeat: this.enemiesInWave - 1,
+            callbackScope: this
+        });
     }
 
     damagePlayer(damage) {
@@ -487,7 +525,12 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-
+        if (this.isGameOver) return;
+    
+        // Check if wave is complete and start next wave
+        if (this.enemiesSpawned >= this.enemiesInWave && this.enemyGroup.getChildren().length === 0) {
+            this.startNewWave();
+        }
     }
 
     // updateScore(points) {
