@@ -1,35 +1,40 @@
 {
-    "description": "Boss Battle.",
+    "title": "Space Drive",
+    "description": "<p>A thrilling tap-to-destroy game where quick reflexes are key to defeating waves of unique enemies</p>",
+    "instructions": "Instructions: 1. Use arrow keys OR joystick to move.2. Use Spacebar/button to shoot.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "background",
-        "player": "player",
-        "enemy": "enemy",
-        "collectible": "collectible",
-        "projectile": "projectile",
-        "projectile_1": "projectile_1",
-        "avoidable": "avoidable"
+      "background": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/history/iteration/69OykoSqlVzz.webp",
+      "player": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/player.png?t=1743963882420",
+      "enemy": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/enemy.png?t=1743963891231",
+      "projectile": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/history/iteration/Z349VVVuWZFW.webp"
     },
-    "instructions": "Instructions:  1.Tap to Throw Blades.",
+    "soundsLoader": {
+      "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/34-music-menu-101soundboards_cc998252-f8e6-4f32-bd24-fd7704a1cb92.mp3?t=1743319454827",
+      "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
+      "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_2.mp3",
+      "upgrade": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3"
+    },
     "deviceOrientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
+      "landscape": {
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
     },
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
-    "soundsLoader": {
-        "background": "https://files.catbox.moe/96wtim.mp3",
-        "lose": "https://files.catbox.moe/syj0l2.mp3",
-        "stretch": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/slice.flac",
-        "damage": "https://files.catbox.moe/ozo7z0.mp3",
-        "collect": "https://files.catbox.moe/psj9yf.mp3",
-        "success": "https://files.catbox.moe/t05pk4.mp3"
-    },
-    "title": "Space Shooter"
-}
+    "orientationSizes": {
+      "landscape": {
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
+    }
+  }
