@@ -811,4 +811,3 @@ const config = {
     },
     deviceOrientation: _CONFIG.deviceOrientation==="landscape"
 };
-

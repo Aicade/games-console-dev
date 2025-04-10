@@ -60,7 +60,7 @@ class GameScene extends Phaser.Scene {
         this.frontWheelGrounded = false;
         this.rearWheelGrounded = false;
     
-        this.sounds.background.setVolume(1).setLoop(true).play();
+        this.sounds.background.setVolume(0.1).setLoop(true).play();
         this.carSound = this.sounds.move.setVolume(1).setLoop(true);
     
         this.width = this.game.config.width;
@@ -471,7 +471,7 @@ class GameScene extends Phaser.Scene {
 
     addPlayer() {
         this.matter.world.pause();
-        this.player = this.add.sprite(this.width / 8, 0, 'player').setScale(0.17);
+        this.player = this.add.sprite(this.width / 8, 0, 'player').setScale(0.3);
         const startX = this.width / 8;
         let startY = this.height * gameOptions.startTerrainHeight;
         for (let i = 0; i < this.mountainGraphics.length; i++) {
@@ -524,7 +524,7 @@ class GameScene extends Phaser.Scene {
     }
 
     spawnCollectible() {
-        var collectible = this.matter.add.sprite(this.player.x + this.width, 400, 'collectible').setScale(0.2);
+        var collectible = this.matter.add.sprite(this.player.x + this.width, 400, 'collectible').setScale(0.3);
         this.collectibles.add(collectible);
     }
 
