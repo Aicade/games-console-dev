@@ -1,0 +1,44 @@
+{
+    "title": "Guard Towers",
+    "description": "<p>A thrilling tap-to-destroy game where quick reflexes are key to defeating waves of unique enemies</p>",
+    "instructions": "Instructions: 1. Use arrow keys OR joystick to move.2. Use Spacebar/button to shoot.",
+    "deviceOrientation": "landscape",
+    "imageLoader": {
+      "background": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/WAVE.png?t=1744368462979",
+      "texture-cobble-granite-pavement_839833-30880": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/texture-cobble-granite-pavement_839833-30880.png?t=1744297529374",
+      "tower 3": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/tower%203.png?t=1744316977313",
+      "tower 1": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/tower%201.png?t=1744316977538",
+      "tower 2": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/tower%202.png?t=1744316977583",
+      "Untitled design": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/newAsset_6.png?t=1744295459556",
+      "WAVE": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/Untitled%20design.png?t=1744365412898"
+    },
+    "soundsLoader": {
+      "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/34-music-menu-101soundboards_cc998252-f8e6-4f32-bd24-fd7704a1cb92.mp3?t=1743319454827",
+      "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
+      "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_2.mp3",
+      "upgrade": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3"
+    },
+    "deviceOrientationSizes": {
+      "landscape": {
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
+    },
+    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+    "phaserVersion": "3.80.1",
+    "orientationSizes": {
+      "landscape": {
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
+    },
+    "mobile_portrait": false
+  }
