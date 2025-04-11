@@ -4,7 +4,7 @@
     "instructions": "Instructions: 1. Use arrow keys OR joystick to move.2. Use Spacebar/button to shoot.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-      "background": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/history/iteration/dPwdd1HVpAqf.webp",
+      "background": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/CHylB0KtItj08AWV/assets/images/try%204.png?t=1744373336390",
       "player": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/assets/image_1_bubbles.))_player.webp",
       "projectile": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/assets/image_3_projectile.webp",
       "newAsset_4": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/assets/image_0_background.webp",

@@ -68,7 +68,7 @@ class GameScene extends Phaser.Scene {
         this.bg.setDisplaySize(width, height);
 
         // Pause button
-        this.pauseButton.setPosition(width - 60 * scaleX, 60 * scaleY).setScale(1 * baseScale);
+        this.pauseButton.setPosition(width - 780 * scaleX, 60 * scaleY).setScale(1 * baseScale);
 
         // Clear existing graphics and textures
         this.children.list.forEach(child => {
@@ -88,13 +88,13 @@ class GameScene extends Phaser.Scene {
         this.path3.lineTo(500 * scaleX, 550 * scaleY);
 
         // Draw debug lines
-        const graphics = this.add.graphics();
-        graphics.lineStyle(2, 0x00ff00);
-        this.path1.draw(graphics);
-        graphics.lineStyle(2, 0xff0000);
-        this.path2.draw(graphics);
-        graphics.lineStyle(2, 0x0000ff);
-        this.path3.draw(graphics);
+        // const graphics = this.add.graphics();
+        // graphics.lineStyle(2, 0x00ff00);
+        // this.path1.draw(graphics);
+        // graphics.lineStyle(2, 0xff0000);
+        // this.path2.draw(graphics);
+        // graphics.lineStyle(2, 0x0000ff);
+        // this.path3.draw(graphics);
 
         // Draw textured paths
         const drawTexturePath = (path) => {
@@ -109,9 +109,9 @@ class GameScene extends Phaser.Scene {
                     .setRotation(angle);
             }
         };
-        drawTexturePath(this.path1);
-        drawTexturePath(this.path2);
-        drawTexturePath(this.path3);
+        // drawTexturePath(this.path1);
+        // drawTexturePath(this.path2);
+        // drawTexturePath(this.path3);
 
         // Resize enemies
         this.enemyGroup.getChildren().forEach(enemy => {
@@ -127,12 +127,12 @@ class GameScene extends Phaser.Scene {
 
         // Player base and health bar
         this.player.setPosition(400 * scaleX, 550 * scaleY).setScale(0.2 * baseScale);
-        this.healthBar.setPosition(400 * scaleX, 500 * scaleY).setScale(baseScale, 1).setDepth(1);
+        // this.healthBar.setPosition(400 * scaleX, 500 * scaleY).setScale(baseScale, 1).setDepth(1);
         // this.add.image(400 * scaleX, 500 * scaleY, 'healthBarFrame').setScale(0.3 * baseScale);
-        this.healthText.setPosition(370 * scaleX, 470 * scaleY, 'pixelfont').setFontSize(16 * baseScale).setDepth(1);
+        this.healthText.setPosition(730 * scaleX, 80 * scaleY, 'pixelfont').setFontSize(48 * baseScale).setDepth(1);
 
         // Wave text
-        this.waveText.setPosition(600 * scaleX, 40 * scaleY).setFontSize(24 * baseScale);
+        this.waveText.setPosition(750 * scaleX, 200 * scaleY).setFontSize(24 * baseScale);
 
         // Resize "NEW WAVE" text if it exists
         this.children.list.forEach(child => {
@@ -142,8 +142,8 @@ class GameScene extends Phaser.Scene {
         });
 
         // Resize skull and kill count
-        this.skullImage.setPosition(20 * scaleX, 20 * scaleY).setScale(0.05 * baseScale);
-        this.killCountText.setPosition(80 * scaleX, 40 * scaleY).setFontSize(40 * baseScale);
+        // this.skullImage.setPosition(20 * scaleX, 20 * scaleY).setScale(0.05 * baseScale);
+        this.killCountText.setPosition(750 * scaleX, 350 * scaleY).setFontSize(40 * baseScale);
 
         // Weapons
         this.weapons.forEach((weapon, index) => {
@@ -204,12 +204,12 @@ class GameScene extends Phaser.Scene {
         this.path3.lineTo(500, 550);
 
         // Debug: Draw both path lines
-        graphics.lineStyle(2, 0x00ff00);
-        this.path1.draw(graphics);
-        graphics.lineStyle(2, 0xff0000);
-        this.path2.draw(graphics);
-        graphics.lineStyle(2, 0x0000ff);
-        this.path3.draw(graphics);
+        // graphics.lineStyle(2, 0x00ff00);
+        // this.path1.draw(graphics);
+        // graphics.lineStyle(2, 0xff0000);
+        // this.path2.draw(graphics);
+        // graphics.lineStyle(2, 0x0000ff);
+        // this.path3.draw(graphics);
 
         // Draw textured paths
         const drawTexturePath = (path) => {
@@ -235,20 +235,20 @@ class GameScene extends Phaser.Scene {
         this.player = this.add.image(400, 550, 'playerBase').setScale(0.2).setDepth(1);
         // Health bar with frame
         // this.add.image(400, 500, 'healthBarFrame').setScale(0.3).setDepth(1);
-        this.healthBar = this.add.rectangle(400, 500, 100, 10, 0x00ff00);
-        this.healthText = this.add.text(350, 490, 'HP: 100', {
+        // this.healthBar = this.add.rectangle(400, 500, 100, 10, 0x00ff00);
+        this.healthText = this.add.text(350, 490, '100', {
             fontSize: '16px',
             fill: '#fff'
         });
 
         // Skull and kill count display
-        this.skullImage = this.add.image(20, 20, 'skull').setOrigin(0).setScale(0.05).setDepth(20);
+        // this.skullImage = this.add.image(20, 20, 'skull').setOrigin(0).setScale(0.05).setDepth(20);
         this.killCountText = this.add.bitmapText(80, 40, 'pixelfont', `${this.killCount}`, 40)
             .setOrigin(0, 0.5)
             .setDepth(20);
 
         // Wave counter
-        this.waveText = this.add.text(650, 40, 'Wave: 1', {
+        this.waveText = this.add.text(650, 40, '1', {
             fontSize: '24px',
             fill: '#fff',
             backgroundColor: '#000000',
@@ -483,7 +483,7 @@ class GameScene extends Phaser.Scene {
         this.enemiesSpawned = 0;
         this.enemiesInWave += 2;
         this.spawnDelay = Math.max(500, this.spawnDelay - 100);
-        this.waveText.setText(`Wave: ${this.waveCount}`);
+        this.waveText.setText(`${this.waveCount}`);
     
         // Only show "NEW WAVE" and delay if it's not the first wave
         if (this.waveCount > 1) {
@@ -516,8 +516,8 @@ class GameScene extends Phaser.Scene {
 
     damagePlayer(damage) {
         this.playerHealth = Math.max(0, this.playerHealth - damage);
-        this.healthBar.scaleX = this.playerHealth / 100;
-        this.healthText.setText(`HP: ${this.playerHealth}`);
+        // this.healthBar.scaleX = this.playerHealth / 100;
+        this.healthText.setText(`${this.playerHealth}`);
 
         if (this.playerHealth <= 0) {
             this.gameOver(); // Call gameOver method instead of showing text
