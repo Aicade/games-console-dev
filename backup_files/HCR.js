@@ -55,6 +55,10 @@ class GameScene extends Phaser.Scene {
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
 
+        // Make sure that the assets used for fuel/collectibles and coins are loaded.
+        // For example, here we assume that "collectible" is the fuel icon and "coin" is the coin icon.
+        // (They should exist in _CONFIG.imageLoader or be added manually.)
+        
         displayProgressLoader.call(this);
     }
 
@@ -62,10 +66,9 @@ class GameScene extends Phaser.Scene {
         // Create keyboard cursors
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        // Initialize mobile flag and input states
+        // Initialize mobile flag and new accelerating flag for mobile support.
         isMobile = !this.sys.game.device.os.desktop;
-        this.isAccelerating = false;
-        this.isBraking = false;
+        this.isAccelerating = false; // Flag to handle mobile gas pedal input
 
         // Sound setup
         this.sounds = {};
@@ -113,11 +116,15 @@ class GameScene extends Phaser.Scene {
         }
     
         this.addPlayer();
+        // Group for fuel collectibles (existing)
         this.collectibles = this.add.group();
+        // New group for coin collectibles
         this.coinCollectibles = this.add.group();
+        // Coin counter variable
         this.coinsCollected = 0;
     
-        // Fuel Container
+        // --- Fuel Container at Top Left ---
+        // Positions and sizes are manually adjustable by editing the x,y values.
         this.fuelBarBg = this.add.rectangle(100, 50, 200, 40, 0x333333)
             .setOrigin(0, 0.5)
             .setDepth(100)
@@ -126,16 +133,22 @@ class GameScene extends Phaser.Scene {
             .setOrigin(0, 0.5)
             .setDepth(101)
             .setScrollFactor(0);
+        // Fuel asset icon is placed relative to the fuel bar.
         this.fuelIcon = this.add.image(40, 50, 'collectible')
             .setScale(0.3)
             .setOrigin(0.5)
             .setScrollFactor(0);
         
+        // --- Draw Bold Black Boundary around Fuel Bar ---
+        // This creates a new graphics object that draws a bold black rectangle around the fuel bar.
         this.fuelBarBorder = this.add.graphics();
         this.fuelBarBorder.lineStyle(4, 0x000000, 1);
+        // Draw rectangle with same x,y and dimensions as fuel bar background.
         this.fuelBarBorder.strokeRect(100 - 1, 50 - 20, 200 + 2, 40 + 2);
     
-        // Coin Container
+        // --- Coin Container (Below Fuel Container) ---
+        // The coin asset is placed on the left and the counter text to its right.
+        // You can manually change coin container position by editing these coordinates.
         this.coinIcon = this.add.image(40, 120, 'coin')
             .setScale(0.28)
             .setOrigin(0.5)
@@ -196,19 +209,24 @@ class GameScene extends Phaser.Scene {
     
         this.input.keyboard.disableGlobalCapture();
 
-        // Circular Gauges
+        // --- Create Circular Gauges (unchanged) ---
+        // Increase gauge size: set radius to 90.
         this.gaugeRadius = 90;
-        this.tickCount = 5;
+        this.tickCount = 5; // 5 tick marks
+        // Define the arc from -135° (left) to 45° (right)
         this.gaugeMinAngle = -135;
         this.gaugeMaxAngle = 45;
+        // Set positions with additional offset for spacing:
         this.speedGaugeCenter = { x: this.width / 2 - 130, y: this.height - 100 };
-        this.fuelGaugeCenter = { x: this.width / 2 + 130, y: this.height - 100 };
+        this.fuelGaugeCenter  = { x: this.width / 2 + 130, y: this.height - 100 };
 
+        // Create background graphics for speed gauge
         this.speedGauge = this.add.graphics();
         this.speedGauge.lineStyle(6, 0xffffff, 1);
         this.speedGauge.fillStyle(0x000000, 0.5);
         this.speedGauge.strokeCircle(this.speedGaugeCenter.x, this.speedGaugeCenter.y, this.gaugeRadius);
         this.speedGauge.fillCircle(this.speedGaugeCenter.x, this.speedGaugeCenter.y, this.gaugeRadius);
+        // Draw tick marks for speed gauge
         for (let i = 0; i < this.tickCount; i++) {
             let t = i / (this.tickCount - 1);
             let angle = Phaser.Math.Linear(this.gaugeMinAngle, this.gaugeMaxAngle, t);
@@ -221,17 +239,20 @@ class GameScene extends Phaser.Scene {
             let ey = this.speedGaugeCenter.y + tickEnd * Math.sin(rad);
             this.speedGauge.lineBetween(sx, sy, ex, ey);
         }
+        // Draw red alert arc in speedometer between tick 4 and tick 5 (from 0° to 45°)
         this.speedAlert = this.add.graphics();
         this.speedAlert.lineStyle(4, 0xff0000, 1);
         this.speedAlert.beginPath();
         this.speedAlert.arc(this.speedGaugeCenter.x, this.speedGaugeCenter.y, this.gaugeRadius - 6, Phaser.Math.DegToRad(0), Phaser.Math.DegToRad(45), false);
         this.speedAlert.strokePath();
 
+        // Create background graphics for fuel gauge
         this.fuelGauge = this.add.graphics();
         this.fuelGauge.lineStyle(6, 0xffffff, 1);
         this.fuelGauge.fillStyle(0x000000, 0.5);
         this.fuelGauge.strokeCircle(this.fuelGaugeCenter.x, this.fuelGaugeCenter.y, this.gaugeRadius);
         this.fuelGauge.fillCircle(this.fuelGaugeCenter.x, this.fuelGaugeCenter.y, this.gaugeRadius);
+        // Draw tick marks for fuel gauge
         for (let i = 0; i < this.tickCount; i++) {
             let t = i / (this.tickCount - 1);
             let angle = Phaser.Math.Linear(this.gaugeMinAngle, this.gaugeMaxAngle, t);
@@ -244,18 +265,23 @@ class GameScene extends Phaser.Scene {
             let ey = this.fuelGaugeCenter.y + tickEnd * Math.sin(rad);
             this.fuelGauge.lineBetween(sx, sy, ex, ey);
         }
+        // Draw red alert arc in fuel meter between tick 1 and tick 2 (from -135° to -90°)
         this.fuelAlert = this.add.graphics();
         this.fuelAlert.lineStyle(4, 0xff0000, 1);
         this.fuelAlert.beginPath();
         this.fuelAlert.arc(this.fuelGaugeCenter.x, this.fuelGaugeCenter.y, this.gaugeRadius - 6, Phaser.Math.DegToRad(-135), Phaser.Math.DegToRad(-90), false);
         this.fuelAlert.strokePath();
 
+        // Create pointer graphics (one for each gauge)
         this.speedPointer = this.add.graphics();
         this.fuelPointer = this.add.graphics();
+        // Set initial pointer positions: speed pointer at minimum and fuel pointer at maximum.
         drawPointer(this.speedPointer, this.speedGaugeCenter.x, this.speedGaugeCenter.y, this.gaugeRadius - 15, this.gaugeMinAngle);
         drawPointer(this.fuelPointer, this.fuelGaugeCenter.x, this.fuelGaugeCenter.y, this.gaugeRadius - 15, this.gaugeMaxAngle);
+        // Save the starting angle for the speedometer pointer.
         this.currentSpeedAngle = this.gaugeMinAngle;
 
+        // --- Set up timer events for fuel and coin spawning ---
         this.timer = this.time.addEvent({
             delay: Phaser.Math.Between(8000, 12000),
             loop: true,
@@ -308,9 +334,10 @@ class GameScene extends Phaser.Scene {
                     else if (this.coinCollectibles.contains(collectible)) {
                         collectible.destroy();
                         this.coinsCollected++;
-                        this.coinText.setText(this.coinsCollected.toString());
+                        this.coinText.setText(this.coinsCollected.toString()); // <-- ADD THIS LINE
                         this.sounds.collect.setVolume(1).setLoop(false).play();
                     }
+                    
                 }
                 
                 const isFrontWheel = pair.bodyA.gameObject === this.frontWheelBody || pair.bodyB.gameObject === this.frontWheelBody;
@@ -323,6 +350,7 @@ class GameScene extends Phaser.Scene {
                 }
             }, this);
         }, this);
+        
     
         this.matter.world.on('collisionend', function (event) {
             event.pairs.forEach(function (pair) {
@@ -350,9 +378,12 @@ class GameScene extends Phaser.Scene {
             callbackScope: this,
             loop: false
         });
+    
+        // --- Update gauge pointers in update() ---
     }
     
     createSpriteButtons() {
+        // Increase the scale for pedals from 0.5 to 0.7 for both mobile and PC.
         this.boostButton = this.add.sprite(this.width - 100, this.height - 100, 'gasPedal', 'pedal-gas-normal.png')
             .setOrigin(0.5, 0.5)
             .setScale(0.7)
@@ -360,19 +391,14 @@ class GameScene extends Phaser.Scene {
             .setScrollFactor(0);
         this.boostButton.setInteractive({ cursor: 'pointer' });
         this.boostButton.on('pointerdown', () => {
-            if (!this.isBraking) {
-                this.isAccelerating = true;
-                this.accelerate();
-                this.boostButton.play('gasPressed');
-            }
+            this.accelerate();
+            this.boostButton.play('gasPressed');
         }, this);
         this.boostButton.on('pointerup', () => {
-            this.isAccelerating = false;
             this.decelerate();
             this.boostButton.play('gasNormal');
         }, this);
         this.boostButton.on('pointerout', () => {
-            this.isAccelerating = false;
             this.decelerate();
             this.boostButton.play('gasNormal');
         }, this);
@@ -384,43 +410,31 @@ class GameScene extends Phaser.Scene {
             .setScrollFactor(0);
         this.brakeButton.setInteractive({ cursor: 'pointer' });
         this.brakeButton.on('pointerdown', () => {
-            this.isBraking = true;
-            this.isAccelerating = false; // Ensure gas is disabled
             this.brake();
             this.brakeButton.play('brakePressed');
         }, this);
         this.brakeButton.on('pointerup', () => {
-            this.isBraking = false;
             this.stopBraking();
             this.brakeButton.play('brakeNormal');
         }, this);
         this.brakeButton.on('pointerout', () => {
-            this.isBraking = false;
             this.stopBraking();
             this.brakeButton.play('brakeNormal');
         }, this);
     
-        // Keyboard inputs with priority for brake
         this.input.keyboard.on("keydown-RIGHT", () => {
-            if (!this.isBraking) {
-                this.isAccelerating = true;
-                this.accelerate();
-                this.boostButton.play('gasPressed');
-            }
+            this.accelerate();
+            this.boostButton.play('gasPressed');
         }, this);
         this.input.keyboard.on("keyup-RIGHT", () => {
-            this.isAccelerating = false;
             this.decelerate();
             this.boostButton.play('gasNormal');
         }, this);
         this.input.keyboard.on("keydown-LEFT", () => {
-            this.isBraking = true;
-            this.isAccelerating = false; // Ensure gas is disabled
             this.brake();
             this.brakeButton.play('brakePressed');
         }, this);
         this.input.keyboard.on("keyup-LEFT", () => {
-            this.isBraking = false;
             this.stopBraking();
             this.brakeButton.play('brakeNormal');
         }, this);
@@ -436,12 +450,17 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
+        // Update camera scroll
         this.cameras.main.scrollX = this.body.x - this.width / 8;
     
-        // Apply acceleration immediately to avoid lag
-        this.acceleration = this.targetAcceleration;
+        const accelerationStep = 0.0001;
+        if (this.acceleration < this.targetAcceleration) {
+            this.acceleration = Math.min(this.acceleration + accelerationStep, this.targetAcceleration);
+        } else if (this.acceleration > this.targetAcceleration) {
+            this.acceleration = Math.max(this.acceleration - accelerationStep, this.targetAcceleration);
+        }
     
-        if (this.targetAcceleration === 0) {
+        if (this.targetAcceleration === 0 && (!this.brakeButton.input || !this.brakeButton.input.isDown)) {
             if (this.velocity > 0) {
                 this.velocity = Math.max(this.velocity - this.decelerationRate, 0);
             } else if (this.velocity < 0) {
@@ -451,8 +470,11 @@ class GameScene extends Phaser.Scene {
             this.velocity += this.acceleration;
         }
     
-        if (this.isBraking) {
+        if (this.brakeButton && this.brakeButton.input && this.brakeButton.input.isDown) {
             this.brakeHeldTime += this.time.deltaTime / 1000;
+            if (this.velocity <= 0) {
+                this.targetAcceleration = gameOptions.carAcceleration[1];
+            }
         }
     
         this.velocity = Phaser.Math.Clamp(this.velocity, -gameOptions.maxCarVelocity, gameOptions.maxCarVelocity);
@@ -460,6 +482,7 @@ class GameScene extends Phaser.Scene {
         const angle = this.playerBody.angle;
         const isAirborne = !this.frontWheelGrounded && !this.rearWheelGrounded;
     
+        // Airborne physics
         if (isAirborne) {
             if (!this.hasJumped) {
                 this.hasJumped = true;
@@ -471,14 +494,13 @@ class GameScene extends Phaser.Scene {
                 });
                 this.matter.body.setAngularVelocity(this.playerBody, 0);
             }
-            // Apply tilting for gas (backflip) and brake (frontflip)
-            if (this.isAccelerating) {
-                let newAngVel = this.playerBody.angularVelocity - 0.005; // Tilt backward (clockwise)
+            if (this.cursors.right.isDown) {
+                let newAngVel = this.playerBody.angularVelocity - 0.005;
                 newAngVel = Phaser.Math.Clamp(newAngVel, -0.3, 0.3);
                 this.matter.body.setAngularVelocity(this.playerBody, newAngVel);
             }
-            else if (this.isBraking) {
-                let newAngVel = this.playerBody.angularVelocity + 0.005; // Tilt forward (counterclockwise)
+            else if (this.cursors.left.isDown) {
+                let newAngVel = this.playerBody.angularVelocity + 0.005;
                 newAngVel = Phaser.Math.Clamp(newAngVel, -0.3, 0.3);
                 this.matter.body.setAngularVelocity(this.playerBody, newAngVel);
             }
@@ -504,6 +526,10 @@ class GameScene extends Phaser.Scene {
         this.frontWheelBody.friction = 0.8;
         this.rearWheelBody.friction = 0.8;
         
+        if (this.boostButton.input && this.boostButton.input.isDown) {
+            this.accelerate();
+        }
+    
         if (Array.isArray(this.mountainGraphics)) {
             this.mountainGraphics.forEach(function (item) {
                 if (this.cameras.main.scrollX > item.x + item.width + 100) {
@@ -518,11 +544,13 @@ class GameScene extends Phaser.Scene {
             var remaining = (1 - this.timerEvent.getProgress());
             var fuelPercentage = remaining * 100;
             
+            // For horizontal fuel bar, scale on X axis
             this.fuelBar.scaleX = remaining;
             let r = Math.min(255, Math.floor((1 - remaining) * 255));
             let g = Math.min(255, Math.floor(remaining * 255));
             this.fuelBar.fillColor = (r << 16) + (g << 8);
 
+            // Now show low fuel message when remaining fuel falls below 25%.
             if (remaining < 0.25) {
                 this.lowFuel.setVisible(true);
             } else {
@@ -530,17 +558,21 @@ class GameScene extends Phaser.Scene {
             }
         }
     
-        // Update Speedometer
-        const speedIncrement = 0.5;
-        const speedDecrement = 3;
-        if (this.isAccelerating) {
+        // --- Update Speedometer ---
+        // The pointer moves gradually toward the max angle when accelerating (via keyboard or mobile boost button)
+        // and quickly returns to the min angle when released.
+        const speedIncrement = 0.5;   // degrees per frame when accelerating
+        const speedDecrement = 3;     // degrees per frame when not accelerating
+
+        if (this.cursors.right.isDown || this.isAccelerating) {
             this.currentSpeedAngle = Math.min(this.currentSpeedAngle + speedIncrement, this.gaugeMaxAngle);
         } else {
             this.currentSpeedAngle = Math.max(this.currentSpeedAngle - speedDecrement, this.gaugeMinAngle);
         }
         drawPointer(this.speedPointer, this.speedGaugeCenter.x, this.speedGaugeCenter.y, this.gaugeRadius - 15, this.currentSpeedAngle);
     
-        // Update Fuel Gauge
+        // --- Update Fuel Gauge ---
+        // Fuel full (100%) gives 45°; fuel empty (0%) gives -135°.
         let targetFuelAngle = Phaser.Math.Linear(this.gaugeMinAngle, this.gaugeMaxAngle, (this.timerEvent ? (1 - this.timerEvent.getProgress()) : 1));
         drawPointer(this.fuelPointer, this.fuelGaugeCenter.x, this.fuelGaugeCenter.y, this.gaugeRadius - 15, targetFuelAngle);
     }
@@ -676,15 +708,19 @@ class GameScene extends Phaser.Scene {
     }
 
     spawnCollectible() {
+        // Spawn fuel collectible as a dynamic body so it falls onto the platform.
         var collectible = this.matter.add.sprite(this.player.x + this.width, 400, 'collectible').setScale(0.3);
+        // Optionally adjust friction and bounce to make it settle on the terrain.
         collectible.setFriction(0.1);
         collectible.setBounce(0);
         this.collectibles.add(collectible);
     }
     
     spawnCoins() {
+        // Spawn between 3 to 5 coins in a row as dynamic bodies so they fall naturally.
         const numberOfCoins = Phaser.Math.Between(3, 5);
         let startX = this.player.x + this.width;
+        // Adjust the initial vertical position to let coins have enough room to fall onto the terrain.
         const baseY = Phaser.Math.Between(200, 300);
         for (let i = 0; i < numberOfCoins; i++) {
             let coin = this.matter.add.sprite(startX + (i * 50), baseY, 'coin').setScale(0.3);
@@ -694,14 +730,19 @@ class GameScene extends Phaser.Scene {
         }
     }
     
+    // Modified accelerate function with enhanced reverse power and mobile support
     accelerate() {
-        if (this.isBraking) return; // Brake takes priority
-        this.targetAcceleration = gameOptions.carAcceleration[0]; // Reduced from 1.5x to 1x base acceleration
+        this.isAccelerating = true;  // Set flag on gas pedal press
+        if (this.velocity < 0) {
+            this.targetAcceleration = 0.06;
+        } else {
+            this.targetAcceleration = gameOptions.carAcceleration[0] * 1.5;
+        }
         this.carSound.setVolume(1).play();
     }
 
     decelerate() {
-        if (this.isBraking) return; // Brake takes priority
+        this.isAccelerating = false; // Reset flag when gas pedal is released
         this.targetAcceleration = 0;
         this.decelerationRate = 0.01;
         this.tweens.add({
@@ -711,8 +752,13 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    // Modified brake function with enhanced reverse power
     brake() {
-        this.targetAcceleration = gameOptions.carAcceleration[1] * 2; // Use -0.02 (2x base reverse acceleration) instead of -0.1
+        if (this.velocity > 0) {
+            this.targetAcceleration = -0.2;
+        } else {
+            this.targetAcceleration = gameOptions.carAcceleration[1] * 3;
+        }
         this.carSound.setVolume(0.5).play();
     }
     
