@@ -1,0 +1,30 @@
+{
+    "title": "Make Way",
+    "description": "A racing game where you navigate through traffic and avoid bombs.",
+    "deviceOrientation": "landscape",
+    "imageLoader": {
+        "background": "https://media-hosting.imagekit.io/f2bf08cefcf34c61/Screenshot%202025-04-19%20153943-Photoroom.png?Expires=1839665734&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=L2rrU7LqdeBDSoMBnm1UEuio9wyX6EKlL2IaKFYZDgajpckEApeSIOycwAWbHtsQk0sbWpzq-Lq4xkBxbza~wThkwk5oxVPqzxdxpJaHGrI3G2K2z88~-PwEmQs26ECbTK3tXX8g3TJ8XFH-i4W6hEn90Fwgy20~WbJwcfdCOo2pB6-BEHP~iHlC5zgPUgUd2Veafvt5zFP2kNY~7aV~abb2RjcsifOb0172Q0hJ~l7~epvL1XBe1-seuEO2jbhB01CfXmw7Bx9y0VaSREK56BJVwEwg2kqV2ilo1Et-i0JeI0UZ76Ec6-liJ0M04tZdi8vfZfpsCp7zp6II7dPlBA__",
+        "player": "https://media-hosting.imagekit.io/7db4f641158e4558/player%20car-Photoroom-Photoroom.png?Expires=1839667129&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=ADtUnJ--ncDL6Lis~1OcXesIU2gLsTXFnoSV8SisPfDVZLMwpZWGv3awVFSW3GruloMQqbKISsYTrLpvQlBn2EdSDdiaTSriL3Op3ILv7jPG4bOPhRdYpS6y-5LY8LPqRLxBxy1Ta9sPSmJD~SUG~Mmw6W9O7LMHhiXWLZ-ovPClu506WLBhYfwE2HOVoCiOCf0PoDpN-PWwfVvn5ZY5kINs-Za3iG7trKeXq3e3OL0SZhl5C~i14aDZGGDf2UaaXxNyNbuEqM0aBp61rqLReVihv442-mqZXmF2nCSm5~9ocHwjw6Ez7QC-dMjblujVWSvAFctfVRTt7p-XkwBycQ__",
+        "enemy": "https://media-hosting.imagekit.io/a0f6fb62471f43ca/enemy%20car-Photoroom-Photoroom.png?Expires=1839667129&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Slj8pAgnOBj2NU7t9OlVzjvWPrclBG8BGdJeBxfYu2hy3lIEmxKQQ-2-CD7ETLD3~dqafVl0VVPTTf9d5fBjRNK4enSxzC8KWV5IN89H0UiQtrs-HBlvxFlVJAgOmJiejsVKy8Unp3bE3U0mAcFqhiBGBZnpOlkH7CMNSTiLEFpbEFh7ktDDbUCnAn5kzkD1mQcYfvVlxonPqw4g2-daVtIU27jtL~5-Qjfv63M8ShZ3u~HYmJTLNm3jn9T1Hy33QEzmD3B~7o3~r59h-~998rx2gwahC2cejFwwictML1fFzljF-EDG~WtPEuxKqW3Nrous1dGJm36GhG~i5RwLlQ__",
+        "bomb": "https://media-hosting.imagekit.io/4ff3b0e0ba764136/bomb-Photoroom.png?Expires=1839667743&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=fVesvXK8-88Yq09XxHeRUWOBGTT8pOnpvjzxPyFCfHNBLaWnHZAtvzS3UhwKXTLewVMd4rB~g9oTkcNnH05CbAmccR-Jmr02FxuXF3aeRA4iDPe-KuY6NPvddC1vNr9DOtNB2JvQMIrtsVfCGjRIxns~bF-7sM4iJLXqMiTM8DGHA0Z0~i8nlWpOYJMjonocTtWYRtpy4bh61svpeXlLpr7XdxhPtVLQxvyVjaOWyL5M4fkx39GcN~aPzBc9WKFmaxsiG3xtdnYDEqhkIYntBHHFy7AL7TVRnYxx8vszHd57uQ1Hh6QyVCHvAIBphAjkaIpmCDCTMeJckRvpRNlpfQ__"
+    },
+    "instructions": "Instructions: Use arrow keys to move: Up/Down to change lanes, Left to slow down, Right to speed up. Avoid enemy cars to maintain speed, and avoid bombs to stay alive.",
+    "deviceOrientationSizes": {
+        "landscape": {
+            "height": 720,
+            "width": 1280
+        },
+        "portrait": {
+            "height": 1280,
+            "width": 720
+        }
+    },
+    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+    "phaserVersion": "3.80.1",
+    "soundsLoader": {
+        "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Background_3cd80d47-33cf-4ca1-8c60-7a13793255ef.mp3?t=1744134167420",
+        "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
+        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
+        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3"
+    }
+}
