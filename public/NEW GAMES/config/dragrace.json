@@ -1,0 +1,29 @@
+{
+    "title": "Drag Race",
+    "description": "A side-view drag racing game where you shift gears by timing your space bar press perfectly to outrace your opponent.",
+    "deviceOrientation": "landscape",
+    "imageLoader": {
+        "background": "https://media-hosting.imagekit.io/517462f1a6e84f66/hot-wheels-game-start-Photoroom.png?Expires=1840212256&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=OcE27wAxMfd86RxJRHvjRrdqVyfr~3MTz8HyFzQPbWAzGBaJI-gooXhRPxF~hy70JL40CSAQDg6FDNPdK9oXzgedqaOKVhVQP9otOnTQq~2QvP74T8tX1EbJxe~kniVhJrT~1CQZh1vm3BMutoZdS4rXU9YG9DtlGVIAKh2heyJ-tgJSKhCW4n8JwK9EjKjuL9QYV0hL8EXaOlKf4udjqDu9kXXtZoVnP-Nr6zDaCHpw0UylS6GUQ1sftI7rxoCLH8WrEAHwwXGILpfT0YHngv~pjqMNqLFA-QfuBGVpGo8M599QMVT2JTaaH6qMIu0gBGXA3HLU24qea0z6kcgPfQ__",
+        "playerCar": "https://media-hosting.imagekit.io/1f8b8d50e54642cc/car1-removebg-preview.png?Expires=1840210662&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=UV40dj9wi4ofiXBGIJFisoKv906UAs9YYdBeRqaJLtDdEi1KTWd8MhB5yJz-YXCch-zKZVJJrpa~5s4WV64ibQz9i7EkbHSSVsIFBdGufaootTwZ4XzkBRvs2a8JzeB2tlJlTFg346amKlxgUmJDskpSlNRRohObcQeCn7rq0amWO0Cez53DxzqJ2Mc6FpGQdsZ4CKwODCeWMWA~ut5SSAC1TrqlSrKfy5FNuj6Pq7uHrZM5cPAnvS4GK8fxVG4yH23iQbcFZFMkeXJcmxk4W~M9EdzqiRUjQ1g97nFVOc3qK7nizMn99kit960blmES6q0wXePs6jLzk0eR55vuOQ__",
+        "enemyCar": "https://media-hosting.imagekit.io/b9328ecd8ba846cb/car2-Photoroom-Photoroom.png?Expires=1840210662&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=AOL-kIehpUCMpTS6Y1Ui7dJcBhMjPRz5ggreuFnQn8vDG-zl~KTGGGBOcdMfrSqNI9k9UN4nkIZzqqo0zkv92jwSRfKITXllSDkYkY8wFLjiHAAuPQjpV40csEx-U7nx-KKoLKsga6dqvykCuDTSJOniXS5iFl3eQ4Jc-T5NzIqk-YVyppmMUoIutob-wUMUUtkx~fGT4HfIygw9PW9H1IEPyqQ~QiGA8OO49ewj0rkV6n9dtSKTxI6hoBqve5hj4GXlvvuEnj69tEo2fgY0ALaUKgwKDuZZGiwluLvYIescFSyh9dasgq~0Euwr2lYo7iCeoFMZvdzma4i~rGIa4g__"
+    },
+    "instructions": "Instructions: 1. Press and hold the space bar to rev the engine at the start. 2. Release the space bar when the countdown finishes. 3. Press the space bar to shift gears when the vertical line is in the green zone for perfect timing.",
+    "deviceOrientationSizes": {
+        "landscape": {
+            "height": 720,
+            "width": 1280
+        },
+        "portrait": {
+            "height": 1280,
+            "width": 720
+        }
+    },
+    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+    "phaserVersion": "3.80.1",
+    "soundsLoader": {
+        "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/car.mp3",
+        "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
+        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
+        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3"
+    }
+}
