@@ -179,6 +179,7 @@ class GameScene extends Phaser.Scene {
         this.enemies.push(enemy);
         enemy.setScale(0.3);
         enemy.body.setSize(enemy.body.width * 1.2, enemy.body.height / 1.5);
+        enemy.body.allowGravity = false; // Prevent falling
         this.vfx.scaleGameObject(enemy, 1.1);
         let distance = Math.sqrt(distX * distX + distY * distY);
         let fps = 60;
@@ -485,8 +486,18 @@ class GameScene extends Phaser.Scene {
                 this.bombsRemaining = 3;
                 this.displayBulletsRemaining();
                 this.displayBombsRemaining();
-                this.create_Bridge(10, 550, 4);
-                this.spawnEnemy(65, 250, 'enemy', 100, 0, 0)
+
+                // Platforms (128px per segment)
+                this.create_Bridge(10, 650, 3); // Lower: x=10 to ~394, y=650
+                this.create_Bridge(300, 500, 3); // Mid: x=300 to ~684, y=500
+                this.create_Bridge(100, 350, 4); // High: x=100 to ~612, y=350
+
+                // Static enemies
+                this.spawnEnemy(150, 615, 'enemy', 0, 0, 0); // Lower platform (easy)
+                this.spawnEnemy(300, 1100, 'enemy', 0, 0, 0); // Ground level (easy, near player)
+                this.spawnEnemy(400, 465, 'enemy', 0, 0, 0); // Mid platform
+                this.spawnEnemy(450, 315, 'enemy', 0, 0, 0); // High platform
+
                 break;
 
             case 2:

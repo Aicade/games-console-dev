@@ -196,7 +196,7 @@ class GameScene extends Phaser.Scene {
         this.scoreText = this.add.bitmapText(this.game.config.width / 2 - 200, 20, 'pixelfont', '0', 32);
         this.scoreText.setOrigin(0.5, 0); // Center horizontally, align top
         this.scoreText.setDepth(1); // Ensure it’s above other elements
-        this.scoreText.setTint(0x0000ff);
+        this.scoreText.setTint(0xFFFF00);
         this.scoreText.setDropShadow(2, 2, 0x000000, 0.8); // Add a shadow for better contrast
 
         // Lives text
@@ -365,7 +365,7 @@ class GameScene extends Phaser.Scene {
         this.clockHand.clear();
 
         const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
-        const centerX = this.game.config.width / 2;
+        const centerX = this.game.config.width / 2 + 120;
         const centerY = 60 * scale;
         
         // Draw outer glow
@@ -444,7 +444,7 @@ class GameScene extends Phaser.Scene {
         this.clockHand.clear();
 
         const scale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
-        const centerX = this.game.config.width / 2;
+        const centerX = this.game.config.width / 2 + 120;
         const centerY = 60 * scale;
 
         // Get percentage of time remaining

@@ -1,0 +1,48 @@
+{
+    "title": "Audio Game",
+    "description": "Shoot the enemies falling from the sky",
+    "instructions": "Instructions:1. Use arrow keys OR joystick to move. 2. Use Spacebar/button to shoot.",
+    "deviceOrientation": "portrait",
+    "imageLoader": {
+      "background": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/ocEiImA18nG0bo0w/assets/image_0_background.webp",
+      "player": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/ocEiImA18nG0bo0w/assets/image_1_player.webp",
+      "enemy": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/ocEiImA18nG0bo0w/assets/image_2_enemy.webp",
+      "projectile": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/ocEiImA18nG0bo0w/assets/image_3_projectile.webp"
+    },
+    "soundsLoader": {
+      "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-10.mp3",
+      "blast": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
+      "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_2.mp3",
+      "upgrade": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3",
+      "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
+      "m4": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/m4_ad2830c5-2c71-4672-b18b-2368bf0abbb8.mp3?t=1744184984447",
+      "jazz-music-whiskey-bar-restaurant-casino-background-intro-theme-263181": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/jazz-music-whiskey-bar-restaurant-casino-background-intro-theme-263181_fce37527-f4d5-4943-99b2-b0617df98ea3.mp3?t=1744634566878",
+      "aising": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/aising_e60a0cfb-d750-481f-bb34-81d28a132f2e.mp3?t=1745252323560",
+      "square audio": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/square%20audio_4d1d7fed-fb59-4984-986a-c03ee4c45786.mp3?t=1745252323630",
+      "amen drum": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/amen%20drum_bd5aff18-2d31-43d5-bb6a-af72343dd62f.mp3?t=1745252323719",
+      "whistle": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/whistle_0dcafa5f-1a14-416d-bd0d-bd448c3fe075.mp3?t=1745252323818",
+      "shaky": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/shaky_9f19cfb4-4380-483b-81ca-528aec993fb5.mp3?t=1745252323906"
+    },
+    "deviceOrientationSizes": {
+      "landscape": {
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
+    },
+    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+    "phaserVersion": "3.80.1",
+    "orientationSizes": {
+      "landscape": {
+        "height": 720,
+        "width": 1280
+      },
+      "portrait": {
+        "height": 1280,
+        "width": 720
+      }
+    }
+  }
