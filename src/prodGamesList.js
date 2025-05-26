@@ -30,6 +30,7 @@ const prodGamesList = [
     "MathPuzzle",
     "MessidodgeCorona",
     "Missonman",
+    "mortalKombat",
     "NinjaBlades",
     "petGame",
     "Platformer",
