@@ -2,10 +2,10 @@
     "description": "Reaction game.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "https://media-hosting.imagekit.io/de67867c3e2140dd/hill%20climb%20bg.png?Expires=1838891605&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=HuIaMdnKpHMDajwLWwC5XAmeMFqePGJr1FSjQqns-Pz0KBxyuzlwYCLu7mYf0MQTcZoN-hm-NI5bKRR0hiOjcB~ztkLiwTFdjIfFKv9~dW0OFb7jDLTQyNg0FgL01ZuRMerdSp~rrIKUdcHyCN8dq~WPwnAq2avWMe3wwpTLxOjc7OUOD2laTC7PR~ed~abLO774xJytopsjHmg~gp1i348wSQuztGu5FHXmBE74K~MpA0m~MQh3bQzECIuQ~W9vDvPNNd4ss9Smv4Ndi6iKzsIAYuCeMIuZ6VIF-UU8MgpWCTCC5l2QUVzezAV5Nx2sBcAKZjoaMvXyjwPdWmmQLA__",
-        "player": "https://media-hosting.imagekit.io/6ae83f9ee4d946ad/car-Photoroom-removebg-preview.png?Expires=1838892044&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=0n7L4fjZxWs-v45eYYgJFAuZsrLrcguWBVqNEOe01irys4S4H1FvJBB~iI9F83XmT2hZhpdCOLeEJeExDzuR20Xv4LQai7c8Upc8rCxHF5JKKE~HQ16UEPby5D-P2-rVq5MNO7A0Fpm7r7FrR~MkiePDcYtJUUK56lIJnFGLRYDTN~yRc65U1RNqmhCEzBTd9SLH~1jUwTy8NBK46cI4TZnVGsacrjzfuxBSpdsGOdUDOsfGELsdU5jQj1tx-sv~-nzrXM4Z69ESX6GTktCmcPaKgFpEg2JBR2SJKrCMjPyTEKJ5HyN5-3j50Db04as99Ou7UWPKMeBCdVjfYrBSKA__",
-        "collectible": "https://media-hosting.imagekit.io/a3f0066450704e7f/fuel.png?Expires=1838892222&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=tyehWZ4-zO3ELglv7Uuu5sT9~I~cxr~4wcm~zSzPWdJnBsX7b2eceu5yVvq0UjQ3XCmVD8UmNvwxQEOSEl54gy1brj2S-JTKcXjUoiV60AKxF9b6EJsPQdSKPNUbo1g8yYjZE469MrL8czo7tZ7GNShg87LEIVW8YEsedf~4f~OFEGKWMz8Uk7UfDr4BrS3zXPwZFjr-ULeDxTDVTdSg59prbJD5uGeFFrlMypZpODS0B3vbr4A63rJqylkPYXtapDfS5bMHo16Z7ObMUc8G17Rs758D4A9VY9N0Y6SOmq6wrX8x24PvG1pypLkMyggVjunZGrBYtE2rVcxyTucZcQ__",
-        "coin": "https://media-hosting.imagekit.io/48129b0935ef4659/collectible.png?Expires=1838458493&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=FlEtFKaAzBUy0qwMRI35-K7eGno468ywgCTDek59pqpWdZZB78b-yVnOBoyPArAwTHzRf2MWIVzatdEKwtdsxX4l97dimL9kbH-jhoeY5euXHtYrO1Z8ZweEm~OwfabMW~zUK9anzA0GCLsmDzo22nGWos8cjw-f7RXOwlKfg97VMtFDvIb~Npym2dq7xRhOBkLpxsZ-cw~BKblxKdZzhsVYr2gRmbXhD6-LPM01EqU7-7KZ92KXEfA047ZfSEith1HHhb7KSzlSOApuDkMFaIJiu2tUT4ycugKkeW3JYxOctOa7zLf2XD1OzwSHMPb1~g3NkHx69ajs2cWhudLrVQ__"
+        "background": "public/assets/background_1.png",
+        "player": "public/assets/player_1.png",
+        "collectible": "public/assets/collectible_1.png",
+        "coin": "public/assets/dollar.png"
     },
     "instructions": "Instructions: 1.Tap to destory.",
     "deviceOrientationSizes": {
