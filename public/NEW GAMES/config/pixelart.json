@@ -1,0 +1,53 @@
+{
+  "title": "Draw Pixel Art",
+  "description": "Draw reference images within the time limit to complete the levels.",
+  "instructions": "Instructions:1. Click, hold, and drag to aim. 2. Release to shoot. 3. Destroy all obstacles.4. You have 3 lives.",
+  "deviceOrientation": "portrait",
+  "imageLoader": {
+    "background": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_15.png",
+    "player": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/image_1_player.webp",
+    "enemy": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/image_2_enemy.webp",
+    "eraser": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_4.png",
+    "checkmark": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/history/iteration/RY0nkYisKuCj.webp",
+    "nextLevel": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_6.png",
+    "apple": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_7.png",
+    "banana": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_8.png",
+    "orange": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_9.png",
+    "strawberry": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_10.png",
+    "watermelon": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_11.png",
+    "grapes": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_12.png",
+    "mango": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_13.png",
+    "pineapple": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_14.png",
+    "retry": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/history/iteration/4AFmzYXP60Tf.webp",
+    "newAsset_16": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/history/iteration/v0MADgeDfrty.webp"
+  },
+  "soundsLoader": {
+    "background": "https://files.catbox.moe/qaqhzn.mp3",
+    "levelup": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3",
+    "stretch": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/stretch.mp3",
+    "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_3.mp3",
+    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  }
+}
