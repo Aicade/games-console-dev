@@ -38,7 +38,7 @@ class GameScene extends Phaser.Scene {
         this.powerUps = null;
         this.score = 0;
         this.width = this.game.config.width;
-        this.height = this.game.config.height;
+        this.height = this.game.config.height; //checking
     }
 
     preload() {
