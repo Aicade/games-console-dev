@@ -1,30 +1,40 @@
 {
-    "description": "A Doodle Jump–style game where the player automatically jumps upward from platform to platform. The game ends when you fall.",
-    "deviceOrientation": "portrait",
-    "imageLoader": {
-        "background": "https://media-hosting.imagekit.io/b05597d822ca443d/doodle%20jump%20bg.png?Expires=1838481515&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=YEdKXBGhyjeyKsL4Zk2jr0lm0ds05805WAQIgYpoVyERQ~q~nAHC4VTDyGunRgoAWgxaMRxuDn9ML7Dhjh~CURkleEmiwROvsiAqcVsbOrIx5cnOyp61Bt-Hyzt5fMSd09CrRbY9jLur1zhmN-1yoVNvdwr6Is7bnXwoxvXKUBC63r2W7GCEmA1OquXhJZE2As1uPkXLLyfzEZOptw0ShzOaQZAKrpXb1kRNED0vY5QGzyLfIcPOStZM4LfHaYQYDPEyJe7WI0twPa3AbZK-BwfuIE-UMgwm~72I0Oosh3jDMebaA2iv4wDvyvHGRWgBVIJSzWNPV~jtHmI43dNd5g__",
-        "platform": "https://media-hosting.imagekit.io/174147fd349d4bcd/doodle%20platform-Photoroom.png?Expires=1838482776&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=ee31Gv8brGKNum7tTovAXKVKUfFXg9G7zKlXKgjDEUno5vP395L7HXBuJTF~RVjhQP5YV2owCgzdz7dv-Y64Gpbb-m8ELtvlv~GKLeMZgbRLuxsp3FANpPFV8d0htdnd2uILMSPCYHmmo2~YDW~5tdhY83ymSnnXEB3HYlPia4bhXNJjBQ5A6q7TwKtX-TTXUm9N54PFlC8lxRxrg226DFAHEV~-tndsswog1-5ie9SYC9E5a9xKs5wxVKYTfAP-pkRClu~GHtcowBrzcpsgi~FriEjYj76GMGY2JAq4hg2XBorDkCRnX6taa7L7u85z61ywyijiedMXRTcFWHAjGQ__"
+  "title": "DoodleJump",
+  "description": "A Doodle Jump–style game where the player automatically jumps upward from platform to platform. The game ends when you fall.",
+  "instructions": "Instructions: Use LEFT/RIGHT arrow keys or mobile buttons to move. Jumping is automatic when landing on a platform.",
+  "deviceOrientation": "portrait",
+  "imageLoader": {
+    "background": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/hyARr7Yi9NWD4b34/assets/images/background_4.png?t=1748945245759",
+    "platform": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/hyARr7Yi9NWD4b34/assets/images/platform_1.png?t=1748945265205"
+  },
+  "soundsLoader": {
+    "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Background_3cd80d47-33cf-4ca1-8c60-7a13793255ef.mp3?t=1744134167420",
+    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
+    "jump": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Jump_4e42502a-1765-49c5-95f5-4ef18300e806.mp3?t=1744132241323",
+    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3",
+    "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "instructions": "Instructions: Use LEFT/RIGHT arrow keys or mobile buttons to move. Jumping is automatic when landing on a platform.",
-    "orientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
-    "phaserVersion": "3.80.1",
-    "mobile_portrait": false,
-    "soundsLoader": {
-        "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Background_3cd80d47-33cf-4ca1-8c60-7a13793255ef.mp3?t=1744134167420",
-        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
-        "jump": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Jump_4e42502a-1765-49c5-95f5-4ef18300e806.mp3?t=1744132241323",
-        "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3",
-        "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav"
-    },
-    "title": "DoodleJump"
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "mobile_portrait": false
 }
