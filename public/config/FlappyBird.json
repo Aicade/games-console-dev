@@ -2,9 +2,9 @@
     "description": "Reaction and survival game.",
     "deviceOrientation": "portrait",
     "imageLoader": {
-        "background": "background",
-        "platform": "platform",
-        "player": "player"
+        "background": "public/assets/background_1.png",
+        "platform": "public/assets/platform_1.png",
+        "player": "public/assets/player_1.png"
     },
     "instructions": "Instructions: 1. Use SPACE or touch to make the player jump. 2. Avoid touching the avoidables or ground.",
     "orientationSizes": {
@@ -20,7 +20,7 @@
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
     "soundsLoader": {
-        "background": "background",
+        "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-1.mp3",
         "jump": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
        "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3"
