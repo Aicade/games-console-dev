@@ -1,0 +1,41 @@
+{
+  "title": "ChessMaster Challenge",
+  "description": "play chess",
+  "instructions": "Instructions: 1. Avoid enemies.",
+  "deviceOrientation": "portrait",
+  "imageLoader": {
+    "background": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/image_0_wallpaper_background.webp",
+    "player": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/image_1_player.webp",
+    "enemy": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/image_2_enemy.webp",
+    "new_asset_4": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/images/new_asset_4.png",
+    "new_asset_5": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/images/new_asset_5.png"
+  },
+  "soundsLoader": {
+    "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-10.mp3",
+    "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
+    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
+    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  }
+}
