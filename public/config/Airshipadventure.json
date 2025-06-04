@@ -1,13 +1,13 @@
 {
     "orientation": "landscape",
     "imageLoader": {
-        "background": "background",
-        "player": "player",
-        "avoidable": "avoidable",
-        "collectible": "collectible"
+        "background": "public/assets/background_1.png",
+        "player": "public/assets/player_1.png",
+        "avoidable": "public/assets/avoidable_1.png",
+        "collectible": "public/assets/collectible_1.png"
     },
     "soundsLoader": {
-        "background": "background",
+        "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-1.mp3",
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
         "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/footsteps_1.mp3",
         "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav"

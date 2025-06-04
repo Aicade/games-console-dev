@@ -6,11 +6,7 @@
         "player": "player",
         "key":"key",
         "exit": "exit",
-<<<<<<< HEAD
         "circleSpike":"projectile",
-=======
-        "circleSpike":"circleSpike",
->>>>>>> 2dc3652 (New Games and updates)
         "tiles":"tiles"
     },
     "instructions": "Use the arrow keys to move: left and right to dodge obstacles, up to jump, and spacebar for special actions. Master the controls to conquer each level!",
