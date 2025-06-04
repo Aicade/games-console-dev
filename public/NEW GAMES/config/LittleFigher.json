@@ -1,0 +1,69 @@
+{
+  "title": "Little Fighters Survival",
+  "description": "<p>Hold to move your player forward, avoid obstacles and reach your destination.</p>",
+  "instructions": "Instructions:1. Hold to move forward 2. Release to stop moving",
+  "deviceOrientation": "landscape",
+  "imageLoader": {
+    "background_forest": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/back.png?t=1748513746411",
+    "select_bg": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/ChatGPT%20Image%20May%2028%2C%202025%2C%2005_22_08%20PM%281%29.png?t=1748433185931",
+    "platform_grass": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/platform_grass.png?t=1748513820791",
+    "character_1_idle": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/090.png?t=1748423172167",
+    "character_1_kick": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/039.png?t=1748423323484",
+    "character_1_shoot": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/020.png?t=1748423451100",
+    "character_1_icon": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_1_icon.png?t=1748423505347",
+    "character_2_idle": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_2_idle.png?t=1748425324540",
+    "character_2_punch": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_2_punch.png?t=1748425444514",
+    "character_2_kick": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_2_kick.png?t=1748425661840",
+    "character_2_shoot": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_2_shoot.png?t=1748425610252",
+    "character_2_icon": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_2_icon.png?t=1748425339330",
+    "character_3_idle": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_3_idle.png?t=1748424159787",
+    "character_3_icon": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_3_icon.png?t=1748424180539",
+    "character_3_shoot": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_3_shoot.png?t=1748424305789",
+    "character_3_kick": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_3_kick.png?t=1748424662822",
+    "character_3_punch": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_3_punch.png?t=1748424716493",
+    "enemy_1": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/enemy_1.png?t=1748502910531",
+    "enemy_1_icon": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/enemy_1_icon.png?t=1748432199556",
+    "projectile_1": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/projectile_1.png?t=1748424959223",
+    "character_1_punch": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/character_1_punch.png?t=1748425268937",
+    "fire": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/newAsset_23.png?t=1748449073170",
+    "hit_particle": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/hit_particle.png?t=1748498951101",
+    "punch_particle": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/punch_particle.png?t=1748499034555",
+    "kick_particle": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/kick_particle.png?t=1748499101271",
+    "spawn_particle": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/spawn_particle.png?t=1748499236487",
+    "hurt_particle": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/hurt_particle.png?t=1748499656624",
+    "back": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ulDhnMGVhM1wiQfN/assets/images/istockphoto-1128211656-612x612.png?t=1748422107206"
+  },
+  "soundsLoader": {
+    "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-2.mp3",
+    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
+    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
+    "punch": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_759431a1-a1e2-4e7a-8b6f-abc3a33ce1d7.mp3?t=1748427249303",
+    "hurt": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_d0a681bf-b484-4bcc-973a-fa66191ee37e.mp3?t=1748427233146",
+    "levelUp": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_9add2690-3ecb-4426-afe4-b3b837a1a409.mp3?t=1748427215856",
+    "shoot": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_eca1d84f-606b-4030-8b88-32577a9c5fd2.mp3?t=1748427201491",
+    "kick": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_45f87ef3-4605-4c1d-886a-d7a6870ee01d.mp3?t=1748427184380",
+    "special": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_8a61e29a-9f4a-4f54-92f2-dd1856b9e67b.mp3?t=1748427170352"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  }
+}
