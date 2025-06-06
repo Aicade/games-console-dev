@@ -1,31 +1,49 @@
 {
-  "description": "A thrilling tap-to-destroy game where quick reflexes are \n key to defeating waves of unique enemies",
-  "deviceOrientation": "landscape",
-  "imageLoader": {
-      "background": "background",
-      "player": "player",
-      "enemy": "enemy",
-      "projectile": "projectile"
-  },
-  "instructions": "Instructions: 1. Use arrow keys OR joystick to move.2. Use Spacebar/button to shoot.",
-  "orientationSizes": {
-      "landscape": {
-          "height": 720,
-          "width": 1280
-      },
-      "portrait": {
-          "height": 1280,
-          "width": 720
-      }
-  },
-  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
-  "phaserVersion": "3.80.1",
-  "mobile_portrait": false,
-  "soundsLoader": {
-      "background": "background",
-      "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
-      "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_2.mp3",
-      "upgrade": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3"
-  },
-  "title": "Space Drive"
+    "title": "Space Invader",
+    "description": "A thrilling tap-to-destroy game where quick reflexes are \n key to defeating waves of unique enemies",
+    "instructions": "Instructions: 1. Use arrow keys OR joystick to move.2. Use Spacebar/button to shoot.",
+    "deviceOrientation": "landscape",
+    "imageLoader": {
+        "background": "background",
+        "player": "player",
+        "enemy": "enemy",
+        "projectile": "projectile"
+    },
+    "soundsLoader": {
+        "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
+        "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
+        "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_2.mp3",
+        "upgrade": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3"
+    },
+    "deviceOrientationSizes": {
+        "landscape": {
+            "height": 720,
+            "width": 1280
+        },
+        "portrait": {
+            "height": 1280,
+            "width": 720
+        }
+    },
+    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+    "phaserVersion": "3.80.1",
+    "fontLoader": {
+        "pixelfont_png": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.png",
+        "pixelfont_xml": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.xml"
+    },
+    "libLoader": {
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+        "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png"
+    },
+    "orientationSizes": {
+        "landscape": {
+            "height": 720,
+            "width": 1280
+        },
+        "portrait": {
+            "height": 1280,
+            "width": 720
+        }
+    },
+    "mobile_portrait": false
 }
