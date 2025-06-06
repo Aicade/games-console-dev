@@ -59,7 +59,7 @@ class GameScene extends Phaser.Scene {
 
     create() {
         this.score = 0;
-        this.timer = 60; // Reset timer on scene start/restart
+        this.timer = 60; // Reset timer on scene start
         this.vfx = new VFXLibrary(this);
         this.cursor = this.input.keyboard.createCursorKeys();
 
