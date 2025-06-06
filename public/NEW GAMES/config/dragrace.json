@@ -4,15 +4,28 @@
   "instructions": "Instructions: 1. Press and hold the space bar to rev the engine at the start. 2. Release the space bar when the countdown finishes. 3. Press the space bar to shift gears when the vertical line is in the green zone for perfect timing.",
   "deviceOrientation": "landscape",
   "imageLoader": {
-    "background": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/hyARr7Yi9NWD4b34/assets/images/background_4.png?t=1748944123525",
-    "playerCar": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/hyARr7Yi9NWD4b34/assets/images/elon.png?t=1748944093178",
-    "enemyCar": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/hyARr7Yi9NWD4b34/assets/images/enemy_1.png?t=1748944094564"
+    "background": "background",
+    "player": "player",
+    "enemy": "enemy"
   },
   "soundsLoader": {
     "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/car.mp3",
     "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
     "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
     "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3"
+  },
+  "atlasLoader": {
+    "brakePedal": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/nCHTvXMyqtIdO4kH/assets/images/breakes.png?t=1742286073193",
+      "atlasURL": "https://aicade-ui-assets.s3.amazonaws.com/nishchal/games/breaks/history/json/dzb89wXm9WWT.json"
+    },
+    "gasPedal": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/nCHTvXMyqtIdO4kH/assets/images/gas.png?t=1742286021661",
+      "atlasURL": "https://aicade-ui-assets.s3.amazonaws.com/nishchal/games/gas/history/json/srC4LL1aAAPy.json"
+    }
+  },
+  "libLoader":{
+      "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
   },
   "deviceOrientationSizes": {
     "landscape": {
