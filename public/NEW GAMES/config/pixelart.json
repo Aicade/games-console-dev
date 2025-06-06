@@ -4,9 +4,9 @@
   "instructions": "Instructions:1. Click, hold, and drag to aim. 2. Release to shoot. 3. Destroy all obstacles.4. You have 3 lives.",
   "deviceOrientation": "portrait",
   "imageLoader": {
-    "background": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/images/new_asset_15.png",
-    "player": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/image_1_player.webp",
-    "enemy": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/ZouwZsWdRUUtGw8Y/assets/image_2_enemy.webp"
+    "background": "background",
+    "player": "player",
+    "enemy": "enemy"
   },
   "soundsLoader": {
     "background": "background",
