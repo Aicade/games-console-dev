@@ -10,7 +10,7 @@
     "player": "player",
     "enemy": "enemy",
     "enemy_1": "enemy_1",
-    "enemy_2": "enemy_2"
+    "enemy_2": "enemy_1"
   },
   "soundsLoader": {
     "sfx_powerup": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/item-pick-up-38258_44dffda3-8bf5-41bb-bfee-d1555406fc00.mp3?t=1748921942619",
