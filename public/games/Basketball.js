@@ -29,15 +29,14 @@ class GameScene extends Phaser.Scene {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
 
-        this.load.image('heart', 'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png');
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        for (const key in _CONFIG.libLoader) {
+
+            this.load.image(key, _CONFIG.libLoader[key]);
+
+        }
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
-
-
-        this.load.image('basket', `https://play.rosebud.ai/assets/basket_asset_03.png?QN8Y`);
-        this.load.image('block', `https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+04+Plaster+Grey.png`);
 
         displayProgressLoader.call(this);
     }
