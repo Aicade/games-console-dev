@@ -1,29 +1,41 @@
 {
-    "description": "In Berlin Wall Breaker, players take control of a cannon to aim and shoot at the right time to break down the Berlin Wall. The gameplay is focused on precision and timing to progress through the levels.",
-    "deviceOrientation": "portrait",
-    "imageLoader": {
-        "background": "background",
-        "player": "player",
-        "enemy": "enemy",
-        "platform": "platform"
-    },
-    "instructions": "Instructions:1. Tap to shoot. 2. Destroy all obstacles.",
-    "orientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
-    },
-    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
-    "phaserVersion": "3.80.1",
-    "soundsLoader": {
-        "background": "background",
+  "title": "CannonBalls",
+  "description": "Tap to throw harpoon",
+  "instructions": "Tap to throw harpoon.",
+  "deviceOrientation": "landscape",
+  "imageLoader": {
+    "background": "background",
+    "player": "player",
+    "collectible": "collectible",
+    "avoidable": "avoidable",
+    "projectile": "projectile"
+  },
+  "soundsLoader": {
+    "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-13.mp3",
     "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
-    "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_2.mp3"
-        },
-    "title": "Cannon Ball"
+    "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
+    "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
   }
+}
