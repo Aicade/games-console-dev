@@ -205,7 +205,7 @@ class GameScene extends Phaser.Scene {
                 this.sounds.damage.play();
                 this.enemyPositionIndex = Math.min(this.enemyPositionIndex + 1, this.carPositions.length - 1);
                 this.tweens.add({
-                    targets: this.enemyCar,
+                    targets: this.enemy,
                     x: this.carPositions[this.enemyPositionIndex],
                     duration: 500,
                     ease: 'Linear',
@@ -228,7 +228,7 @@ class GameScene extends Phaser.Scene {
                 this.sounds.damage.play();
                 this.enemyPositionIndex = Math.min(this.enemyPositionIndex + 1, this.carPositions.length - 1);
                 this.tweens.add({
-                    targets: this.enemyCar,
+                    targets: this.enemy,
                     x: this.carPositions[this.enemyPositionIndex],
                     duration: 500,
                     ease: 'Linear',
@@ -269,8 +269,8 @@ class GameScene extends Phaser.Scene {
                 this.raceEnded = true;
                 this.raceStarted = false;
                 this.tweens.add({
-                    targets: this.enemyCar,
-                    x: this.width + this.enemyCar.width,
+                    targets: this.enemy,
+                    x: this.width + this.enemy.width,
                     duration: 1000,
                     ease: 'Linear',
                     onComplete: () => {
@@ -281,8 +281,8 @@ class GameScene extends Phaser.Scene {
                 this.raceEnded = true;
                 this.raceStarted = false;
                 this.tweens.add({
-                    targets: this.playerCar,
-                    x: this.width + this.playerCar.width,
+                    targets: this.player,
+                    x: this.width + this.player.width,
                     duration: 1000,
                     ease: 'Linear',
                     onComplete: () => {
@@ -297,13 +297,13 @@ class GameScene extends Phaser.Scene {
             this.finishLine.setAlpha(1);
             this.finishLine.body.setVelocityX(-300);
 
-            this.physics.world.overlap(this.finishLine, this.playerCar, () => {
+            this.physics.world.overlap(this.finishLine, this.player, () => {
                 this.raceEnded = true;
                 this.finishLine.body.setVelocityX(0);
                 this.raceStarted = false;
                 this.tweens.add({
-                    targets: this.playerCar,
-                    x: this.width + this.playerCar.width,
+                    targets: this.player,
+                    x: this.width + this.player.width,
                     duration: 1000,
                     ease: 'Linear',
                     onComplete: () => {
@@ -311,12 +311,12 @@ class GameScene extends Phaser.Scene {
                     }
                 });
             });
-            this.physics.world.overlap(this.finishLine, this.enemyCar, () => {
+            this.physics.world.overlap(this.finishLine, this.enemy, () => {
                 this.raceEnded = true;
                 this.finishLine.body.setVelocityX(0);
                 this.tweens.add({
-                    targets: this.enemyCar,
-                    x: this.width + this.enemyCar.width,
+                    targets: this.enemy,
+                    x: this.width + this.enemy.width,
                     duration: 1000,
                     ease: 'Linear',
                     onComplete: () => {
@@ -427,12 +427,12 @@ function gameSceneCreate(game) {
     game.background1.setScale(game.width / game.background1.width, game.height / game.background1.height);
 
     // Cars (with physics)
-    game.playerCar = game.physics.add.image(200, game.height - 80, 'playerCar').setScale(0.8).setDepth(2);
-    game.playerCar.body.setSize(game.playerCar.width * 0.8, game.playerCar.height * 0.8);
-    game.playerCar.body.setImmovable(true);
-    game.enemyCar = game.physics.add.image(200, game.height - 250, 'enemyCar').setScale(0.5).setDepth(1);
-    game.enemyCar.body.setSize(game.enemyCar.width * 0.8, game.enemyCar.height * 0.8);
-    game.enemyCar.body.setImmovable(true);
+    game.player = game.physics.add.image(200, game.height - 80, 'player').setScale(0.8).setDepth(2);
+    game.player.body.setSize(game.player.width * 0.8, game.player.height * 0.8);
+    game.player.body.setImmovable(true);
+    game.enemy = game.physics.add.image(200, game.height - 250, 'enemy').setScale(0.5).setDepth(1);
+    game.enemy.body.setSize(game.enemy.width * 0.8, game.enemy.height * 0.8);
+    game.enemy.body.setImmovable(true);
 
     // Finish line (with physics)
     game.finishLine = game.add.rectangle(game.width, 0, 4, game.height, 0x00ff00).setOrigin(0, 0).setDepth(3).setAlpha(0);
@@ -596,7 +596,7 @@ function gameSceneCreate(game) {
             game.sounds.damage.play();
             game.enemyPositionIndex = Math.min(game.enemyPositionIndex + 1, game.carPositions.length - 1);
             game.tweens.add({
-                targets: game.enemyCar,
+                targets: game.enemy,
                 x: game.carPositions[game.enemyPositionIndex],
                 duration: 500,
                 ease: 'Linear',
@@ -775,7 +775,7 @@ function handleGearShift(game) {
         game.vfx.shakeCamera(100, 0.01);
         game.enemyPositionIndex = Math.min(game.enemyPositionIndex + 1, game.carPositions.length - 1);
         game.tweens.add({
-            targets: game.enemyCar,
+            targets: game.enemy,
             x: game.carPositions[game.enemyPositionIndex],
             duration: 500,
             ease: 'Linear',
@@ -801,7 +801,7 @@ function handleGearShift(game) {
         game.sounds.damage.play();
         game.enemyPositionIndex = Math.min(game.enemyPositionIndex + 1, game.carPositions.length - 1);
         game.tweens.add({
-            targets: game.enemyCar,
+            targets: game.enemy,
             x: game.carPositions[game.enemyPositionIndex],
             duration: 500,
             ease: 'Linear',
@@ -827,7 +827,7 @@ function handleGearShift(game) {
         game.sounds.success.play();
         game.playerPositionIndex = Math.min(game.playerPositionIndex + 1, game.carPositions.length - 1);
         game.tweens.add({
-            targets: game.playerCar,
+            targets: game.player,
             x: game.carPositions[game.playerPositionIndex],
             duration: 500,
             ease: 'Linear',
@@ -857,7 +857,7 @@ function handleGearShift(game) {
         game.sounds.damage.play();
         game.enemyPositionIndex = Math.min(game.enemyPositionIndex + 1, game.carPositions.length - 1);
         game.tweens.add({
-            targets: game.enemyCar,
+            targets: game.enemy,
             x: game.carPositions[game.enemyPositionIndex],
             duration: 500,
             ease: 'Linear',
