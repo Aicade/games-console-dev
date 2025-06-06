@@ -4,11 +4,9 @@
   "instructions": "Instructions: 1. Avoid enemies.",
   "deviceOrientation": "portrait",
   "imageLoader": {
-    "background": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/image_0_wallpaper_background.webp",
-    "player": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/image_1_player.webp",
-    "enemy": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/image_2_enemy.webp",
-    "new_asset_4": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/images/new_asset_4.png",
-    "new_asset_5": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/4aBPjFBOdalPhblh/assets/images/new_asset_5.png"
+    "background": "background",
+    "player": "player",
+    "enemy": "enemy"
   },
   "soundsLoader": {
     "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-10.mp3",
@@ -37,5 +35,20 @@
       "height": 1280,
       "width": 720
     }
+  },
+  "libLoader": {
+    "white_pawn": "https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg",
+    "white_rook": "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg",
+    "white_knight": "https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg",
+    "white_bishop": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg",
+    "white_queen": "https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg",
+    "white_king": "https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg",
+    "black_pawn": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg",
+    "black_rook": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg",
+    "black_knight": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg",
+    "black_bishop": "https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg",
+    "black_queen": "https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg",
+    "black_king": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg",
+    "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
   }
 }

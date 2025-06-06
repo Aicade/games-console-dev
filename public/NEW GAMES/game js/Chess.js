@@ -42,21 +42,15 @@ class ChessScene extends Phaser.Scene {
         this.isComputerPlaying = true; // Auto-play black moves using chess-bot
     }
     preload() {
-        // Load chess piece images
-        this.load.image('white_pawn', 'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg');
-        this.load.image('white_rook', 'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg');
-        this.load.image('white_knight', 'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg');
-        this.load.image('white_bishop', 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg');
-        this.load.image('white_queen', 'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg');
-        this.load.image('white_king', 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg');
-        
-        this.load.image('black_pawn', 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg');
-        this.load.image('black_rook', 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg');
-        this.load.image('black_knight', 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg');
-        this.load.image('black_bishop', 'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg');
-        this.load.image('black_queen', 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg');
-        this.load.image('black_king', 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg');
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        for (const key in _CONFIG.imageLoader) {
+            this.load.image(key, _CONFIG.imageLoader[key]);
+        }
+        for (const key in _CONFIG.soundsLoader) {
+            this.load.audio(key, _CONFIG.soundsLoader[key]);
+        }
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
         
         displayProgressLoader.call(this);
     }
