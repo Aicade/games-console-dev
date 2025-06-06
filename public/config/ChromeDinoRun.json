@@ -1,11 +1,16 @@
 {
     "description": "A horizontal side-scroller running game",
     "deviceOrientation": "landscape",
+    "libLoader":{
+        "heart":"https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png",
+        "pauseButton":"https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+
+    },
     "imageLoader": {
-        "background": "public/assets/background_1.png",
-        "player": "public/assets/elon.png",
-        "avoidable": "public/assets/enemy_1.png",
-        "platform": "public/assets/platform_1.png"
+        "background": "background",
+        "player": "player",
+        "avoidable": "avoidable",
+        "platform": "platform"
     },
     "instructions": "Instructions: 1. Press Space/Tap to jump 2. Avoid obstacles",
     "orientationSizes": {
