@@ -5,6 +5,10 @@
     "imageLoader": {
         "background": "background"
     },
+    "libLoader" : {
+        "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png",
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+    },
     "instructions": "Instructions: 1. Tap on correct OR incorrect option.",
     "deviceOrientationSizes": {
         "landscape": {
