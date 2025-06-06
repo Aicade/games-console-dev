@@ -2,11 +2,24 @@
     "description": "Reaction game.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "public/assets/background_1.png",
-        "player": "public/assets/player_1.png",
-        "collectible": "public/assets/collectible_1.png",
+        "background": "background",
+        "player": "player",
+        "collectible": "collectible",
         "coin": "public/assets/dollar.png"
     },
+    "atlasLoader": {
+    "brakePedal": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/nCHTvXMyqtIdO4kH/assets/images/breakes.png?t=1742286073193",
+      "atlasURL": "https://aicade-ui-assets.s3.amazonaws.com/nishchal/games/breaks/history/json/dzb89wXm9WWT.json"
+    },
+    "gasPedal": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/nCHTvXMyqtIdO4kH/assets/images/gas.png?t=1742286021661",
+      "atlasURL": "https://aicade-ui-assets.s3.amazonaws.com/nishchal/games/gas/history/json/srC4LL1aAAPy.json"
+    }
+  },
+  "libLoader":{
+    "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+  },    
     "instructions": "Instructions: 1.Tap to destory.",
     "deviceOrientationSizes": {
         "landscape": {

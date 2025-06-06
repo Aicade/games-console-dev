@@ -47,9 +47,13 @@ class GameScene extends Phaser.Scene {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
         
-        this.load.atlas('brakePedal', 'https://aicade-user-store.s3.amazonaws.com/6994335331/games/nCHTvXMyqtIdO4kH/assets/images/breakes.png?t=1742286073193', 'https://aicade-ui-assets.s3.amazonaws.com/nishchal/games/breaks/history/json/dzb89wXm9WWT.json');
-        this.load.atlas('gasPedal', 'https://aicade-user-store.s3.amazonaws.com/6994335331/games/nCHTvXMyqtIdO4kH/assets/images/gas.png?t=1742286021661', 'https://aicade-ui-assets.s3.amazonaws.com/nishchal/games/gas/history/json/srC4LL1aAAPy.json');
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+       for (const key in _CONFIG.atlasLoader) {
+        const atlas = _CONFIG.atlasLoader[key];
+        this.load.atlas(key, atlas.textureURL, atlas.atlasURL);
+        }
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
 
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
