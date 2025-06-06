@@ -1,11 +1,15 @@
 {
     "description": "A game where you have to slice the rope at the right time.",
     "deviceOrientation": "portrait",
+    "libLoader":{
+        "pauseButton":"https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+
+    },
     "imageLoader": {
-        "background": "public/assets/background_3.png",
-        "platform": "public/assets/platform_1.png",
-        "player": "public/assets/player_1.png",
-        "projectile": "public/assets/projectile_1.png"
+        "background": "background",
+        "platform": "platform",
+        "player": "player",
+        "projectile": "projectile"
     },
     "instructions": "Instructions: 1. Swipe to slice the rope. 2. Make the player reach the goal.",
     "deviceOrientationSizes": {
