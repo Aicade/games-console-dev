@@ -1,6 +1,11 @@
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
+        this.colors = [
+            0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff,
+            0x00ffff, 0xffa500, 0x800080, 0x008000, 0x654321,
+            0x000000, 0xffffff
+        ];
     }
 
     preload() {
@@ -13,14 +18,11 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
-
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
         
-        this.colors = [
-            0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff,
-            0x00ffff, 0xffa500, 0x800080, 0x008000, 0x654321,
-            0x000000, 0xffffff
-        ];
+        
 
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + 'pix.png', fontBaseURL + 'pix.xml');
