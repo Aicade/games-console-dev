@@ -5,9 +5,13 @@
     "imageLoader": {
         "background": "background",
         "player": "player",
-        "collectible": "collectible",
         "collectible_1": "collectible_1",
+        "collectible_2": "collectible_2",
         "avoidable": "avoidable"
+    },
+    "libLoader": { 
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+        "pillar" : "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png"
     },
     "instructions": "Instructions: 1. Use ARROW keys to move.",
     "deviceOrientationSizes": {
