@@ -6,8 +6,8 @@
     "imageLoader": {
       "background": "background",
       "platform": "platform",
-      "player": "player_face",
-      "enemy": "enemy_face"  
+      "player": "player",
+      "enemy": "enemy"  
     },
     "soundsLoader": {
       "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/8-bit-loop-music-290770_9ac77b8a-b9b6-493c-a304-77486aeaf2ce.mp3?t=1748247086017",
