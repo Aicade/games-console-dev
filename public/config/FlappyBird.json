@@ -1,10 +1,15 @@
 {
-    "description": "Reaction and survival game.",
+    "description": "Tap and jump",
     "deviceOrientation": "portrait",
+    "libLoader":{
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+        "pillar":"https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png"
+
+    },
     "imageLoader": {
-        "background": "public/assets/background_1.png",
-        "platform": "public/assets/platform_1.png",
-        "player": "public/assets/player_1.png"
+        "background": "background",
+        "platform": "platform",
+        "player": "player"
     },
     "instructions": "Instructions: 1. Use SPACE or touch to make the player jump. 2. Avoid touching the avoidables or ground.",
     "orientationSizes": {

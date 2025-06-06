@@ -28,9 +28,16 @@ const gameConstants = {
     backgroundScrollSpeed: 0.5 // Background scrolls slower than foreground for parallax effect
 };
 
-// Preload function for GameScene - keeping original
-function gameScenePreload(scene) {
-    for (const key in _CONFIG.imageLoader) {
+
+
+// Game Scene
+class GameScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'GameScene' });
+    }
+
+    preload() {
+         for (const key in _CONFIG.imageLoader) {
         scene.load.image(key, _CONFIG.imageLoader[key]);
     }
 
@@ -38,8 +45,7 @@ function gameScenePreload(scene) {
         scene.load.audio(key, _CONFIG.soundsLoader[key]);
     }
 
-    scene.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-    scene.load.image("pillar", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png");
+    
     
     // Add spritesheet for wing animation (if available)
     if (_CONFIG.imageLoader.playerSpritesheet) {
@@ -56,16 +62,6 @@ function gameScenePreload(scene) {
     scene.load.on('loaderror', (file) => {
         console.error('Error loading asset:', file.key);
     });
-}
-
-// Game Scene
-class GameScene extends Phaser.Scene {
-    constructor() {
-        super({ key: 'GameScene' });
-    }
-
-    preload() {
-        gameScenePreload(this);
         displayProgressLoader.call(this);
         addEventListenersPhaser.bind(this)();
     }
