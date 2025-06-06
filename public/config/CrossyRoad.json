@@ -1,28 +1,52 @@
 {
-    "description": "Hold to move your player forward, avoid obstacles and reach your destination.",
-    "deviceOrientation": "landscape",
-    "imageLoader": {
-        "background": "background",
-        "player": "player",
-        "enemy": "enemy"
+  "title": "Crossy Road",
+  "description": "Hold to move your player forward, avoid obstacles and reach your destination.",
+  "instructions": "Use arrow keys to move up, down, left, and right.",
+  "deviceOrientation": "landscape",
+  "imageLoader": {
+    "background": "background",
+    "player": "player",
+    "enemy": "enemy",
+    "collectible": "collectible"
+  },
+  "soundsLoader": {
+    "bg": "https://files.catbox.moe/psj9yf.mp3",
+    "lose": "https://files.catbox.moe/skrenm.mp3",
+    "collect": "https://files.catbox.moe/psj9yf.mp3"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "instructions": "Use arrow keys to move up, down, left, and right.",
-    "orientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
-    "phaserVersion": "3.80.1",
-    "soundsLoader": {
-        "background": "background",
-        "lose": "https://files.catbox.moe/skrenm.mp3",
-        "collect": "https://files.catbox.moe/psj9yf.mp3"
-    },
-    "title": "Crossy Road"
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "mobile_portrait": false,
+  "libLoader": {
+    "cave_ground": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png",
+    "bridge_mid": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Wall/s2+greenish+tile+horizontal.png",
+    "bridge_mid_v": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Wall/s2+greenish+tile+vertical.png",
+    "next_level": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/arrow.png",
+    "bomb": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/Bomb_FNPIB.png?t=1743096817209",
+    "hand": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/KgUw0B1xxrz13Vl2/assets/images/newAsset_14.png?t=1743944513822",
+    "gun": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/assets/image_2_player.webp",
+    "rpg": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/Bomb_FNPIB.png?t=1743096817209",
+    "gunButton": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/assets/image_2_player.webp",
+    "rpgButton": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/ZVCvos4iEH44XG5X/assets/images/Bomb_FNPIB.png?t=1743096817209"
+  }
 }
