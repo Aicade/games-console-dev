@@ -21,21 +21,23 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
         }
-        // NOTE: We removed the external star asset load.
         
         // Load sounds from JSON config
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
-        // Load the star sound.
-        this.load.audio('starSound', 'https://files.catbox.moe/9wqm2a.mp3');
+
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
+      
         
         // Load bitmap font for UI
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
         // Load pause button asset from base code
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+       
         
         displayProgressLoader.call(this);
     }
@@ -245,7 +247,7 @@ this.progressBarFill.fillRoundedRect(
         });
         
 // Grid Setup: 8 columns x 7 rows with fixed tile size (80).
-this.tileTypes = ['candy_1', 'candy_2', 'candy_3'];
+this.tileTypes = ['collectible_1', 'collectible_2', 'collectible_3'];
 this.numCols = 8;
 this.numRows = 7;
 this.tileWidth = 80;
@@ -831,11 +833,11 @@ displayMatchMessage(message) {
         for (let group of matches) {
             if (group.length > 0) {
                 let type = group[0].tileType;
-                if (type === 'candy_1' && this.sounds.collect1) {
+                if (type === 'collectible_1' && this.sounds.collect1) {
                     this.sounds.collect1.play();
-                } else if (type === 'candy_2' && this.sounds.collect2) {
+                } else if (type === 'collectible_2' && this.sounds.collect2) {
                     this.sounds.collect2.play();
-                } else if (type === 'candy_3' && this.sounds.collect3) {
+                } else if (type === 'collectible_3' && this.sounds.collect3) {
                     this.sounds.collect3.play();
                 }
             }
