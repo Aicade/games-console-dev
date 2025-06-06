@@ -5,9 +5,14 @@
         "background": "background",
         "player": "player",
         "collectible": "collectible",
-        "avoidable": "enemy",
+        "avoidable": "avoidable",
         "projectile": "projectile",
         "platform": "platform"
+    },
+    "libLoader": {
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+        "pillar" : "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png",
+        "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png"
     },
     "instructions": "Tap to throw harpoon.",
     "orientationSizes": {
