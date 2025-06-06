@@ -1,0 +1,64 @@
+{
+  "title": "ShooterInMaze",
+  "description": "<p>shooter in maze is a game similar to hunter assassin</p>",
+  "instructions": "Instructions:1. Use UP arrow to jump & RIGHT arrow to throw 2. ",
+  "deviceOrientation": "landscape",
+  "imageLoader": {
+    "background": "background",
+    "projectile": "projectile",
+    "collectible": "collectible",
+    "player": "player",
+    "enemy": "enemy",
+    "enemy_1": "enemy_1",
+    "enemy_2": "enemy_2"
+  },
+  "soundsLoader": {
+    "sfx_powerup": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/item-pick-up-38258_44dffda3-8bf5-41bb-bfee-d1555406fc00.mp3?t=1748921942619",
+    "sfx_click": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/pick-up-sfx-38516_e82cf833-bdaf-40ed-8811-04bef16762ac.mp3?t=1748921942701",
+    "sfx_shoot_basic": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_28e936b6-fbfd-4c5b-b931-852b46940895.mp3?t=1748922688391",
+    "sfx_shoot_shotgun": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/072781_bullet-39719_bf59dfbf-7388-44ca-ac83-9c11c6871edf.mp3?t=1748921942561",
+    "sfx_shoot_laser": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_6123f8a7-b66c-4305-904c-65a9f3bf1ba5.mp3?t=1748923728975",
+    "sfx_enemy_die": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_2e265c2f-bf60-4036-95fa-1226dbd227bd.mp3?t=1748924922816",
+    "sfx_enemy_hit": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_9e699e5d-79ec-497d-b1c4-cb6a0adfe724.mp3?t=1748924979877",
+    "sfx_player_hit": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_3945f9e7-044a-4d4c-8a98-edbd7e51fc8a.mp3?t=1748927251341"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "libLoader": {
+    "background_cave": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/U7dAM16tXVey5Sp3/assets/images/background_cave.png?t=1748667062132",
+    "background_volcano": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/background_volcano.png?t=1748683161833",
+    "enemyBullet": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/U7dAM16tXVey5Sp3/assets/images/playerBullet.png?t=1748667149519",
+    "wall_cave": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/U7dAM16tXVey5Sp3/assets/images/wall_cave.png?t=1748667199487",
+    "wall_bush": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/wall_bush.png?t=1748670608576",
+    "wall_lava": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/wall_lava.png?t=1748670618460",
+    "pause": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/pause.png?t=1748689018091",
+    "Cover_image": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/Cover_image.png?t=1748689106622",
+    "basic_gun": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/basic_gun.png?t=1748840546149",
+    "shotgun": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/shotgun.png?t=1748840634329",
+    "laser": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/laser.png?t=1748840587604",
+    "power_freeze": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/power_freeze.png?t=1748854799770",
+    "power_damage": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/power_damage.png?t=1748854846569",
+    "power_speed": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/power_speed.png?t=1748859181379",
+    "power_area": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/power_area.png?t=1748884215703"
+  }
+}
