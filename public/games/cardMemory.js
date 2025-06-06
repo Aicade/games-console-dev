@@ -17,9 +17,10 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
-
-        this.load.image('heart', 'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png');
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
+        
         this.load.bitmapFont('pixelfont',
             'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.png',
             'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.xml');
