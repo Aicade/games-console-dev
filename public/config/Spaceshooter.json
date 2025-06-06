@@ -4,16 +4,21 @@
     "instructions": "Instructions: 1. Use arrow keys OR joystick to move.2. Use Spacebar/button to shoot.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-      "background": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/history/iteration/69OykoSqlVzz.webp",
-      "player": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/player.png?t=1743963882420",
-      "enemy": "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/enemy.png?t=1743963891231",
-      "projectile": "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/history/iteration/Z349VVVuWZFW.webp"
+      "background": "background",
+      "player": "player",
+      "enemy": "enemy",
+      "projectile": "projectile"
     },
     "soundsLoader": {
       "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/34-music-menu-101soundboards_cc998252-f8e6-4f32-bd24-fd7704a1cb92.mp3?t=1743319454827",
       "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/blast.mp3",
       "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_2.mp3",
       "upgrade": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3"
+    },
+    "libLoader":{
+      "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png",
+      "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+
     },
     "deviceOrientationSizes": {
       "landscape": {
