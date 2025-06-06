@@ -375,63 +375,29 @@ class GameScene extends Phaser.Scene {
         this.width = this.game.config.width;
         this.height = this.game.config.height;
 
-        this.load.atlas('fighterAtlas', _CONFIG.imageLoader['spritesheet'], 'https://files.catbox.moe/x53w7u.json');
-        this.load.atlas('kickAtlas', _CONFIG.imageLoader['kickSpritesheet'], 'https://files.catbox.moe/nmfzpp.json');
-        this.load.atlas('punchAtlas', _CONFIG.imageLoader['punchSpritesheet'], 'https://files.catbox.moe/f3xvrx.json');
-        this.load.image('simpleDodgeSprite', _CONFIG.imageLoader['simpleDodgeSprite']);
-        
-        this.load.atlas('damageAtlas', 'https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2821%29.png?t=1745564404529', {
-            "frames": {
-                "image_40-removebg-preview.png": {
-                    "frame": { "x": 1, "y": 1, "w": 65, "h": 96 },
-                    "rotated": false,
-                    "trimmed": false,
-                    "spriteSourceSize": { "x": 0, "y": 0, "w": 65, "h": 96 },
-                    "sourceSize": { "w": 65, "h": 96 }
-                },
-                "image_41-removebg-preview.png": {
-                    "frame": { "x": 68, "y": 1, "w": 65, "h": 98 },
-                    "rotated": false,
-                    "trimmed": false,
-                    "spriteSourceSize": { "x": 0, "y": 0, "w": 65, "h": 98 },
-                    "sourceSize": { "w": 65, "h": 98 }
-                }
-            },
-            "meta": {
-                "app": "http://www.codeandweb.com/texturepacker",
-                "version": "1.0",
-                "image": "spritesheet(18).png",
-                "format": "RGBA8888",
-                "size": { "w": 134, "h": 100 },
-                "scale": "1"
-            }
-        });
-        this.load.atlas('punchEffectAtlas', 'https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2822%29.png?t=1746119507007', {
-            "frames": {
-                "image_0(17).png": { "frame": { "x": 1, "y": 1, "w": 127, "h": 122 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 127, "h": 122 }, "sourceSize": { "w": 127, "h": 122 } },
-                "image_1(17).png": { "frame": { "x": 130, "y": 1, "w": 163, "h": 204 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 163, "h": 204 }, "sourceSize": { "w": 163, "h": 204 } },
-                "image_2(13).png": { "frame": { "x": 1, "y": 207, "w": 184, "h": 195 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 184, "h": 195 }, "sourceSize": { "w": 184, "h": 195 } },
-                "image_3(10).png": { "frame": { "x": 187, "y": 207, "w": 180, "h": 186 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 180, "h": 186 }, "sourceSize": { "w": 180, "h": 186 } },
-                "image_4(10).png": { "frame": { "x": 295, "y": 1, "w": 153, "h": 153 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 153, "h": 153 }, "sourceSize": { "w": 153, "h": 153 } },
-                "image_5(6).png": { "frame": { "x": 369, "y": 156, "w": 171, "h": 165 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 171, "h": 165 }, "sourceSize": { "w": 171, "h": 165 } }
-            },
-            "meta": {
-                "app": "http://www.codeandweb.com/texturepacker",
-                "version": "1.0",
-                "image": "spritesheet.png",
-                "format": "RGBA8888",
-                "size": { "w": 541, "h": 403 },
-                "scale": "1"
-            }
-        });
-
+        // Load images from config
         for (const key in _CONFIG.imageLoader) {
-            console.log(`Loading image: ${key} from ${_CONFIG.imageLoader[key]}`);
             this.load.image(key, _CONFIG.imageLoader[key]);
         }
+
+        // Load sounds from config
         for (const key in _CONFIG.soundsLoader) {
-            console.log(`Loading audio: ${key} from ${_CONFIG.soundsLoader[key]}`);
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
+        }
+
+        // Load library images from config
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
+
+        // Load atlases from config
+        for (const key in _CONFIG.atlasLoader) {
+            const atlas = _CONFIG.atlasLoader[key];
+            if (atlas.atlasURL) {
+                this.load.atlas(key, atlas.textureURL, atlas.atlasURL);
+            } else if (atlas.atlasData) {
+                this.load.atlas(key, atlas.textureURL, atlas.atlasData);
+            }
         }
 
         displayProgressLoader.call(this);

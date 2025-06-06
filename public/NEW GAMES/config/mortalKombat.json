@@ -26,12 +26,9 @@
     "libLoader":{
       "fighter1": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_13_1_-removebg-preview.png?t=1745510094953",
       "fighter2": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/fighter1_1.png?t=1745510130932",
-      "spritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2818%29.png?t=1745510570561",
       "dodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_92-removebg-preview.png?t=1745511297418",
       "punchDodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_91-removebg-preview.png?t=1745511993517",
       "simpleDodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_76-removebg-preview.png?t=1745523774776",
-      "kickSpritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2819%29.png?t=1745524147517",
-      "punchSpritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2820%29.png?t=1745527073194",
       "spritesheet(21)": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2821%29.png?t=1745564404529",
       "selectionscreen": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/741bed6ce4ae079f1dba7f77164419744f83f7e7.png?t=1746036333256",
       "spritesheet(22)": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2822%29.png?t=1746119507007",
@@ -42,6 +39,70 @@
       "rightButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/rightButton.png?t=1746185513591"
 
     },
+    "atlasLoader": {
+    "fighterAtlas": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2818%29.png?t=1745510570561",
+      "atlasURL": "https://files.catbox.moe/x53w7u.json"
+    },
+    "kickAtlas": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2819%29.png?t=1745524147517",
+      "atlasURL": "https://files.catbox.moe/nmfzpp.json"
+    },
+    "punchAtlas": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2820%29.png?t=1745527073194",
+      "atlasURL": "https://files.catbox.moe/f3xvrx.json"
+    },
+    "damageAtlas": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2821%29.png?t=1745564404529",
+      "atlasData": {
+        "frames": {
+          "image_40-removebg-preview.png": {
+            "frame": { "x": 1, "y": 1, "w": 65, "h": 96 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 65, "h": 96 },
+            "sourceSize": { "w": 65, "h": 96 }
+          },
+          "image_41-removebg-preview.png": {
+            "frame": { "x": 68, "y": 1, "w": 65, "h": 98 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 65, "h": 98 },
+            "sourceSize": { "w": 65, "h": 98 }
+          }
+        },
+        "meta": {
+          "app": "http://www.codeandweb.com/texturepacker",
+          "version": "1.0",
+          "image": "spritesheet(18).png",
+          "format": "RGBA8888",
+          "size": { "w": 134, "h": 100 },
+          "scale": "1"
+        }
+      }
+    },
+    "punchEffectAtlas": {
+      "textureURL": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2822%29.png?t=1746119507007",
+      "atlasData": {
+        "frames": {
+          "image_0(17).png": { "frame": { "x": 1, "y": 1, "w": 127, "h": 122 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 127, "h": 122 }, "sourceSize": { "w": 127, "h": 122 } },
+          "image_1(17).png": { "frame": { "x": 130, "y": 1, "w": 163, "h": 204 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 163, "h": 204 }, "sourceSize": { "w": 163, "h": 204 } },
+          "image_2(13).png": { "frame": { "x": 1, "y": 207, "w": 184, "h": 195 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 184, "h": 195 }, "sourceSize": { "w": 184, "h": 195 } },
+          "image_3(10).png": { "frame": { "x": 187, "y": 207, "w": 180, "h": 186 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 180, "h": 186 }, "sourceSize": { "w": 180, "h": 186 } },
+          "image_4(10).png": { "frame": { "x": 295, "y": 1, "w": 153, "h": 153 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 153, "h": 153 }, "sourceSize": { "w": 153, "h": 153 } },
+          "image_5(6).png": { "frame": { "x": 369, "y": 156, "w": 171, "h": 165 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 171, "h": 165 }, "sourceSize": { "w": 171, "h": 165 } }
+        },
+        "meta": {
+          "app": "http://www.codeandweb.com/texturepacker",
+          "version": "1.0",
+          "image": "spritesheet.png",
+          "format": "RGBA8888",
+          "size": { "w": 541, "h": 403 },
+          "scale": "1"
+        }
+      }
+    }
+  },
     "deviceOrientationSizes": {
       "landscape": {
         "height": 720,
