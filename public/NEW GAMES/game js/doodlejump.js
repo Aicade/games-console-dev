@@ -1,10 +1,10 @@
 // Touch Screen Controls Configuration
 const joystickEnabled = false; // Disabled as Doodle Jump only needs left/right
-const buttonEnabled = true;    // Buttons for left/right movement
-const hideButtons = true;      // Hide buttons on desktop
+const buttonEnabled = true;    
+const hideButtons = true;     
 var isMobile = false;
 
-// Button Plugin URL (Joystick not needed)
+
 const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
 
 // Game Scene
@@ -47,38 +47,34 @@ class GameScene extends Phaser.Scene {
     /** Load game assets */
     preload() {
         // Images
-        this.load.image("background", "https://media-hosting.imagekit.io/b05597d822ca443d/doodle%20jump%20bg.png?Expires=1838481515&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=YEdKXBGhyjeyKsL4Zk2jr0lm0ds05805WAQIgYpoVyERQ~q~nAHC4VTDyGunRgoAWgxaMRxuDn9ML7Dhjh~CURkleEmiwROvsiAqcVsbOrIx5cnOyp61Bt-Hyzt5fMSd09CrRbY9jLur1zhmN-1yoVNvdwr6Is7bnXwoxvXKUBC63r2W7GCEmA1OquXhJZE2As1uPkXLLyfzEZOptw0ShzOaQZAKrpXb1kRNED0vY5QGzyLfIcPOStZM4LfHaYQYDPEyJe7WI0twPa3AbZK-BwfuIE-UMgwm~72I0Oosh3jDMebaA2iv4wDvyvHGRWgBVIJSzWNPV~jtHmI43dNd5g__");
-        this.load.image("player", "https://media-hosting.imagekit.io/0031c94e870b496a/doodle%20player.png?Expires=1838481776&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Sfb6QaADXADnaKKB8fyatqV2pZSiDmr31yNQ1~DHeQeOyXbZu5vs3jme4B2~MOzL9wIuWY65r698BXIm~x94dwQmtZmlnrvC-lFuo9D-UrMsbyduUZ0rvKeQh3NfiwycCVKVoWb4CMrWbNYzA1omCRyWRDk9CgmTdy2ml5EqbBvSfWZTSkfaEE7Abgz7Hg0dO9NeBOkEeZSjiq45t5-ytxYM0IOT9FYsMXQegna~iTtZnyBBVAwRQb1yfpboCuttgLCkqNi0ekvebD0jpthRj92eHD-~B7qeaJHWmPXvhz3M02CXbZNZAZv0mqmoraPHghBdEm7u3XgndDS-l3J0ag__");
-        // Shooting player asset (for shooting animation)
-        this.load.image("playerShoot", "https://media-hosting.imagekit.io/d011f005d76147b9/doodle%20shoot-Photoroom.png?Expires=1838487463&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=vtxT36LnswSCm2w8hIfCUR4~s1ZtUVcTWJiyNFkjf2rT5qD3gDZgqLheBge0-~VD~GLM6WhgNUk5Dc8-~yc56JGIL~E~f0Vp0Fdj32SRqE5fZql-8SN3Y5-WZ0EuyRYYWQktbcsq6WrvBlBXwLDnvgPu0CpiZor31-Rh7THThDi-oeEjD6n5jaWh9Hep4krvRul9EE5IU8j0GBgpyWi63LEIawBoYj0L~DjB0fRJKU2IEbtvf5NCNXJMJCxVpcoNuLc1JTqe-aPGtIFImcMIppztRA00hq0p0pSv~kNchYNS8GqUXr0ybhDqDG5FGscoS6Ek2pjrv0TCPE8UuQcrNHayERTR3WE-1V1~Lj5zOQOKDc24O3Y3-aUY3IY7Rs9-TrvmChoh90I-Yd9fb3tZewLRRiNat8q0IW7X4ECTa3SMuMsy~jUqtPjPJCUCQyV3ghFzRwKIUQiWScNJJFGHoRrrjCgTrRf3silAPiMo8UDN-I2JnJdj06N8qzBM5m2iWvf4s4eY2adxs1L7F-2YXL17mOBWX3S2qoJqpWb56ApjT9Gbb~KvWLy8S4xZ8rh9PB18f1QEhw1Jus7ZVwaL1Kywo6rWUvNxaHcgmRK81Dr-N57GRPHKroWAw__");
-        this.load.image("platform", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233410.png?t=1743617599903");
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-        this.load.bitmapFont('pixelfont', "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.png", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.xml");
-        // Spring asset preload
-        this.load.image("spring", "https://media-hosting.imagekit.io/37dc26cf68b34417/doodle%20spring-Photoroom.png?Expires=1838483294&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=iFlchJbYKM610zgKXkwr-EgZIY4MyU~4FHpQNSrMxUxjA4nRs801Idr7txNfsDtOqZW~Ti2Zy~pcKYiAWOkNP7YRS4q8PnftXWUfmjLPSa-8e~RC75IDo3wwSRbvpvtWZfalEHL62fGMk5qITdz8WbqIrkiAYQpfnBYjdMre-i06TF0N6hNkI7NdieXRBjDvParwwB12S-LZeTiCT~cPX8s38lEIAWEnzYvwRdqlYfQGYjtlbcPZvYXS1fEI065IqZQKrmLVlJDp0VmXwFc5CutLbBVNC89KXYUPggiMbFeHKSxeXNT1C0iwgEcSDOBQe78lwj3FnYUsiMQ28MD0sA__");
-        // Crack asset preload (used for cracked platforms)
-        this.load.image("crack", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233422.png?t=1743617757767");
-        // Enemy asset preload
-        this.load.image("enemy", "https://media-hosting.imagekit.io/edf067be557a4ce8/doodle%20enemy-Photoroom.png?Expires=1838486361&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=EteowRmUAz0axmZI2KHXiRF1R0gcqUlGklhVAQk5h~KESqggfpPVyvGM~v8nR3bPgr8qFuAFz8l5vAvBN8hQUBRdIgIJhOi-DVTaxyrrckZur929BfFCeB~3kWE2elieydEK4cGcac13aJaE5yfvuGbRMxL1IMyweJN4rz-KXwJQNdAHvdTo~7-VMI7DBrOVoHkw4bqrs7l1NHftgx2fAfnTwfGvqsqcAcr0pvKWWLEvBOcR2KzblJhpu53LPZ9QriLkpW5D-~cS7H~AJkQuCvcrIEiySYtCXvqSFd2u7Z4853AVx8QxktBaIYafQn~4ExsUEoRlFJcZpZPc23V-XA__");
-        // NEW: Load jetpack asset for power-up (to spawn on platform)
-        this.load.image("jetpack", "https://media-hosting.imagekit.io/047fede0ca4e43b5/doodle_jetpack-removebg-preview.png?Expires=1838530428&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=DaaBGJRc~FBibzYTsmJZkGOtcNL6Ygwze-EboUo6NB25YGplSx3CGvyDZxeyN76VTWkf50J43LhB7tr4CMdNh4qdkGw4fjjfkdLlglpAYjy4XNUrgjzbYVB6peasAF7sHMB5qOERWmqxCSyMbwETZfiCfQhflpAl2y-J4fYCrRPrBXrPdyKmi8HMUWnNfa20K7qORYq0gEH6yV5kxpIZhqSlJvCA9v-klvXiQCHRL-7eeXGe2s5xnJJAdxjOl9MvpI839kCBcbg~MNpNlfJEC7pXwjnkFROdwv~8UaGXaOw3dKRgd9gpLyFns~L0x82NBc02QL-UcKkQsm0mGWqB1g__");
-        // NEW: Load jetpack player asset for when the power-up is active
-        this.load.image("jetpackPlayer", "https://media-hosting.imagekit.io/125ac29ce6844ab0/doodler%20jetpack.png?Expires=1838530428&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=kGLuGpVNS8GqUXr0ybhDqDG5FGscoS6Ek2pjrv0TCPE8UuQcrNHayERTR3WE-1V1~Lj5zOQOKDc24O3Y3-aUY3IY7Rs9-TrvmChoh90I-Yd9fb3tZewLRRiNat8q0IW7X4ECTa3SMuMsy~jUqtPjPJCUCQyV3ghFzRwKIUQiWScNJJFGHoRrrjCgTrRf3silAPiMo8UDN-I2JnJdj06N8qzBM5m2iWvf4s4eY2adxs1L7F-2YXL17mOBWX3S2qoJqpWb56ApjT9Gbb~KvWLy8S4xZ8rh9PB18f1QEhw1Jus7ZVwaL1Kywo6rWUvNxaHcgmRK81Dr-N57GRPHKroWAw__");
+        this.load.image("background", _CONFIG.imageLoader.background);
+        this.load.image("player", _CONFIG.imageLoader.player);
+        ;
+        this.load.image("platform", _CONFIG.imageLoader.platform);
+        
+        this.load.bitmapFont('pixelfont', _CONFIG.fontLoader.pixelfont.png, _CONFIG.fontLoader.pixelfont.xml);
+        
+       
+        this.load.image("enemy", _CONFIG.imageLoader.enemy);
+        this.load.image("collectible", _CONFIG.imageLoader.collectible);
+        
+
+        this.load.image("playerShoot", _CONFIG.libLoader.playerShooter); // Use playerShooter for shooting animation
+    this.load.image("spring", _CONFIG.libLoader.spring);
+    this.load.image("pauseButton", _CONFIG.libLoader.pauseButton);
+    this.load.image("crack", _CONFIG.libLoader.crack);
+    this.load.image("jetpackPlayer", _CONFIG.libLoader.jetpackPlayer);
 
         // Audio
-        this.load.audio("background", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Background_3cd80d47-33cf-4ca1-8c60-7a13793255ef.mp3?t=1744134167420"]);
-        this.load.audio("lose", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3"]);
-        this.load.audio("jump", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Jump_4e42502a-1765-49c5-95f5-4ef18300e806.mp3?t=1744132241323"]);
-        this.load.audio("collect", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3"]);
-        this.load.audio("success", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav"]);
-        // ── NEW SPRING SOUND ─────────────────────────────────────────────────────
-        this.load.audio("springSound", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Spring_b221b4e4-3300-4f8d-937a-17d16caf3646.mp3?t=1744134407165"]);
-        // ── NEW JETPACK SOUND ────────────────────────────────────────────────────
-        this.load.audio("jetpackSound", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/doodle%20jetpack_afccc19d-772e-4bbc-9b83-9cb716cac929.mp3?t=1744134665210"]);
-        // ── NEW CRACK PLATFORM SOUND ─────────────────────────────────────────────
-        this.load.audio("crackSound", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Platform%20Crack_c34b6a03-57a7-4e68-aed4-f52493f84832.mp3?t=1744135032021"]);
-        // ── NEW ENEMY SOUND ──────────────────────────────────────────────────────
-        this.load.audio("enemySound", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Enemy_dfe86aed-13ab-4645-b3b4-2c1232a14e67.mp3?t=1744135326035"]);
+        this.load.audio("background", [_CONFIG.soundsLoader.background]);
+        this.load.audio("lose", [_CONFIG.soundsLoader.lose]);
+        this.load.audio("jump", [_CONFIG.soundsLoader.jump]);
+        this.load.audio("collect", [_CONFIG.soundsLoader.collect]);
+        this.load.audio("success", [_CONFIG.soundsLoader.success]);
+        this.load.audio("springSound", [_CONFIG.soundsLoader.springSound]);
+        this.load.audio("jetpackSound", [_CONFIG.soundsLoader.jetpackSound]);
+        this.load.audio("crackSound", [_CONFIG.soundsLoader.crackSound]);
+        this.load.audio("enemySound", [_CONFIG.soundsLoader.enemySound]);
 
         // Load button plugin for mobile controls
         if (buttonEnabled) {
@@ -126,13 +122,9 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.soundsLoader) {
             this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
         }
-        // ── ADD NEW SPRING SOUND INSTANCE ─────────────────────────────────────────
         this.sounds.springSound = this.sound.add('springSound', { loop: false, volume: 0.8 });
-        // ── ADD NEW JETPACK SOUND INSTANCE ────────────────────────────────────────
         this.sounds.jetpackSound = this.sound.add('jetpackSound', { loop: true, volume: 0.6 });
-        // ── ADD NEW CRACK PLATFORM SOUND INSTANCE ─────────────────────────────────
         this.sounds.crackSound = this.sound.add('crackSound', { loop: false, volume: 0.8 });
-        // ── ADD NEW ENEMY SOUND INSTANCE ───────────────────────────────────────────
         this.sounds.enemySound = this.sound.add('enemySound', { loop: true, volume: 0.5 });
 
         isMobile = !this.sys.game.device.os.desktop;
@@ -150,7 +142,7 @@ class GameScene extends Phaser.Scene {
             .setOrigin(0, 0)
             .setScrollFactor(0);
 
-        // Create a graphics object for debugging hitboxes (debug drawing removed)
+        // Create a graphics object for debugging hitboxes
         this.debugGraphics = this.add.graphics();
 
         // Spawn the first platform at the bottom middle
@@ -172,7 +164,7 @@ class GameScene extends Phaser.Scene {
         // Store the player's default physics body dimensions for later resetting
         this.defaultBodyWidth = this.player.body.width;
         this.defaultBodyHeight = this.player.body.height;
-        // Define desired jetpack hitbox dimensions manually (adjust as needed)
+        // Define desired jetpack hitbox dimensions manually
         this.jetpackBodyWidth = this.defaultBodyWidth * 0.3;
         this.jetpackBodyHeight = this.defaultBodyHeight * 0.3;
 
@@ -246,24 +238,21 @@ class GameScene extends Phaser.Scene {
 
         // Score UI: add the score text and create a bold, translucent box around it.
         this.scoreText = this.add.bitmapText(10, 10, 'pixelfont', 'Score: 0', 28).setScrollFactor(0);
-        // Create a graphics object for the box
         const padding = 10;
-        const offsetX = 20;  // Shift the box 20 pixels to the right
-        const offsetY = 15;  // Shift the box 15 pixels downward
-        const extraWidth = 100;  // Increase the width from the right side by 10 pixels
+        const offsetX = 20;
+        const offsetY = 15;
+        const extraWidth = 100;
         const bounds = this.scoreText.getTextBounds();
         this.scoreBox = this.add.graphics();
-        // Draw an opaque black border (thickness 6) and a translucent black fill (alpha 0.5)
-        this.scoreBox.lineStyle(6, 0x000000, 1);  // Opaque black boundary
+        this.scoreBox.lineStyle(6, 0x000000, 1);
         this.scoreBox.fillStyle(0x000000, 0.5);
         this.scoreBox.strokeRect(bounds.local.x - padding + offsetX, bounds.local.y - padding + offsetY, bounds.local.width + padding * 2 + extraWidth, bounds.local.height + padding * 2);
         this.scoreBox.fillRect(bounds.local.x - padding + offsetX, bounds.local.y - padding + offsetY, bounds.local.width + padding * 2 + extraWidth, bounds.local.height + padding * 2);
-        // Ensure the box does not scroll with the camera
         this.scoreBox.setScrollFactor(0);
 
         this.startingY = this.player.y;
 
-        // Pause button – triggers the SDK overlay
+        // Pause button
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
         this.pauseButton = this.add.sprite(this.game.config.width - 60, 60, "pauseButton")
             .setOrigin(0.5, 0.5)
@@ -272,14 +261,14 @@ class GameScene extends Phaser.Scene {
             .setScrollFactor(0);
         this.pauseButton.on('pointerdown', () => this.pauseGame());
 
-        // Collision overlap for platforms (normal jump boost or cracked behavior)
+        // Collision overlap for platforms
         this.physics.add.overlap(this.player, this.platforms, this.checkPlatformCollision, null, this);
 
         // Mobile controls
         this.createMobileButtons();
         this.input.keyboard.disableGlobalCapture();
 
-        // IMPORTANT: Attach the SDK event listeners so that resume/restart/destroy work.
+        // Attach SDK event listeners
         if (typeof addEventListenersPhaser === "function") {
             addEventListenersPhaser.call(this);
         }
@@ -399,7 +388,7 @@ class GameScene extends Phaser.Scene {
             this.gameOver();
         }
 
-        // ── UPDATE ENEMY SOUND BASED ON VISIBILITY ───────────────────────────────
+        // Update enemy sound based on visibility
         let enemyVisible = false;
         this.enemies.children.iterate((enemy) => {
             if (enemy.active) {
@@ -445,9 +434,7 @@ class GameScene extends Phaser.Scene {
             player.setVelocityY(-1000);
             this.sounds.jump.setVolume(1.5).setLoop(false).play();
             if (platform.isCracked) {
-                // ── PLAY CRACK PLATFORM SOUND ───────────────────────────────────
                 this.sounds.crackSound.play();
-
                 if (platform.crackSprite) {
                     this.tweens.add({
                         targets: platform.crackSprite,
@@ -477,7 +464,6 @@ class GameScene extends Phaser.Scene {
         if (player.body.velocity.y > 0 && player.y < spring.y) {
             player.setVelocityY(-2000);
             spring.destroy();
-            // ── PLAY DEDICATED SPRING SOUND ─────────────────────────────────────
             this.sounds.springSound.play();
         }
     }
@@ -497,9 +483,7 @@ class GameScene extends Phaser.Scene {
     collectJetpack(player, jetpack) {
         jetpack.destroy();
         this.jetpackActive = true;
-        // ── PLAY JETPACK LOOPING SOUND ───────────────────────────────────────
         this.sounds.jetpackSound.play();
-
         this.player.setTexture('jetpackPlayer');
         this.player.setScale(0.4);
         this.player.body.setSize(this.jetpackBodyWidth, this.jetpackBodyHeight, true);
@@ -509,9 +493,7 @@ class GameScene extends Phaser.Scene {
             delay: 5000,
             callback: () => {
                 this.jetpackActive = false;
-                // ── STOP JETPACK SOUND WHEN POWER-UP ENDS ─────────────────────────
                 this.sounds.jetpackSound.stop();
-
                 this.player.setTexture(this.defaultPlayerTexture);
                 this.player.setScale(this.defaultPlayerScale);
                 this.player.body.setSize(this.defaultBodyWidth, this.defaultBodyHeight, true);
@@ -585,6 +567,3 @@ const config = {
     },
     deviceOrientation: _CONFIG.deviceOrientation === "landscape"
 };
-
-// Initialize the Phaser game instance
-//const game = new Phaser.Game(config);

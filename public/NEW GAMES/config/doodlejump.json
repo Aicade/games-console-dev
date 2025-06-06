@@ -4,15 +4,22 @@
   "instructions": "Instructions: Use LEFT/RIGHT arrow keys or mobile buttons to move. Jumping is automatic when landing on a platform.",
   "deviceOrientation": "portrait",
   "imageLoader": {
-    "background": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/hyARr7Yi9NWD4b34/assets/images/background_4.png?t=1748945245759",
-    "platform": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/hyARr7Yi9NWD4b34/assets/images/platform_1.png?t=1748945265205"
+    "background": "background",
+    "platform": "platform",
+    "player": "player",
+    "enemy": "enemy",
+    "collectible": "collectible"
   },
   "soundsLoader": {
     "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Background_3cd80d47-33cf-4ca1-8c60-7a13793255ef.mp3?t=1744134167420",
     "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
     "jump": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Jump_4e42502a-1765-49c5-95f5-4ef18300e806.mp3?t=1744132241323",
     "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3",
-    "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav"
+    "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav",
+    "springSound": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Spring_b221b4e4-3300-4f8d-937a-17d16caf3646.mp3?t=1744134407165",
+    "jetpackSound": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/doodle%20jetpack_afccc19d-772e-4bbc-9b83-9cb716cac929.mp3?t=1744134665210",
+    "crackSound": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Platform%20Crack_c34b6a03-57a7-4e68-aed4-f52493f84832.mp3?t=1744135032021",
+    "enemySound": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Doodle%20Enemy_dfe86aed-13ab-4645-b3b4-2c1232a14e67.mp3?t=1744135326035"
   },
   "deviceOrientationSizes": {
     "landscape": {
@@ -26,6 +33,17 @@
   },
   "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
   "phaserVersion": "3.80.1",
+  "fontLoader": {
+    "pixelfont_png": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.png",
+    "pixelfont_xml": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.xml"
+  },
+  "libLoader": {
+    "playerShooter": "https://aicade-user-store.s3.amazonaws.com/9201845761/games/7qpNBn0tB8uiVER3/assets/images/playerShooter.png?t=1749212117076",
+    "spring": "https://aicade-user-store.s3.amazonaws.com/9201845761/games/7qpNBn0tB8uiVER3/assets/images/spring.png?t=1749212132393",
+    "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+    "crack": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233422.png?t=1743617757767",
+    "jetpackPlayer": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/0pCEDXnohRdlzBLk/history/iteration/YW0j1EoAgf7T.webp"
+  },
   "orientationSizes": {
     "landscape": {
       "height": 720,
