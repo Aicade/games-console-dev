@@ -7,6 +7,9 @@
         "enemy": "enemy",
         "collectible": "collectible"
     },
+    "libLoader": {
+        "pauseButton" : "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+    },
     "instructions": "Instructions: 1. Touch to move/slide the puzzle piece 2. Touch to see new puzzle after completing.",
     "deviceOrientationSizes": {
         "landscape": {
