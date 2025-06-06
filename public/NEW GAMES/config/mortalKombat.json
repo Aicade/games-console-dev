@@ -1,32 +1,13 @@
 {
-    "title": "PUNCH OUT - ELON VS GANDHI",
+    "title": "Fighting_1v1 Arena",
     "description": "<p>A 1V1 KICKASS BATTLE AMONG LEGENDS Instructions:1. Use A TO PUNCH, S TO KICK , AND D TO DODGE AND BASIC LEFT AND RIGHT ARROW TO MOVE</p>",
     "instructions": "Instructions:1. Use A TO PUNCH, S TO KICK , AND D TO DODGE AND BASIC LEFT AND RIGHT ARROW TO MOVE",
     "deviceOrientation": "landscape",
     "imageLoader": {
-      "background": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/chinatown.png?t=1745871654984",
-      "fighter1": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_13_1_-removebg-preview.png?t=1745510094953",
-      "fighter2": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/fighter1_1.png?t=1745510130932",
-      "platform": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/image_4_platform.webp",
-      "spritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2818%29.png?t=1745510570561",
-      "dodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_92-removebg-preview.png?t=1745511297418",
-      "punchDodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_91-removebg-preview.png?t=1745511993517",
-      "simpleDodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_76-removebg-preview.png?t=1745523774776",
-      "kickSpritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2819%29.png?t=1745524147517",
-      "punchSpritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2820%29.png?t=1745527073194",
-      "spritesheet(21)": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2821%29.png?t=1745564404529",
-      "digital-art-pixel-art-pixelated-pixels-wallpaper-thumb": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/image_0_action._background.webp",
-      "ninjaFace": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/ninjaFace.png?t=1745850656908",
-      "hoverFace": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/newAsset_14.png?t=1745848117994",
-      "chinatown": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/digital-art-pixel-art-pixelated-pixels-wallpaper-thumb.png?t=1745837802486",
-      "selectionscreen": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/741bed6ce4ae079f1dba7f77164419744f83f7e7.png?t=1746036333256",
-      "741bed6ce4ae079f1dba7f77164419744f83f7e7": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/1055_Kubernetes-release-blog-blog-image-915x480.png?t=1746030209082",
-      "spritesheet(22)": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2822%29.png?t=1746119507007",
-      "punchButton": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/history/iteration/UjpGDiPQebRF.webp",
-      "dodgeButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/newAsset_20.png?t=1746169009312",
-      "kickButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/newAsset_21.png?t=1746169070001",
-      "leftButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/leftButton.png?t=1746185500577",
-      "rightButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/rightButton.png?t=1746185513591"
+      "background": "background",
+      "platform": "platform",
+      "player": "player_face",
+      "enemy": "enemy_face"  
     },
     "soundsLoader": {
       "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/8-bit-loop-music-290770_9ac77b8a-b9b6-493c-a304-77486aeaf2ce.mp3?t=1748247086017",
@@ -41,6 +22,25 @@
       "Door Opening": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Door%20Opening_e7d3bd0b-36cb-470e-8fc8-01993726798f.mp3?t=1746032227949",
       "walking": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Walking_0781140c-e2a3-4423-bd0d-a38d9e72a332.mp3?t=1746032228306",
       "Ambient Music": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Ambient%20Music_05c59552-7410-4552-84bd-0641561234ac.mp3?t=1746032240293"
+    },
+    "libLoader":{
+      "fighter1": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_13_1_-removebg-preview.png?t=1745510094953",
+      "fighter2": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/fighter1_1.png?t=1745510130932",
+      "spritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2818%29.png?t=1745510570561",
+      "dodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_92-removebg-preview.png?t=1745511297418",
+      "punchDodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_91-removebg-preview.png?t=1745511993517",
+      "simpleDodgeSprite": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/image_76-removebg-preview.png?t=1745523774776",
+      "kickSpritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2819%29.png?t=1745524147517",
+      "punchSpritesheet": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2820%29.png?t=1745527073194",
+      "spritesheet(21)": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2821%29.png?t=1745564404529",
+      "selectionscreen": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/741bed6ce4ae079f1dba7f77164419744f83f7e7.png?t=1746036333256",
+      "spritesheet(22)": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/spritesheet%2822%29.png?t=1746119507007",
+      "punchButton": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/history/iteration/UjpGDiPQebRF.webp",
+      "dodgeButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/newAsset_20.png?t=1746169009312",
+      "kickButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/newAsset_21.png?t=1746169070001",
+      "leftButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/leftButton.png?t=1746185500577",
+      "rightButton": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/YkAM4irVk8PSdezP/assets/images/rightButton.png?t=1746185513591"
+
     },
     "deviceOrientationSizes": {
       "landscape": {

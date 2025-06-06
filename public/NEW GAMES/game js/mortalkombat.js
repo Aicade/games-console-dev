@@ -17,6 +17,9 @@ class CharacterSelectScene extends Phaser.Scene {
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
 
         // Load bitmap font
         this.load.bitmapFont(
@@ -67,8 +70,8 @@ class CharacterSelectScene extends Phaser.Scene {
     createCharacterCards() {
         // Character data
         const characters = [
-            { type: 'ninjaFace', fullBodyType: 'fighter1', name: 'NINJA', tint: 0xADD8E6 },
-            { type: 'hoverFace', fullBodyType: 'fighter2', name: 'HOVER', tint: 0xFFD700 }
+            { type: 'player', fullBodyType: 'fighter1', name: 'NINJA', tint: 0xADD8E6 },
+            { type: 'enemy', fullBodyType: 'fighter2', name: 'HOVER', tint: 0xFFD700 }
         ];
         
         // Card positions
@@ -216,8 +219,8 @@ class CharacterSelectScene extends Phaser.Scene {
         
         // Find the other character
         const characters = [
-            { type: 'ninjaFace', fullBodyType: 'fighter1', name: 'NINJA', tint: 0xADD8E6 },
-            { type: 'hoverFace', fullBodyType: 'fighter2', name: 'HOVER', tint: 0xFFD700 }
+            { type: 'player', fullBodyType: 'fighter1', name: 'NINJA', tint: 0xADD8E6 },
+            { type: 'enemy', fullBodyType: 'fighter2', name: 'HOVER', tint: 0xFFD700 }
         ];
         
         const cpuCharacter = characters.find(c => c.type !== playerCharacter.type);
@@ -757,12 +760,12 @@ class GameScene extends Phaser.Scene {
         
         this.cpuInitialFaceX = this.cpu.x;
         this.cpuInitialFaceY = this.cpu.y + (this.isMobile ? -100 : -220);
-        this.playerFace = this.add.image(this.playerInitialFaceX, this.playerInitialFaceY, this.playerCharacter === 'fighter1' ? 'ninjaFace' : 'hoverFace')
+        this.playerFace = this.add.image(this.playerInitialFaceX, this.playerInitialFaceY, this.playerCharacter === 'fighter1' ? 'player' : 'enemy')
             .setScale(this.isMobile ? 0.25 : 0.5)
             .setDepth(6);
         this.playerFace.setOrigin(0.5, 0.5);
 
-        this.cpuFace = this.add.image(this.cpuInitialFaceX, this.cpuInitialFaceY, cpuCharacter === 'fighter1' ? 'ninjaFace' : 'hoverFace')
+        this.cpuFace = this.add.image(this.cpuInitialFaceX, this.cpuInitialFaceY, cpuCharacter === 'fighter1' ? 'player' : 'enemy')
             .setScale(this.isMobile ? 0.25 : 0.5)
             .setDepth(6);
         this.cpuFace.setOrigin(0.5, 0.5);
