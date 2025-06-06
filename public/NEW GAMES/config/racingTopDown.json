@@ -1,0 +1,52 @@
+{
+  "title": "Racing Rush",
+  "description": "Highway racing",
+  "instructions": "Dodge against the cars and complete the laps",
+  "deviceOrientation": "landscape",
+  "imageLoader": {
+    "player": "player",
+    "enemy_1": "enemy_1",
+    "enemy_2": "enemy_2",
+    "enemy_3": "enemy_3"
+  },
+  "soundsLoader": {
+    "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-8.mp3",
+    "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
+    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
+    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
+    "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3"
+  },
+  "libLoader": {
+    "straightroad": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/straightroad.png?t=1748765805388",
+    "Grass": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/Grass.png?t=1748767866800",
+    "roadcorner": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/roadcorner.png?t=1748942532071",
+    "speedometer": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/speedometer.png?t=1749032964244",
+    "tire": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/tire.png?t=1749040963040",
+    "retrybutton": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/retrybutton.png?t=1749137974256",
+    "start_tile": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/start_tile.png?t=1749138049117",
+    "finish_tile": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/finish_tile.png?t=1749138060992"
+    
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  }
+}

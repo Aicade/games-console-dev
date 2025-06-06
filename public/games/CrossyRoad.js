@@ -17,17 +17,16 @@ const config = {
   // Do not instantiate Phaser.Game here per Aicade requirements.
   
   function preload() {
-    // Load image assets.
-    this.load.image('background', 'assets/background.png');
-    this.load.image('enemy', 'assets/enemy.png');
-    this.load.image('player', 'assets/player.png');
-    this.load.image('collectible', 'assets/collectible.png');
+     for (const key in _CONFIG.imageLoader) {
+            this.load.image(key, _CONFIG.imageLoader[key]);
+        }
+            for (const key in _CONFIG.soundsLoader) {
+            this.load.audio(key, [_CONFIG.soundsLoader[key]]);
+        }
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, [_CONFIG.libLoader[key]]);
+        }
     this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-    
-    // Load sound assets using the provided URLs.
-    this.load.audio("bg", "https://files.catbox.moe/7c4wcf.mp3");       // Background music
-    this.load.audio("lose", "https://files.catbox.moe/skrenm.mp3");       // Lose sound
-    this.load.audio("collect", "https://files.catbox.moe/psj9yf.mp3");      // Collect sound
   }
   
   function create() {
