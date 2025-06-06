@@ -5,9 +5,13 @@
         "background": "background",
         "player": "player",
         "enemy": "enemy",
-        "projectile": "projectile"
-        
+        "projectile": "projectile",
+        "platform":"platform"
     },
+    "libLoader":{
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+        "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png"
+    },    
     "instructions": "Instructions:1. Use arrow keys OR joystick to move. 2. Use Spacebar/button to shoot.",
     "orientationSizes": {
         "landscape": {
