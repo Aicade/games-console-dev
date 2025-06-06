@@ -5,6 +5,11 @@
         "background": "background",
         "enemy": "enemy"
     },
+    "libLoader": {
+        "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png",
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+        "pillar": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png"
+    }, 
     "instructions": "Instructions: 1. Shoot and kill ducks.",
     "deviceOrientationSizes": {
         "landscape": {
@@ -25,5 +30,5 @@
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
         "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3"
     },
-    "title": "Duck HUnt"
+    "title": "Duck Hunt"
 }

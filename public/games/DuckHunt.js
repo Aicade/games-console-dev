@@ -17,10 +17,10 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
+        for(const key in _CONFIG.libLoader) {
+            this.load.script(key, _CONFIG.libLoader[key]);
+        }
 
-        this.load.image('heart', 'https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png');
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-        this.load.image("pillar", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png");
 
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
@@ -89,35 +89,85 @@ class GameScene extends Phaser.Scene {
         this.sniperScope = this.add.graphics({ fillStyle: { color: 0x000000 } });
         this.sniperScope.setDepth(11);
 
-        this.input.on("pointerdown", function () {
-            if (!this.isGameOver) {
-                this.sounds.damage.setVolume(1).setLoop(false).play()
-                this.lives -= 1;
-                this.updateLives(this.lives);
-                this.cameras.main.flash(100);
+this.input.on("pointerdown", (pointer) => {
+    if (this.isGameOver) return;
+    
+    // Get all enemies at the pointer position
+    const enemiesAtPointer = this.enemies.getChildren().filter(enemy => {
+        return enemy.getBounds().contains(pointer.x, pointer.y);
+    });
 
-                // Create the bitmap text object
-                let missedText = this.add.bitmapText(this.cameras.main.centerX,
-                    this.cameras.main.centerY, 'pixelfont', 'MISS',
-                    64).setOrigin(0.5, 0.5).setDepth(11);
+    if (enemiesAtPointer.length > 0) {
+        // Player hit an enemy
+        const enemy = enemiesAtPointer[0];
+        this.sounds.move.setVolume(4).setLoop(false).play();
+        
+        this.cameras.main.flash(100);
+        enemy.body.moves = false;
+        
+        this.time.delayedCall(400, () => {
+            enemy.body.moves = true;
+        }, [], this);
 
-                // Apply red tint
-                missedText.setTint(0xff0000);
+        const emitter = this.add.particles(enemy.x, enemy.y, 'bubbles', {
+            speed: { min: -100, max: 300 },
+            scale: { start: .2, end: 0 },
+            blendMode: 'MULTIPLY',
+            lifespan: 550,
+            tint: 0x93C54B
+        });
 
-                // Create the tween
-                this.tweens.add({
-                    targets: missedText,
-                    scaleX: 2, // Scale X to 1.5
-                    scaleY: 2, // Scale Y to 1.5
-                    alpha: 1, // Fade out
-                    duration: 500,
-                    angle: Phaser.Math.Between(-10, 10),
-                    onComplete: () => {
-                        missedText.destroy();
-                    }
-                });
+        emitter.explode(200);
+
+        if (enemy.flipX)
+            enemy.angle -= (90 + 45);
+        else
+            enemy.angle += (90 + 45);
+            
+        if (enemy.flipTimer) {
+            enemy.flipTimer.remove();
+        }
+        
+        enemy.setVelocityX(0);
+        enemy.setVelocityY(500);
+        this.updateScore(1);
+        enemy.removeInteractive();
+        
+        // Remove the enemy after a delay
+        this.time.delayedCall(1000, () => {
+            enemy.destroy();
+        });
+    } else {
+        // Player missed
+        this.sounds.damage.setVolume(1).setLoop(false).play();
+        this.lives -= 1;
+        this.updateLives(this.lives);
+        this.cameras.main.flash(100);
+
+        let missedText = this.add.bitmapText(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY, 
+            'pixelfont', 
+            'MISS',
+            64
+        )
+        .setOrigin(0.5, 0.5)
+        .setDepth(11)
+        .setTint(0xff0000);
+
+        this.tweens.add({
+            targets: missedText,
+            scaleX: 2,
+            scaleY: 2,
+            alpha: 1,
+            duration: 500,
+            angle: Phaser.Math.Between(-10, 10),
+            onComplete: () => {
+                missedText.destroy();
             }
-        }, this);
+        });
+    }
+}, this);
 
         let bubble = this.add.graphics({ x: -100, y: 0, add: false });
 
