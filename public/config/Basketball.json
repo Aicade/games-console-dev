@@ -9,9 +9,9 @@
 
     },
     "imageLoader": {
-        "background": "public/assets/background_1.png",
-        "player": "public/assets/player_1.png",
-        "avoidable": "public/assets/avoidable_1.png"
+        "background": "background",
+        "player": "player",
+        "avoidable": "avoidable"
     },
     "instructions": "Instructions: 1.Tap to destory.",
     "deviceOrientationSizes": {
