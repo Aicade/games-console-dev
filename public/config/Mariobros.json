@@ -1,42 +1,82 @@
 {
-    "description": "A Platformer game where you collect powerups and kill enemies by \n stomping them. Game ends after you reach 500m",
-    "deviceOrientation": "landscape",
-    "imageLoader": {
-        "background": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233355-Photoroom.png?t=1743617430629",
-        "player": "https://media-hosting.imagekit.io/1d1ce86f3c99446f/player.png?Expires=1838456896&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Yh9R0ufjTZxeVCrlo8dNsb2RoDsbQruw1wTjfKeXR~U5kQcqPWuZZwTp8fZoxTG~uPpCCKtKV2-Wrh4LII-kiTH9KmD1i0AfleqsEN3kvHhRI5DvNULhmL7o0Kb1UNq-yonCMIj9UFsko0kEcncsJ0YiVxLDVDTtEMAe-aYHcJQEFqiR2hJGtdUYuxWHUaVQXUYy0u76sHqZ8D1cIycT2umZEtVyDwRruodY2-i7-Ki6xUtJaXtYznMtPgzRTfdTUjrYwFJ6Avblgv02HbW~7aKmdMG6gz9K5WT8V3fKs4jcj88CpY45u81fBg8GZimKqDug7CpfBkqcUomnCiUx4w__",
-        "enemy": "https://media-hosting.imagekit.io/a289561ec2ca47dc/enemy.png?Expires=1838457153&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=dAPmc6zh-S3qyLwUMIWgQWky1-0O02KqxGXoqWueughg6-A7NKgHm7cZcczUQ~ZAalscBhWTyvWYh2YE0r~woamTDmuvaNFS4TLbiYIq8V7LXmhvJaADTHa~cz3SZ4Qz5y28T7dI3t7SHAajtV~wNnDMH4PDaVO5CHZ6sFx6BUyoCPLU0M4uBqDRV59fxkYua2vf7qvTRXzA1X5dNW9yDwVuHH8PHLP7xtMdrN~IxZ14eJySDUKQPTDjqFxF9OL~wgwoMPwOyPKW4JUm8vjqbZ9O2lAbmUneSwYNZIDC8vSE73MhKFVOC1YpzDp9RAEqyzfITzhDzltPOBnvduxNsA__",
-        "collectible": "collectible",
-        "collectible_1": "collectible_1",
-        "projectile": "projectile",
-        "platform": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233410.png?t=1743617599903",
-        "platformGlow": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233422.png?t=1743617757767"
+  "title": "Super Jump Adventure",
+  "description": "<p>A Platformer game where you collect powerups and kill enemies by stomping them. Game ends after you reach 500m</p>",
+  "instructions": "Instructions: 1. Use LEFT / RIGHT arrow key to move. 2. Use UP arrow / Square button to jump 3. Use SPACE/ round button to shoot and destroy enemies",
+  "deviceOrientation": "landscape",
+  "imageLoader": {
+
+    
+    "background": "background",
+    "background_2": "background_2",
+    "background_3": "background_3",
+    "platform_3": "platform_3",
+    "enemy": "enemy",
+    "platform": "platform",
+    "player": "player",
+    "projectile": "projectile",
+    "collectible": "collectible",
+    "collectible_1": "collectible_1",
+    "platform_2": "platform_2"
+  },
+  "soundsLoader": {
+    "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-6.mp3",
+    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
+    "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/damage_1.mp3",
+    "jump": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_1.mp3",
+    "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav",
+    "upgrade_1": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_1.mp3",
+    "upgrade_2": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3",
+    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3",
+    "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_3.mp3",
+    "stretch": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_1.mp3",
+    "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "instructions": "Instructions: 1. Use LEFT / RIGHT arrow key to move. 2. Use UP arrow / Square button to jump 3. Use SPACE/ round button to shoot and destroy enemies",
-    "orientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
-    "phaserVersion": "3.80.1",
-    "mobile_portrait": false,
-    "soundsLoader": {
-        "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Super%20Mario%20Bros.%20Theme%20Song_6dcc911a-75bd-4e82-9f53-e542146ff9c9.mp3?t=1743667399595",
-        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
-        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/damage_1.mp3",
-        "jump": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_1.mp3",
-        "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav",
-        "upgrade_1": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_1.mp3",
-        "upgrade_2": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_2.mp3",
-        "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3",
-        "shoot": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_3.mp3",
-        "stretch": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_1.mp3",
-        "success": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/success_1.wav"
-    },
-    "title": "Mariobros"
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "libLoader": {
+    "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+    "snowflake": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/snowflake.png?t=1749188835771",
+    "fireTrail": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/fireTrail.png?t=1749188889098",
+    "spark": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/spark.png?t=1749188984020",
+    "icyBurst": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/icyBurst.png?t=1749189621085",
+    "dust": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/dust.png?t=1748862564071",
+    "iconSize": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/iconSize.png?t=1749198469070",
+    "iconshield": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/iconshield.png?t=1749198469107",
+     "iconBullet": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/iconBullet.png?t=1749198468841",
+    "avatar": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/avatar.png?t=1749198468870",
+    "heart": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/heart.png?t=1749198468922",
+    "collectible": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/collectible.png?t=1749198468947",
+    "iconmissile": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/iconmissile.png?t=1749198468980",
+    "coin": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/coin.png?t=1749198469007",
+    "missile": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/missile.png?t=1749198467216",
+    "snowBall": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/snowBall.png?t=1749141801958",
+    "lavaBall": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/lavaBall.png?t=1749141826574",
+    "fireball": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/fireball.png?t=1748884732700",
+    "projectile": "https://aicade-ui-assets.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/image_5_projectile.webp",
+    "platform": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/platform.png?t=1749198467118",
+    "platformGlow": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/platformGlow.png?t=1749198467141",
+    "rocketLauncher": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/rocketLauncher.png?t=1749198467191",
+    "collectible_1": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/collectible_1.png?t=1749198468819",
+    "boss": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/image_2_enemy.png?t=1749107833121"
+  }
 }

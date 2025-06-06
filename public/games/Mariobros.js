@@ -16,10 +16,28 @@ const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-n
 */
 
 const PLAYER_STATE = {
-    SMALL: 0,
-    BIG: 1,
+    SMALL:   0,
+    BIG:     1,
     BULLETS: 2,
-}
+    SHIELD:  3,
+    MISSILE: 4
+};
+
+const LEVEL= {
+    FIRST:   1,
+    SECOND:  2,
+    THIRD:   3,
+    FOURTH:  4,
+};
+
+const ENEMIES = {
+    BASIC: 0,
+    FIRE: 1,
+    SNOW: 2,
+};
+
+
+
 
 // Game Scene
 class GameScene extends Phaser.Scene {
@@ -28,54 +46,103 @@ class GameScene extends Phaser.Scene {
     }
 
     init() {
+
+        this.currentLevel = LEVEL.SECOND; // Start with Level 1
+
         this.cursors = null;
         this.player = null;
         this.platforms = null;
+        this.bottom_platform=null;
         this.enemies = null;
         this.nextEnemyTime = 0;
         this.nextBricksTime = 0;
         this.scoreText = null;
         this.powerUps = null;
         this.score = 0;
+        this.missiles = null;
+        this.rocketLauncher = null;
+        this.leveluptext=null;
+        this.lastEnemyShootTime = 0; 
+        this.enemyShootDelay = 8000; 
+        this.freezeDuration = 3000;
+          
+          // Lives / Hearts
+        this.maxLives = 8;
+        this.currentLives = 3; // Start with 3
+        this.livesArray = [];  // For storing heart GameObjects
+        this.highestX      = 0;
+
+        // Power-up Icons
+        this.sizeIcon     = null;
+        this.bulletIcon   = null;
+        this.shieldIcon   = null;
+        this.missileIcon  = null;
+
+        //boss
+         this.bossMaxLives    = 12;
+         this.bossCurrentLives = 12;
+         this.bossLivesArray   = [];    
+         this.boss = null;
+
+         this.input.addPointer(3);
+        this.score = 0;
+        this.meter = 0;
+        this.totalMeters = 0
+        this.finishPoint = 20000;
+        this.playerState = PLAYER_STATE.SMALL; // 0 : small | 1 : Big | 2 : Big + Bullets
+        this.brickSize = 50;
+
+         this.fireDelay = 4000;
+        this.lastFireTime = 0;
+        this.bossFireballSpeed = 150;
+         this.playerReachedFinish = false;
+
+
+         this.missileCount = 0;
+         this.missileCountText = '';
+
         this.width = this.game.config.width;
-        this.height = this.game.config.height; //checking
+        this.height = this.game.config.height;
+
+        
     }
 
     preload() {
-        // Load image assets using direct URL strings, except for player and enemy
 
-        this.load.image("background", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233355-Photoroom.png?t=1743617430629");
-        
-        // Load player and enemy using the old method
-        this.load.image("player", "https://media-hosting.imagekit.io/1d1ce86f3c99446f/player.png?Expires=1838456896&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Yh9R0ufjTZxeVCrlo8dNsb2RoDsbQruw1wTjfKeXR~U5kQcqPWuZZwTp8fZoxTG~uPpCCKtKV2-Wrh4LII-kiTH9KmD1i0AfleqsEN3kvHhRI5DvNULhmL7o0Kb1UNq-yonCMIj9UFsko0kEcncsJ0YiVxLDVDTtEMAe-aYHcJQEFqiR2hJGtdUYuxWHUaVQXUYy0u76sHqZ8D1cIycT2umZEtVyDwRruodY2-i7-Ki6xUtJaXtYznMtPgzRTfdTUjrYwFJ6Avblgv02HbW~7aKmdMG6gz9K5WT8V3fKs4jcj88CpY45u81fBg8GZimKqDug7CpfBkqcUomnCiUx4w__");
-        this.load.image("enemy", "https://media-hosting.imagekit.io/a289561ec2ca47dc/enemy.png?Expires=1838457153&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=dAPmc6zh-S3qyLwUMIWgQWky1-0O02KqxGXoqWueughg6-A7NKgHm7cZcczUQ~ZAalscBhWTyvWYh2YE0r~woamTDmuvaNFS4TLbiYIq8V7LXmhvJaADTHa~cz3SZ4Qz5y28T7dI3t7SHAajtV~wNnDMH4PDaVO5CHZ6sFx6BUyoCPLU0M4uBqDRV59fxkYua2vf7qvTRXzA1X5dNW9yDwVuHH8PHLP7xtMdrN~IxZ14eJySDUKQPTDjqFxF9OL~wgwoMPwOyPKW4JUm8vjqbZ9O2lAbmUneSwYNZIDC8vSE73MhKFVOC1YpzDp9RAEqyzfITzhDzltPOBnvduxNsA__");
-    
-        this.load.image("collectible", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_12.png?t=1743665247183");
-        this.load.image("collectible_1", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_8.png?t=1743665381909");
-        this.load.image("projectile", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_10.png?t=1743668862744");
-        this.load.image("platform", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233410.png?t=1743617599903");
-        this.load.image("platformGlow", "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/Screenshot%202025-04-02%20233422.png?t=1743617757767");
+         for (const key in _CONFIG.imageLoader) {
+            this.load.image(key, _CONFIG.imageLoader[key]);
+        }
 
+        if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
+
+        for (const key in _CONFIG.imageLoader) {
+            this.load.image(key, _CONFIG.imageLoader[key]);
+        }
+
+        for (const key in _CONFIG.soundsLoader) {
+            this.load.audio(key, [_CONFIG.soundsLoader[key]]);
+        }
         
+       for (const key in _CONFIG.atlasLoader) {
+        const atlas = _CONFIG.atlasLoader[key];
+        this.load.atlas(key, atlas.textureURL, atlas.atlasURL);
+        }
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
+        
+   
         // Load additional UI assets
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
         this.load.bitmapFont('pixelfont',
             "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.png",
             "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/pix.xml"
         );
-        
-        // Load audio assets using direct URL strings
-        this.load.audio("background", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Super%20Mario%20Bros.%20Theme%20Song_6dcc911a-75bd-4e82-9f53-e542146ff9c9.mp3?t=1743667399595"]);
-        this.load.audio("lose", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20lose_8c4b4d4d-a4a1-4943-ada5-417b192f6ab6.mp3?t=1743675830252"]);
-        this.load.audio("damage", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/damage_1.mp3"]);
-        this.load.audio("jump", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20jump_8eec73f2-5531-4f0e-a301-f53b99846ee4.mp3?t=1743675889691"]);
-        this.load.audio("destroy", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav"]);
-        this.load.audio("upgrade_1", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/upgrade_1.mp3"]);
-        this.load.audio("upgrade_2", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20upgrade_cdd0775d-ba78-4e15-b7de-26d086dc686d.mp3?t=1743675886252"]);
-        this.load.audio("collect", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_3.mp3"]);
-        this.load.audio("shoot", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20fireball_be569211-d077-4267-8306-122b34da14f1.mp3?t=1743675865122"]);
-        this.load.audio("stretch", ["https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/shoot_1.mp3"]);
-        this.load.audio("success", ["https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mario%20win_6f2168d3-b74c-461d-bf77-35104ec0dfff.mp3?t=1743675851396"]);
+
+            this.load.bitmapFont(
+            'pixelFont',
+            'assets/fonts/PressStart2P.png',
+            'assets/fonts/PressStart2P.fnt'
+        );
         
         // Load plugins if enabled
         if (joystickEnabled) {
@@ -88,6 +155,8 @@ class GameScene extends Phaser.Scene {
         // Attach additional event listeners and display the progress loader
         addEventListenersPhaser.bind(this)();
         displayProgressLoader.call(this);
+
+
     }
     
     create() {
@@ -100,97 +169,279 @@ class GameScene extends Phaser.Scene {
 
         this.sounds.background.setVolume(0.1).setLoop(true).play();
 
-        this.input.addPointer(3);
-        this.score = 0;
-        this.meter = 0;
-        this.finishPoint = 20000;
-        this.playerState = PLAYER_STATE.SMALL; // 0 : small | 1 : Big | 2 : Big + Bullets
-        this.brickSize = 50;
-
         // Create a tileSprite that covers more vertical space so it repeats the background image
         this.bg = this.add.tileSprite(
             0,
             0,
             this.finishPoint + 200,
-            this.game.config.height * 1.5,
+            this.game.config.height,
             'background'
         ).setOrigin(0, 0.04);
+
+        this.bottom_platform = this.add.tileSprite(
+            0,
+            this.game.config.height - 50, // Adjust this Y position to align with your ground
+            this.finishPoint + 200,
+            100, // Height of the bottom platform
+            'bottom_platform' // Using the correct key
+        ).setOrigin(0, 0)
+        .setScrollFactor(1)
+        .setDepth(2);
 
         // Adjust the tile position so that the bottom of the repeated image aligns with the bottom of the screen
         this.bg.tilePositionY = this.bg.height - this.game.config.height;
 
         this.bg.setScrollFactor(1);
 
-        this.endPole = this.add.sprite(this.finishPoint, 100, 'platform').setOrigin(0, 0);
-        this.endPole.setScrollFactor(1);
-        this.endPole.displayHeight = this.game.config.height;
-        this.endPole.displayWidth = 40;
-        
-        // UI Block Configurations for Meter and Coin UI
-        const meterBlockConfig = {
-            x: 10,               // X position for meter block
-            y: 10,               // Y position for meter block
-            width: 220,          // Width of meter block
-            height: 40,          // Height of meter block
-            borderThickness: 4,  // Thickness of the white boundary
-            borderColor: 0xffffff, // White border color
-            fillColor: 0x000000,   // Black fill color
-            fillAlpha: 0.5       // Translucency (0.5 means 50% opacity)
-        };
+        // this.endPole = this.add.sprite(this.finishPoint, 100, 'platform').setOrigin(0, 0);
+        // this.endPole.setScrollFactor(1);
+        // this.endPole.displayHeight = this.game.config.height;
+        // this.endPole.displayWidth = 40;
 
-        const coinBlockConfig = {
-            x: 10,               // X position for coin block
-            y: 60,               // Y position for coin block
-            width: 150,          // Width of coin block
-            height: 60,          // Height of coin block
-            borderThickness: 4,  // Thickness of the white boundary
-            borderColor: 0xffffff, // White border color
-            fillColor: 0x000000,   // Black fill color
-            fillAlpha: 0.5       // Translucency
-        };
+            
 
-        // Create Phaser Graphics for UI blocks
-        this.meterBlock = this.add.graphics();
-        this.coinBlock = this.add.graphics();
 
-        // Function to draw a block using a configuration object
-        function drawBlock(graphics, config) {
-            graphics.clear();
-            // Draw the translucent filled rectangle
-            graphics.fillStyle(config.fillColor, config.fillAlpha);
-            graphics.fillRect(config.x, config.y, config.width, config.height);
-            // Draw the bold white border
-            graphics.lineStyle(config.borderThickness, config.borderColor);
-            graphics.strokeRect(config.x, config.y, config.width, config.height);
-        }
+                this.createBoss(); // Initialize the boss
 
-        // Draw the blocks
-        drawBlock(this.meterBlock, meterBlockConfig);
-        drawBlock(this.coinBlock, coinBlockConfig);
 
-        // Make the blocks fixed to the camera
-        this.meterBlock.setScrollFactor(0);
-        this.coinBlock.setScrollFactor(0);
+                
+                    // AVATAR & HEALTH BAR
+                    
+                    // Avatar image
+                    this.avatar = this.add.image(60, 60, 'avatar')
+                        .setDisplaySize(80, 80)
+                        .setScrollFactor(0)
+                        .setDepth(10);
 
-        // Add the UI elements on top of the blocks
-        this.meterText = this.add.bitmapText(40, 2, 'pixelfont', 'Meter: 0m', 28)
-            .setScrollFactor(0)
-            .setDepth(11);
+                        // Icons positioned directly below the avatar
+                    const iconY = 60 + 50 + 15;  // avatar Y + half avatar height + padding
 
-        this.scoreImg = this.add.image(40, 87, 'collectible_1')
-            .setScale(0.1)
-            .setScrollFactor(0)
-            .setDepth(11);
-        this.scoreText = this.add.bitmapText(60, 60, 'pixelfont', 'x 0', 28)
-            .setScrollFactor(0)
-            .setDepth(11);
+                    this.sizeIcon = this.add.image(60, iconY, 'iconSize')
+                        .setDisplaySize(40, 40)
+                        .setAlpha(0.3)     // start grayed out
+                        .setScrollFactor(0)
+                        .setDepth(10);
 
-        // Initialize powerUpText for displaying power-up messages
-        this.powerUpText = this.add.bitmapText(200, 100, 'pixelfont', '', 30)
-            .setScrollFactor(0)
-            .setDepth(11);
+                    this.bulletIcon = this.add.image(60 + 50, iconY, 'iconBullet')
+                        .setDisplaySize(40, 40)
+                        .setAlpha(0.3)
+                        .setScrollFactor(0)
+                        .setDepth(10);
 
-        this.finishText = this.add.bitmapText(this.finishPoint - 30, 50, 'pixelfont', 'FINISH', 30).setScrollFactor(1);
+                    this.shieldIcon = this.add.image(60 + 100, iconY, 'iconshield')
+                        .setDisplaySize(40, 40)
+                        .setAlpha(0.3)
+                        .setScrollFactor(0)
+                        .setDepth(10);
+
+                    this.missileIcon = this.add.image(60 + 150, iconY, 'iconmissile')
+                        .setDisplaySize(40, 40)
+                        .setAlpha(0.3)
+                        .setScrollFactor(0)
+                        .setDepth(10);
+
+                        this.missileCountCircle = this.add.circle(
+                        this.missileIcon.x + 20,
+                        this.missileIcon.y + 20,
+                        14,
+                        0xffffff
+                    )
+                    .setScrollFactor(0)
+                    .setDepth(12);
+
+                    this.missileCountText = this.add.text(
+                        this.missileCountCircle.x,
+                        this.missileCountCircle.y,
+                        `${this.missileCount}`,
+                        {
+                            fontFamily: 'monospace',
+                            fontSize: '20px',
+                            color: '#000000',
+                            align: 'center'
+                        }
+                    )
+                    .setOrigin(0.5)
+                    .setScrollFactor(0)
+                    .setDepth(13);
+
+                       
+
+                    // Draw hearts (lives)
+                    for (let i = 0; i < this.maxLives; i++) {
+                        const heart = this.add.image(120 + i * 40, 60, 'heart')
+                        .setDisplaySize(50, 50)
+                        .setScrollFactor(0)
+                        .setDepth(10)
+                        .setVisible(i < this.currentLives); // Only show lives that exist
+
+                        this.livesArray.push(heart);
+                    }
+
+
+            // ── DISTANCE BAR WITH AVATAR ──
+                    this.barWidth  = 600; 
+                    this.barHeight = 24; 
+                    this.barY      = 60;  // align with hearts
+                    this.barStartX = this.scale.width/2 - this.barWidth/2;
+                    this.totalMeters = Math.round(this.finishPoint / 100);
+
+                    // BG
+                    this.distanceBarBg = this.add.rectangle(
+                    this.scale.width/2, this.barY,
+                    this.barWidth, this.barHeight,
+                    0xaaaaaa
+                    )
+                    .setOrigin(0.5)
+                    .setScrollFactor(0)
+                    .setDepth(10);
+
+                    // fill
+                    this.distanceBarFill = this.add.rectangle(
+                    this.barStartX, this.barY,
+                    0, this.barHeight,
+                    0x00ff00
+                    )
+                    .setOrigin(0, 0.5)
+                    .setScrollFactor(0)
+                    .setDepth(11);
+
+                    // avatar
+                    this.distanceAvatar = this.add.image(
+                    this.barStartX, this.barY
+                    , 'avatar')
+                    .setDisplaySize(32, 32)   // larger so you can see it
+                    .setOrigin(0.5, 0.5)       // center in both axes
+                    .setScrollFactor(0)
+                    .setDepth(12);
+
+                    // text
+                this.distanceText = this.add.text(
+                this.scale.width/2,
+                this.barY + this.barHeight/2 + 25,
+                `0 / ${this.totalMeters}m`,
+                {
+                    fontFamily: 'monospace',
+                    fontSize: '32px',
+                    color: '#ffffff',
+                    stroke: '#000000',        // black outline
+                    strokeThickness: 4,       // thickness of outline
+                    align: 'center',
+                    shadow: {
+                    offsetX: 2,
+                    offsetY: 2,
+                    color: '#000000',
+                    blur: 2,
+                    fill: true
+                    }
+                }
+                )
+                .setOrigin(0.5)
+                .setScrollFactor(0)
+                .setDepth(11);
+
+        // Coin icon
+                this.scoreImg = this.add.image(60, 180, 'collectible_1')
+                    .setDisplaySize(65, 65) // slightly smaller for clean look
+                    .setScrollFactor(0)
+                    .setDepth(11);
+
+                // Coin text, aligned right next to image
+                this.scoreText = this.add.text(90, 166, '0', {
+                    fontFamily: 'monospace',
+                    fontSize: '32px',
+                    color: '#ffffff',
+                    stroke: '#000000',
+                    strokeThickness: 4,
+                    align: 'center',
+                    shadow: {
+                        offsetX: 2,
+                        offsetY: 2,
+                        color: '#000000',
+                        blur: 2,
+                        fill: true
+                    }   
+                })
+                .setScrollFactor(0)
+                .setDepth(11);
+
+
+            // Initialize powerUpText for displaying power-up messages
+        // POWER-UP MESSAGES (centered above the bar)
+         this.powerUpText = this.add.text(
+         this.scale.width / 2,                      // center X
+         this.barY + this.barHeight / 2 + 100,       // same Y as finishText
+                '',                                         // initially empty
+                {
+                    fontFamily: 'monospace',
+                    fontSize: '30px',
+                    color: '#ffffff',                         // white message
+                    stroke: '#000000',                        // black outline
+                    strokeThickness: 4,
+                    align: 'center',
+                    shadow: {
+                    offsetX: 2,
+                    offsetY: 2,
+                    color: '#000000',
+                    blur: 3,
+                    fill: true
+                    }
+                }
+                )
+                .setOrigin(0.5, 0)    // top-center origin, same as finishText
+                .setScrollFactor(0)
+                .setDepth(11);
+
+                //leveluptext
+                this.leveluptext = this.add.text(
+                this.scale.width / 2,                      // center X
+                this.barY + this.barHeight / 2 + 100,       // same Y as finishText
+                        '',                                         // initially empty
+                        {
+                            fontFamily: 'monospace',
+                            fontSize: '30px',
+                            color: '#ffcc00',                        
+                            stroke: '#000000',                        // black outline
+                            strokeThickness: 4,
+                            align: 'center',
+                            shadow: {
+                            offsetX: 2,
+                            offsetY: 2,
+                            color: '#000000',
+                            blur: 3,
+                            fill: true
+                            }
+                        }
+                        )
+                        .setOrigin(0.5, 0)    // top-center origin, same as finishText
+                        .setScrollFactor(0)
+                        .setDepth(11);
+                
+               
+
+                // FINISH TEXT (centered below the bar, not overlapping)
+                this.finishText = this.add.text(
+                this.finishPoint - 100,               // center X
+                this.barY + this.barHeight / 2 + 100, // below the bar by 40px
+                'FINISH',
+                {
+                    fontFamily: 'monospace',
+                    fontSize: '30px',
+                    color: '#ffcc00',
+                    stroke: '#000000',
+                    strokeThickness: 4,
+                    align: 'center',
+                    shadow: {
+                    offsetX: 2,
+                    offsetY: 2,
+                    color: '#000000',
+                    blur: 3,
+                    fill: true
+                    }
+                }
+                )
+                .setOrigin(0.5, 0)    // horizontally centered, vertical origin at top
+                .setScrollFactor(1)   // scrolls with world if you want it near the finish pole
+                .setDepth(11);
         // Add input listeners
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
         this.pauseButton = this.add.sprite(this.game.config.width - 60, 60, "pauseButton").setOrigin(0.5, 0.5);
@@ -201,13 +452,17 @@ class GameScene extends Phaser.Scene {
         this.physics.world.bounds.setTo(0, 0, this.finishPoint + 200, this.game.config.height);
         this.physics.world.setBoundsCollision(true);
 
-        this.player = this.physics.add.sprite(0, 500, 'player').setScale(0.15).setBounce(0.1).setCollideWorldBounds(true);
+        this.player = this.physics.add.sprite(100, 500, 'player').setScale(0.2).setBounce(0.1).setCollideWorldBounds(true);
+
+        this.player.body.setMaxVelocity(300, 1000);
+
+        // 1b) Add horizontal drag so they don’t stop instantly
+        this.player.body.setDrag(800, 0);
+
 
         this.player.body.setSize(this.player.body.width / 1.5, this.player.body.height);
         this.player.setGravityY(800);
         this.player.power_state = PLAYER_STATE.SMALL;
-
-        this.cursors = this.input.keyboard.createCursorKeys();
 
         this.bullets = this.physics.add.group({
             defaultKey: 'projectile',
@@ -263,6 +518,7 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.bullets, this.platforms);
         this.physics.add.collider(this.bullets, this.ground);
 
+
         this.playerMovedBackFrom = this.player.x;
         this.canSpawnEnemies = true;
         this.createMobileButtons();
@@ -271,49 +527,201 @@ class GameScene extends Phaser.Scene {
 
         // In create(), add the jump key for spacebar jump
         this.jumpKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    }
 
-    update(time, delta) {
-        if (this.player.x > this.endPole.x - 20) {
-            this.player.setTint(0x00ff00);
-            this.physics.pause();
-            this.time.delayedCall(1000, () => {
-                this.gameOver();
+
+            // ─── 5) Create missile group before its collider ──────────────────────────
+            this.missiles = this.physics.add.group({
+                defaultKey: 'missile',
+                maxSize: 10
             });
-        }
 
-        // Use either keyboard or our mobile left/right flags
-        if ((this.cursors.left.isDown || this.leftPressed) && this.player.x > this.cameras.main.scrollX) {
-            this.player.leftShoot = true;
-            if (this.canSpawnEnemies) this.canSpawnEnemies = false;
-            if (this.playerMovedBackFrom < this.player.x) {
-                this.playerMovedBackFrom = this.player.x;
-            }
-            this.cameras.main.stopFollow();
-            this.player.flipX = true;
-            this.player.setVelocityX(-160);
-        } else if ((this.cursors.right.isDown || this.rightPressed)) {
-            this.player.leftShoot = false;
-            if (!this.canSpawnEnemies) this.canSpawnEnemies = true;
-            if (this.player.x > this.playerMovedBackFrom) {
-                this.cameras.main.startFollow(this.player);
-            }
-            this.player.setVelocityX(160);
-            this.player.flipX = false;
-        } else {
-            this.player.setVelocityX(0);
-        }
+            //  // Register one collider for “bullet touches boss”:
+            this.physics.add.collider(
+                this.bullets,
+                this.boss,
+                this.onBulletBossCollision,
+                null,
+                this
+            );
 
-        // Use spacebar (or buttonA) for jump
-        if ((this.jumpKey.isDown || (this.buttonA && this.buttonA.button.isDown)) && this.player.body.touching.down) {
-            this.sounds.jump.setVolume(0.2).setLoop(false).play();
-            this.player.setVelocityY(-750);
+            // Register one collider for “missile touches boss”:
+            this.physics.add.collider(
+                this.missiles,
+                this.boss,
+                this.onMissileBossCollision,
+                null,
+                this
+            );
+           
+            //  Set up boss ↔ platforms & boss ↔ ground collisions ─────────────────
+            this.physics.add.collider(this.boss, this.platforms);
+            this.physics.add.collider(this.boss, this.ground);
+
+          
+                         
+
+            // When missile hits an enemy:
+            this.physics.add.collider(this.missiles, this.enemies, (missile, enemy) => {
+                
+                 const explosion = this.vfx.createEmitter(
+                    'enemy',              // texture key (e.g. a spark or smoke)
+                    enemy.x, 
+                    enemy.y,
+                    0.03,                 // lifespan or frequency parameter (tweak as needed)
+                    0, 
+                    800                   // particle speed/lifetime (adjust to taste)
+                );
+                explosion.explode(200);
+                // If the enemy tracks `health`, reduce it by 2; else, just destroy:
+                if (enemy.health !== undefined) {
+                    enemy.health -= 2;
+                    if (enemy.health <= 0) {
+                        enemy.destroy();
+                    }
+                } else {
+                    enemy.destroy();
+                }
+
+                 // 4) Destroy the missile itself
+                    missile.destroy();
+
+                    // 5) (Optional) Increment score
+                    this.updateScore(2); // or whatever value you want
+            });
+
+            // ─── (NEW) Rocket launcher sprite (hidden until MISSILE stage)
+            this.rocketLauncher = this.add.image(this.player.x, this.player.y, 'rocketLauncher')
+                .setDisplaySize(48, 48)
+                .setOrigin(0.5, 0.5)
+                .setScrollFactor(0)
+                .setDepth(12)
+                .setVisible(false); // start off hidden
+
+                
+                
+
+        this.physics.add.overlap(this.player, this.bossFireballs, this.onPlayerHit, null, this);
+
+       
+
+        if (typeof this.currentLevel === 'undefined') {
+            this.currentLevel = LEVEL.FIRST; // Default to Level 1 if not set
         }
         
-        if (time > this.nextEnemyTime) {
-            this.spawnEnemy();
-            this.nextEnemyTime = time + Phaser.Math.Between(2000, 6000);
+
+        // Log before and after `loadLevelAssets()`
+      
+        this.loadLevelAssets();
+      
+            this.changeboss(); // Pass enemy and boss to the function
+       
+     
+
+        this.cursors = this.input.keyboard.createCursorKeys();
+         isMobile = this.scale.isPortrait || this.scale.width <= 1280;
+
+            if (isMobile) {
+                this.setupMobileScaling();
+            }
+
+    }
+
+
+
+    update(time, delta) {
+        const isTouchingGround = this.player.body.blocked.down || this.player.body.touching.down;
+
+        // Check if the player is frozen
+        if (!this.player.isFrozen) {
+            // Movement Physics
+            if (this.cursors.left.isDown) {
+                // Move left with acceleration
+                this.player.setAccelerationX(-2000); // Adjust acceleration for smoother movement
+                this.player.flipX = true; // Flip sprite to face left
+                if (isTouchingGround && this.player.body.velocity.x !== 0) {
+                    // ─── Simple dust VFX at feet ───
+                    this.time.delayedCall(100, () => {
+                        this.vfx.createEmitter(
+                            'dust',
+                            this.player.x + 20,
+                            this.player.y + this.player.displayHeight / 2.5,
+                            0.04, 0, 50
+                        ).explode(1);
+                    });
+                }
+            } else if (this.cursors.right.isDown) {
+                // Move right with acceleration
+                this.player.setAccelerationX(600); // Adjust acceleration for smoother movement
+                this.player.flipX = false; // Flip sprite to face right
+                if (isTouchingGround && this.player.body.velocity.x !== 0) {
+                    // ─── Simple dust VFX at feet ───
+                    this.time.delayedCall(100, () => {
+                        this.vfx.createEmitter(
+                            'dust',
+                            this.player.x - 20,
+                            this.player.y + this.player.displayHeight / 2.5,
+                            0.04, 0, 50
+                        ).explode(1);
+                    });
+                }
+            } else {
+                // Stop accelerating when no key is pressed
+                this.player.setAccelerationX(0);
+
+                // Apply ground friction when touching the ground
+                if (isTouchingGround) {
+                    this.player.setDragX(800); // Adjust drag for smoother deceleration
+                }
+            }
+
+            // Jumping Physics
+            if (Phaser.Input.Keyboard.JustDown(this.jumpKey) && isTouchingGround) {
+                // Adjusted jump velocity for higher jumps
+                this.vfx.createEmitter(
+                    'enemy',                                        // use the 'enemy' texture for particles
+                    this.player.x, 
+                    this.player.y + this.player.displayHeight / 2,   // bottom of scaled sprite
+                    0.03, 0, 300
+                ).explode(12);
+
+                this.player.setVelocityY(-600); // Increased from -500 to -600 for higher jump
+                this.sounds.jump.setVolume(0.2).setLoop(false).play();
+            }
+
+            // Variable Jump Height (Allow holding jump key to jump higher)
+            if (this.jumpKey.isDown && this.player.body.velocity.y < 0) {
+                this.player.setGravityY(400); // Reduce gravity while the jump key is held
+            } else {
+                this.player.setGravityY(1600); // Increase gravity for a smooth fall
+            }
+
+            // Prevent infinite acceleration by clamping velocity
+            this.player.setMaxVelocity(300, 1000); // Adjust max velocity for horizontal and vertical movement
+        } else {
+            // If the player is frozen, prevent movement and jumping
+            this.player.setVelocityX(0); // Stop horizontal movement
+            this.player.setAccelerationX(0); // Stop acceleration
+            this.player.setVelocityY(0); // Stop vertical movement
         }
+
+        // Enemy spawn logic
+        if (time > this.nextEnemyTime) {
+            const baseInterval = 5000; // Base spawn interval in milliseconds
+            const maxInterval = 8000;
+            const minInterval = 3000;
+            const progress = Phaser.Math.Clamp(this.meter / this.totalMeters, 0, 1); // Progress 0 to 1
+
+            // Reduce interval as the player progresses, but not below minInterval
+            const spawnInterval = Phaser.Math.Between(
+                Math.max(baseInterval * (1 - progress), minInterval),
+                maxInterval
+            );
+
+            this.spawnEnemy();
+            this.nextEnemyTime = time + spawnInterval;
+        }
+
+        // Brick spawn logic
         if (this.nextBricksTime && time > this.nextBricksTime && (this.cursors.right.isDown || this.rightPressed)) {
             this.nextBricksTime = time + Phaser.Math.Between(6000, 15000);
             let bricksNum = Phaser.Math.Between(2, 5);
@@ -326,13 +734,468 @@ class GameScene extends Phaser.Scene {
             this.nextBricksTime = time;
         }
 
+        // Update distance bar and avatar
         if (this.player.x > this.highestX) {
             this.highestX = this.player.x;
-            this.meter = Math.abs(Math.round(this.player.x / 100));
-            this.meterText.setText('Meter: ' + this.meter + 'm');
+            this.meter = Math.round(this.player.x / 100);
+
+            // update the on-bar text
+            this.distanceText.setText(`${this.meter} / ${this.totalMeters}m`);
+
+            // progress 0→1
+            const progress = Phaser.Math.Clamp(this.meter / this.totalMeters, 0, 1);
+
+            // resize fill
+            this.distanceBarFill.width = this.barWidth * progress;
+
+            // move avatar
+            this.distanceAvatar.x = this.barStartX + this.barWidth * progress;
+        }
+
+        // Stick the rocket launcher to the player when in MISSILE state
+        if (this.player.power_state === PLAYER_STATE.MISSILE) {
+            const offsetX = this.player.flipX ? -28 : 28;
+            const offsetY = 8;
+            this.rocketLauncher.setVisible(true);
+            this.rocketLauncher.setPosition(this.player.x + offsetX, this.player.y + offsetY);
+            this.rocketLauncher.setFlipX(this.player.flipX); // flip if player faces left
+        } else {
+            this.rocketLauncher.setVisible(false);
+        }
+
+        // Destroy missiles that leave the world bounds
+        this.missiles.children.each((missile) => {
+            if (missile.active) {
+                if (missile.x < this.cameras.main.scrollX - 50 || missile.x > this.cameras.main.scrollX + this.width + 50) {
+                    missile.destroy();
+                }
+            }
+        }, this);
+
+        if (!this.playerReachedFinish && this.meter >= 190) {
+            this.playerReachedFinish = true;
+        }
+
+        if (this.playerReachedFinish && time > this.lastFireTime + this.fireDelay) {
+            this.lastFireTime = time;
+            this.fireTrackingFireball();
+        }
+
+        // Check enemy attack conditions (shoot only when player is close)
+       if (time > this.lastEnemyShootTime + this.enemyShootDelay) {
+            this.lastEnemyShootTime = time; // Update last shoot time
+            this.enemies.children.each((enemy) => {
+                const cameraBounds = this.cameras.main.worldView; // Get the camera's viewport bounds
+
+                // Check if the enemy is within the viewport
+                const isEnemyVisible =
+                    enemy.x >= cameraBounds.x &&
+                    enemy.x <= cameraBounds.x + cameraBounds.width &&
+                    enemy.y >= cameraBounds.y &&
+                    enemy.y <= cameraBounds.y + cameraBounds.height;
+
+                if (isEnemyVisible) { // Enemy shoots only if visible on screen
+                    if (this.currentLevel === LEVEL.SECOND) {
+                        this.shootLavaBall(enemy, this.player);
+                    } else if (this.currentLevel === LEVEL.THIRD) {
+                        this.shootSnowBall(enemy, this.player);
+                    }
+                }
+            });
         }
     }
 
+    
+
+    onBossDefeated() {
+        console.log("Boss defeated logic triggered. Current Level:", this.currentLevel);
+
+        if (this.currentLevel === LEVEL.FIRST) {
+            this.boss.destroy();
+            this.currentLevel = LEVEL.SECOND; // Transition to Level 2
+            console.log("Transitioning to Level 2...");
+
+            this.time.delayedCall(2000, () => {
+                this.powerUpText.text="Level 2";
+                
+                this.resetGameState(); // Reset game state variables (excluding currentLevel)
+                this.resetPlayerForLevelTransition(); // Reset player position and state for the new level
+                this.loadLevelAssets();
+            });
+
+        } 
+         else if (this.currentLevel === LEVEL.SECOND) {
+              this.boss.destroy();
+            this.currentLevel = LEVEL.THIRD; // Transition to Level 2
+            console.log("Transitioning to Level 3...");
+
+            this.time.delayedCall(2000, () => {
+                this.powerUpText.text="Level 3";
+                
+                this.resetGameState(); // Reset game state variables (excluding currentLevel)
+                this.resetPlayerForLevelTransition(); // Reset player position and state for the new level
+                this.loadLevelAssets(); // Dynamically load Level 2 assets
+            });
+
+        }  
+        else if (this.currentLevel === LEVEL.THIRD) {
+
+            this.boss.destroy();
+            this.player.setTint(0x00ff00);
+            this.physics.pause();
+            this.time.delayedCall(1000, () => {
+                this.gameOver();
+            }); 
+        }
+    }
+
+    resetPlayerForLevelTransition() {
+        console.log("Resetting player for level transition...");
+        
+        // Reset player position to the start of the new level
+        this.player.setPosition(100, 500); // Starting position for Level 2
+        this.player.setVelocity(0, 0); // Stop any ongoing movement
+        this.player.body.setAcceleration(0); // Reset acceleration
+        
+        // Reset player state (optional, if you have specific states to reset)
+        this.player.clearTint(); // Remove any visual effects like tint
+        this.score=0;
+        this.meter=0;
+
+    }
+
+    resetGameState() {
+        console.log("Resetting game state...");
+        
+        // Do not reset currentLevel here
+        console.log("currentLevel remains unchanged:", this.currentLevel);
+        this.createBoss();
+        this.changeboss();
+        this.bossDefeated = false;
+        this.bossCurrentLives = this.bossMaxLives;
+        this.currentLives = this.maxLives;
+    
+        this.playerReachedFinish = false;
+
+         // Reset the distance bar
+        this.resetDistanceBar(); 
+
+        this.meter=0;   
+    }
+
+    resetDistanceBar() {
+        console.log("Resetting distance bar...");
+
+        // Reset the fill width to 0
+        this.distanceBarFill.setSize(0, this.barHeight);
+
+        // Move the avatar back to the start of the bar
+        this.distanceAvatar.setPosition(this.barStartX, this.barY);
+
+        // Reset totalMeters to 0
+        this.totalMeters = 0;
+
+        // Update the text to reflect the reset state
+        this.distanceText.setText(`0 / ${this.totalMeters}m`);
+    }
+
+    loadLevelAssets() {
+        console.log("Loading assets for Level:", this.currentLevel);
+
+        if (this.currentLevel === LEVEL.FIRST) {
+            // Load Level 1 assets
+            this.bg.setTexture("background");
+            this.bottom_platform.setTexture("bottom_platform");
+           
+        } else if (this.currentLevel === LEVEL.SECOND) {
+            // Load Level 2 assets
+            this.bg.setTexture("background2");
+            this.bottom_platform.setTexture("bottomPlatform2");
+            
+        } else if (this.currentLevel === LEVEL.THIRD) {
+            // Load Level 2 assets
+            this.bg.setTexture("background3");
+            this.bottom_platform.setTexture("bottomPlatform3");
+            // this.platforms.getChildren().forEach((platform) => platform.setTexture("platform2"));
+        }
+        
+        else {
+            console.error("Unexpected currentLevel in loadLevelAssets:", this.currentLevel);
+        }
+    }
+
+    createBoss() {
+        const bossDesiredHeight = this.game.config.height * 0.66;
+        const bossOriginal = this.textures.get('boss').getSourceImage();
+        const bossScaleFactor = bossDesiredHeight / bossOriginal.height;
+
+        // Create the boss sprite
+        this.boss = this.physics.add.sprite(
+            this.finishPoint,
+            0, // We will adjust Y below
+            'boss'
+        );
+
+        this.boss.setScale(bossScaleFactor);
+        this.boss.setOrigin(0.5, 1);
+        this.boss.y = this.game.config.height - 50; // Position bottom at ground
+        this.boss.setCollideWorldBounds(true);
+
+        // Initialize boss properties
+        this.boss.health = 12; // Restore health
+        this.bossCurrentLives = 12;
+        this.bossDefeated = false;
+
+        // Create boss lives UI
+        const heartSize = 24; // Pixel size of each heart icon
+        const spacing = 4; // Spacing between hearts
+        const totalWidth = this.bossCurrentLives * heartSize + (this.bossCurrentLives - 1) * spacing;
+        const startX = this.scale.width / 2 - totalWidth / 2;
+        const yPosition = 20; // 20px down from the top of the screen
+
+        // Clear previous boss lives array
+        this.bossLivesArray.forEach((heart) => heart.destroy());
+        this.bossLivesArray = [];
+
+        for (let i = 0; i < this.bossCurrentLives; i++) {
+            const heart = this.add.image(
+                this.boss.x + i * (heartSize + spacing) - ((this.bossCurrentLives * (heartSize + spacing)) / 2),
+                this.boss.y - this.boss.displayHeight - 30, // A bit above boss's head
+                'heart'
+            )
+                .setDisplaySize(heartSize, heartSize)
+                .setScrollFactor(1) // Make them move with camera
+                .setDepth(20); // Put it above most UI
+
+            this.bossLivesArray.push(heart);
+        }
+
+        // Create boss fireball group
+        this.bossFireballs = this.physics.add.group();
+
+        // Register collider for boss and player interactions
+        // this.physics.add.collider(this.boss, this.platforms);
+
+        // this.physics.add.collider(this.boss, this.ground);
+        // this.physics.add.overlap(this.player, this.bossFireballs, this.onPlayerHit, null, this);
+
+        // Register one collider for “bullet touches boss”:
+        // this.physics.add.collider(
+        //     this.bullets,
+        //     this.boss,
+        //     this.onBulletBossCollision,
+        //     null,
+        //     this
+        // );
+
+        // Register one collider for “missile touches boss”:
+        // this.physics.add.collider(
+        //     this.missiles,
+        //     this.boss,
+        //     this.onMissileBossCollision,
+        //     null,
+        //     this
+        // );
+
+        console.log("Boss created successfully!");
+    }
+
+    bossAnimationStart() {
+        // Clear existing animation safely
+        if (this.bossAnimEvent) {
+            this.bossAnimEvent.destroy();
+            this.bossAnimEvent = null;
+        }
+
+        // Create the idle animation with optimized timing
+        this.bossAnimEvent = this.time.addEvent({
+            delay: 180,    // Animation speed (similar to walking)
+            callback: () => {
+                if (this.boss.leftLeg) {
+                    // Left to Right transition
+                    this.boss.leftLeg = false;
+                    this.boss.rightLeg = true;
+
+                    // Smooth idle animation with angle transition
+                    this.tweens.add({
+                        targets: this.boss,
+                        angle: -5,
+                        duration: 90,  // Half of delay for smooth transition
+                        ease: 'Sine.easeInOut'
+                    });
+
+                    // Optional visual effects for idle animation (like glow or aura)
+                    if (this.vfx) {
+                        this.vfx.createEmitter(
+                            'aura',
+                            this.boss.x,
+                            this.boss.y + this.boss.displayHeight / 2,
+                            0.005, // Adjust particle density
+                            0,     // Direction
+                            30     // Particle count
+                        ).explode(2);
+                    }
+                } else {
+                    // Right to Left transition
+                    this.boss.leftLeg = true;
+                    this.boss.rightLeg = false;
+
+                    // Smooth idle animation with angle transition
+                    this.tweens.add({
+                        targets: this.boss,
+                        angle: 5,
+                        duration: 90,  // Half of delay for smooth transition
+                        ease: 'Sine.easeInOut'
+                    });
+                }
+            },
+            loop: true
+        });
+    }
+
+    changeboss() {
+        if (this.currentLevel === LEVEL.FIRST) {
+            if (this.boss) {
+                this.boss.setTint(0xB5EBF5); // Blue tint for boss in Level 1
+            } else {
+                console.error('Boss is undefined in changeboss.');
+            }
+        } else if (this.currentLevel === LEVEL.SECOND) {
+            if (this.boss) {
+                this.boss.setTint(0xff0000); // Red tint for boss in Level 2
+            } else {
+                console.error('Boss is undefined in changeboss.');
+            }
+        } else if (this.currentLevel === LEVEL.THIRD) {
+            if (this.boss) {
+                this.boss.setTint(0x00cfee); // Green tint for boss in Level 3
+            } else {
+                console.error('Boss is undefined in changeboss.');
+            }
+        } else {
+            console.error('Unexpected level or state in changeboss.');
+        }
+    }
+
+   
+
+    fireTrackingFireball() {
+                // Fireball spawn offset to simulate boss's mouth
+                const mouthOffsetX = -150; // adjust depending on boss image
+                const mouthOffsetY = -400;
+
+                const fireball = this.bossFireballs.create(
+                this.boss.x + mouthOffsetX,
+                this.boss.y + mouthOffsetY,
+                'fireball'
+                );
+
+                fireball.setScale(0.25); // smaller fireball
+                fireball.body.allowGravity = false;
+
+                const direction = new Phaser.Math.Vector2(this.player.x - fireball.x, this.player.y - fireball.y).normalize();
+                fireball.setVelocity(direction.x * this.bossFireballSpeed, direction.y * this.bossFireballSpeed);
+    }
+
+
+    showGameOverScreen() {
+        console.log("Game Over logic triggered.");
+        // Game over logic here
+    }   
+ 
+ 
+     onPlayerHit(player, fireball) {
+        // 1) Destroy the fireball immediately
+        fireball.destroy();
+
+        // 2) Reduce player lives
+        if (this.currentLives > 0) {
+            this.currentLives--;
+            this.livesArray[this.currentLives].setVisible(false);
+            this.cameras.main.shake(200);
+        }
+
+        // 3) Check for “Game Over”
+        if (this.currentLives === 0) {
+            console.log("Game Over - No lives left");
+            player.setTint(0xff0000);
+            this.physics.pause();
+            this.cameras.main.shake(200);
+            this.sound.stopAll();
+            this.sounds.lose.setVolume(0.2).setLoop(false).play();
+            this.sounds.lose.on('complete', () => this.gameOver());
+            return;
+        }
+
+        // 4) Handle power‐state downgrades when hit
+        // ─────────────────────────────────────────────────────────────────
+        // (a) If player was in MISSILE state → drop to SHIELD
+        if (player.power_state === PLAYER_STATE.MISSILE) {
+            player.power_state = PLAYER_STATE.SHIELD;
+
+
+            // Re‐activate shield glow
+            this.colorAnimation(true, player);
+
+            // Dim missile icon
+            this.missileIcon.setAlpha(0.3);
+
+            // Unbind missile key (X), rebind Z to shoot bullets
+            this.input.keyboard.off('keydown-Z', this.shootMissile, this);
+            this.input.keyboard.on('keydown-Z', this.shootBullet, this);
+        }
+
+        // (b) If player was in SHIELD state and lives dropped below max → drop to BULLETS
+        else if (player.power_state === PLAYER_STATE.SHIELD && this.currentLives < this.maxLives) {
+            player.power_state = PLAYER_STATE.BULLETS;
+            this.colorAnimation(false, player);       // remove shield glow
+            this.shieldIcon.setAlpha(0.3);             // dim shield icon
+            player.setTexture('player');               // revert to normal texture
+
+            // Ensure Z shoots bullets
+            this.input.keyboard.off('keydown-Z', this.shootMissile, this);
+            this.input.keyboard.on('keydown-Z', this.shootBullet, this);
+        }
+
+        // (c) If player was in BULLETS state and lives == 5 → drop to BIG
+        else if (player.power_state === PLAYER_STATE.BULLETS && this.currentLives === 5) {
+            this.sounds.damage.setVolume(1).setLoop(false).play();
+            this.colorAnimation(false, this.player);
+            player.power_state = PLAYER_STATE.BIG;
+            this.bulletIcon.setAlpha(0.3);
+
+            // Brief “hit‐bounce” effect
+            player.setAngularVelocity(-900);
+            this.time.delayedCall(500, () => {
+                player.setAngle(0);
+                player.setAngularVelocity(0);
+            });
+        }
+
+        // (d) If player was in BIG state and lives == 3 → drop to SMALL
+        else if (player.power_state === PLAYER_STATE.BIG && this.currentLives === 3) {
+            this.sounds.damage.setVolume(1).setLoop(false).play();
+            player.power_state = PLAYER_STATE.SMALL;
+            this.sizeIcon.setAlpha(0.3);
+            this.colorAnimation(false, this.player);
+
+            // Brief “hit‐bounce” effect and shrink tween (1.5× → 1×)
+            player.setAngularVelocity(-900);
+            this.time.delayedCall(500, () => {
+                player.setAngle(0);
+                player.setAngularVelocity(0);
+            });
+            this.tweens.add({
+                targets: this.player,
+                scaleX: this.player.scaleX / 1.5,
+                scaleY: this.player.scaleY / 1.5,
+                duration: 200,
+                ease: 'Power1'
+            });
+        }
+    }
+
+   
     bindWalkingMovementButtons() {
         this.input.keyboard.on('keydown-RIGHT', this.walkingAnimationStart, this);
         this.input.keyboard.on('keydown-LEFT', this.walkingAnimationStart, this);
@@ -348,20 +1211,52 @@ class GameScene extends Phaser.Scene {
     }
 
     walkingAnimationStart() {
+        // Clear existing animation more safely
         if (this.animEvent) {
             this.animEvent.destroy();
+            this.animEvent = null;
         }
+
+        // Create the walking animation with optimized timing
         this.animEvent = this.time.addEvent({
-            delay: 200,
+            delay: 180,    // Slightly faster for more responsive feel (was 200)
             callback: () => {
                 if (this.player.leftLeg) {
+                    // Left to Right transition
                     this.player.leftLeg = false;
                     this.player.rightLeg = true;
-                    this.player.setAngle(-5);
+                    
+                    // Smoother angle transition
+                    this.tweens.add({
+                        targets: this.player,
+                        angle: -5,
+                        duration: 90,  // Half of delay for smooth transition
+                        ease: 'Sine.easeInOut'
+                    });
+
+                    // Add dust effect when walking
+                    if (this.vfx && this.player.body.touching.down) {
+                        this.vfx.createEmitter(
+                            'dust',
+                            this.player.x - (this.player.flipX ? -10 : 10),
+                            this.player.y + this.player.displayHeight / 3,
+                            0.005,
+                            this.player.flipX ? 180 : 0,
+                            20
+                        ).explode(1);
+                    }
                 } else {
+                    // Right to Left transition
                     this.player.leftLeg = true;
                     this.player.rightLeg = false;
-                    this.player.setAngle(5);
+                    
+                    // Smoother angle transition
+                    this.tweens.add({
+                        targets: this.player,
+                        angle: 5,
+                        duration: 90,  // Half of delay for smooth transition
+                        ease: 'Sine.easeInOut'
+                    });
                 }
             },
             loop: true
@@ -375,17 +1270,43 @@ class GameScene extends Phaser.Scene {
 
     spawnBricks(numOfBricks = 2, XOffset = 100, YOffset = 0) {
         if (!this.canSpawnEnemies) return;
+
         let y = this.game.config.height - this.ground.displayHeight - 215 - YOffset;
-        let x = this.player.x + this.game.config.width / 2 + 100 + XOffset;
-        let platform = this.platforms.create(x, y, 'platform');
-        platform.displayHeight = platform.displayWidth = this.brickSize;
-        platform.refreshBody();
-        let i = numOfBricks - 1;
-        while (i > 0) {
-            x = x + platform.displayWidth + 1;
-            platform = this.platforms.create(x, y, 'platform');
-            let coinProbability = Phaser.Math.Between(1, 10) % 3 === 0; // 33% chance
-            let mushroomProbability = Phaser.Math.Between(1, 10) % 5 === 0; // 20% chance
+        let xStart = this.player.x + this.game.config.width / 2 + 100 + XOffset;
+        const brickSpacing = this.brickSize + 5;
+
+        for (let i = 0; i < numOfBricks; i++) {
+            let x = xStart + i * brickSpacing;
+
+            // Check for overlap with the boss
+            if (this.boss) {
+                let bossBounds = this.boss.getBounds();
+                let brickBounds = new Phaser.Geom.Rectangle(x, y, this.brickSize, this.brickSize);
+                if (Phaser.Geom.Intersects.RectangleToRectangle(brickBounds, bossBounds)) {
+                    continue;
+                }
+            }
+
+            // Check for overlap with existing bricks
+            let brickBounds = new Phaser.Geom.Rectangle(x, y, this.brickSize, this.brickSize);
+            let overlap = this.platforms.getChildren().some(platform => {
+                let platformBounds = platform.getBounds();
+                return Phaser.Geom.Intersects.RectangleToRectangle(brickBounds, platformBounds);
+            });
+
+            if (overlap) {
+                continue;
+            }
+
+            // Create the main platform (brick)
+            let platform = this.platforms.create(x, y, 'platform');
+            platform.displayHeight = platform.displayWidth = this.brickSize;
+            platform.refreshBody();
+
+            // Add collectible logic (coins or mushrooms)
+            let coinProbability = Phaser.Math.Between(1, 10) % 3 === 0;
+            let mushroomProbability = Phaser.Math.Between(1, 10) % 5 === 0;
+
             if (coinProbability) {
                 platform.setTexture("platformGlow");
                 platform.coin = Phaser.Math.Between(1, 5);
@@ -393,20 +1314,46 @@ class GameScene extends Phaser.Scene {
                 platform.setTexture("platformGlow");
                 platform.mushroom = 1;
             }
-            platform.displayHeight = platform.displayWidth = this.brickSize;
-            platform.refreshBody();
 
-            // If this is a second row (i.e. YOffset > 0) and a collectible brick was spawned,
-            // spawn an extra platform in the first row (at firstRowY) with the normal asset.
+            // Re-apply tint after changing texture
+            
+
+            // Add an extra platform below if a collectible is present and YOffset > 0
             if (YOffset > 0 && (coinProbability || mushroomProbability)) {
                 let firstRowY = this.game.config.height - this.ground.displayHeight - this.player.displayHeight - 100;
-                let extraBrick = this.platforms.create(x, firstRowY, 'platform');
-                extraBrick.displayHeight = extraBrick.displayWidth = this.brickSize;
-                extraBrick.refreshBody();
+                let extraBrickBounds = new Phaser.Geom.Rectangle(x, firstRowY, this.brickSize, this.brickSize);
+                let extraOverlap = this.platforms.getChildren().some(platform => {
+                    let platformBounds = platform.getBounds();
+                    return Phaser.Geom.Intersects.RectangleToRectangle(extraBrickBounds, platformBounds);
+                });
+
+                if (!extraOverlap) {
+                    let extraBrick = this.platforms.create(x, firstRowY, 'platform');
+                    extraBrick.displayHeight = extraBrick.displayWidth = this.brickSize;
+                    extraBrick.refreshBody();
+                   
+                }
             }
-            i--;
         }
     }
+    applyPlatformTint(platform) {
+         console.log('Received platform:', platform);
+        if (!platform) {
+            console.error('Platform is undefined in applyPlatformTint.');
+            return;
+        }
+        // Apply tint based on the current level
+        if (this.currentLevel === LEVEL.FIRST) {
+            this.platform.setTint(0x0000ff); // Blue tint for Level 1
+        } else if (this.currentLevel === LEVEL.SECOND) {
+            this.platform.setTint(0xff0000); // Red tint for Level 2
+        } else if (this.currentLevel === LEVEL.THIRD) {
+            this.platform.setTint(0x00ff00); // Green tint for Level 3
+        } else {
+            console.error('Unexpected level in applyPlatformTint.');
+        }
+    }
+
 
     hitBrick(player, brick) {
         if (player.body.touching.up && brick.body.touching.down) {
@@ -469,23 +1416,220 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    spawnEnemy() {
+   spawnEnemy() {
         if (!this.canSpawnEnemies) return;
-        let x = this.player.x + this.game.config.width / 2;
-        let fixedY = 650; // Set the enemy's fixed y-axis spawn position (adjust as needed)
-    
-        let enemy = this.enemies.create(x, fixedY, 'enemy').setScale(0.18);
-        let speed = -150;
-        if (this.player.power_state === PLAYER_STATE.BIG) {
-            speed = -200;
-        } else if (this.player.power_state === PLAYER_STATE.BULLETS) {
-            speed = -250;
+
+            // Enemy spawn logic
+            let x = this.player.x + this.game.config.width; // Spawn in front of the player
+            let fixedY = 400; // Set the enemy's fixed y-axis spawn position (adjust as needed)
+            let enemy = this.enemies.create(x, fixedY, 'enemy').setScale(0.18);
+            this.applyEnemyTint(enemy);
+
+            // Adjust enemy speed based on player's power state
+            let speed = -150;
+            if (this.player.power_state === PLAYER_STATE.BIG) {
+                speed = -200;
+            } else if (this.player.power_state === PLAYER_STATE.BULLETS) {
+                speed = -250;
+            }
+            enemy.setVelocityX(speed);
+            enemy.setGravityY(100);
+            enemy.setBounceX(1);
+            enemy.body.setSize(enemy.width * 0.8, enemy.height * 0.7);
+            enemy.body.setOffset(enemy.width * 0.2, enemy.height * 0.1);
+
+            // Start walking animation
+            this.startEnemyWalkAnimation(enemy);
+          
+    }
+
+    applyEnemyTint(enemy) {
+        // Apply tint based on the current level
+        if (this.currentLevel === LEVEL.FIRST) {
+            enemy.setTint(0x00ff00); // Green tint for Level 1
+        } else if (this.currentLevel === LEVEL.SECOND) {
+            enemy.setTint(0xff0000); // Red tint for Level 2
+        } else if (this.currentLevel === LEVEL.THIRD) {
+            enemy.setTint(0x00cfee); // Blue tint for Level 3
+        } else {
+            console.error('Unexpected level in applyEnemyTint.');
         }
-        enemy.setVelocityX(speed);
-        enemy.setGravityY(100);
-        enemy.setBounceX(1);
-        enemy.body.setSize(enemy.width * 0.8, enemy.height * 0.7);
-        enemy.body.setOffset(enemy.width * 0.2, enemy.height * 0.1);
+    }
+
+    // Helper function: Shoot lava ball
+    shootLavaBall(enemy, target) {
+        const lavaBall = this.physics.add.sprite(enemy.x, enemy.y, 'lavaBall');
+        lavaBall.setScale(0.2); // Reduce size
+        lavaBall.setVelocityX(-300); // Adjust speed
+        lavaBall.setBounce(1); // Allow bouncing off surfaces
+        lavaBall.setCollideWorldBounds(true); // Prevent leaving the game area
+
+        // Add collider with ground and platforms
+        this.physics.add.collider(lavaBall, this.ground,()=>{
+            this.vfx.createEmitter(
+                'spark', 
+                lavaBall.x, 
+                lavaBall.y, 
+                0.05, 
+                0, 
+                100
+            ).explode(20);
+        });
+        this.physics.add.collider(lavaBall, this.platforms,()=>{
+            this.vfx.createEmitter(
+                'spark', 
+                lavaBall.x, 
+                lavaBall.y, 
+                0.05, 
+                0, 
+                100
+            ).explode(20);
+        });
+
+        // Destroy lava ball if it leaves the world bounds
+        this.physics.world.on('worldbounds', (body) => {
+            if (body.gameObject === lavaBall) {
+                lavaBall.destroy();
+            }
+        });
+
+        // Collider with player
+        this.physics.add.collider(lavaBall, target, () => {
+           this.vfx.createEmitter({
+                texture: 'fireTrail',
+                x: target.x,
+                y: target.y,
+                scale: { start: 0.5, end: 0.1 },
+                speed: { min: 200, max: 400 },
+                lifespan: 800,
+                blendMode: 'ADD',
+                gravityY: -200,
+                tint: [0xff4500, 0xff6347] // Bright red and orange for fire effects
+            }).explode(50);
+           this.currentLives--;
+            this.updateLivesDisplay();
+            this.cameras.main.shake(200); // Reduce player health
+            lavaBall.destroy(); // Destroy lava ball after hit
+                if (this.currentLives === 0) {
+                console.log("Game Over - No lives left");
+                target.setTint(0xff0000);
+                this.physics.pause();
+                this.cameras.main.shake(200);
+                this.sound.stopAll();
+                this.sounds.lose.setVolume(0.2).setLoop(false).play();
+                this.sounds.lose.on('complete', () => this.gameOver());
+                return;
+            }
+        });
+    }
+
+    // Helper function: Shoot snowball
+    shootSnowBall(enemy, target) {
+        const snowBall = this.physics.add.sprite(enemy.x, enemy.y, 'snowBall');
+        snowBall.setScale(0.2); // Reduce size
+        snowBall.setVelocityX(-300); // Adjust direction and speed
+        snowBall.setCollideWorldBounds(true); // Prevent leaving the game area
+
+        // Add collider with ground and platforms
+        this.physics.add.collider(snowBall, this.ground, () => {
+            this.vfx.createEmitter(
+                'snowflake', 
+                snowBall.x, 
+                snowBall.y, 
+                0.05, 
+                0, 
+                100
+            ).explode(20);});
+        this.physics.add.collider(snowBall, this.platforms, () => {
+            this.vfx.createEmitter(
+                'snowflake', 
+                snowBall.x, 
+                snowBall.y, 
+                0.05, 
+                0, 
+                100
+            ).explode(20);});
+
+        // Destroy snowball if it leaves the world bounds
+        this.physics.world.on('worldbounds', (body) => {
+            if (body.gameObject === snowBall) {
+                snowBall.destroy();
+            }
+        });
+
+        // Collider with player
+        this.physics.add.collider(snowBall, target, () => {
+            
+             this.vfx.createEmitter({
+                texture: 'icyBurst',
+                x: target.x,
+                y: target.y,
+                scale: { start: 0.8, end: 0.2 },
+                speed: { min: 100, max: 300 },
+                lifespan: 1000,
+                blendMode: 'ADD',
+                gravityY: 0,
+                tint: [0x00ffff, 0xadd8e6] // Light blue and cyan for icy effects
+            }).explode(40);
+            this.freezePlayer(target); // Freeze the player
+            snowBall.destroy(); // Destroy snowball after hit
+        });
+    }
+
+    // Helper function: Freeze player
+    freezePlayer(player) {
+        player.isFrozen = true; // Set frozen state
+        player.setVelocity(0); // Stop movement
+        player.setTint(0x00ffff); // Add visual effect (blue tint)
+
+        this.time.delayedCall(this.freezeDuration, () => {
+            player.isFrozen = false; // Unfreeze player
+            player.clearTint(); // Remove visual effect
+        });
+    }
+
+
+    startEnemyWalkAnimation(enemy) {
+        enemy.animEvent = this.time.addEvent({
+            delay: 180,
+            callback: () => {
+                if (!enemy.body || !enemy.body.velocity.x) return;
+
+                if (enemy.leftLeg) {
+                    enemy.leftLeg = false;
+                    enemy.rightLeg = true;
+
+                    this.tweens.add({
+                        targets: enemy,
+                        angle: -5,
+                        duration: 90,
+                        ease: 'Sine.easeInOut'
+                    });
+
+                    if (this.vfx && enemy.body.touching.down) {
+                        this.vfx.createEmitter(
+                            'dust',
+                            enemy.x - (enemy.flipX ? -10 : 10),
+                            enemy.y + enemy.displayHeight / 3,
+                            0.005,
+                            enemy.flipX ? 180 : 0,
+                            20
+                        ).explode(1);
+                    }
+                } else {
+                    enemy.leftLeg = true;
+                    enemy.rightLeg = false;
+
+                    this.tweens.add({
+                        targets: enemy,
+                        angle: 5,
+                        duration: 90,
+                        ease: 'Sine.easeInOut'
+                    });
+                }
+            },
+            loop: true
+        });
     }
     
     blinkEffect(object = this.powerUpText, duration = 300, blinks = 3) {
@@ -507,18 +1651,31 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+
+    updateLivesDisplay() {
+        for (let i = 0; i < this.maxLives; i++) {
+            this.livesArray[i].setVisible(i < this.currentLives);
+        }
+    }
+
     collectPowerUp(player, powerUp) {
         powerUp.destroy();
-
-        if (player.power_state === PLAYER_STATE.SMALL) {
+        if (player.power_state === PLAYER_STATE.SMALL && this.currentLives >= 3 ) {
             this.powerUpText.text = "SIZE POWER UP";
-            this.blinkEffect(this.powerUpText, 200, 5);
+            this.blinkEffect(this.powerUpText, this.scale.width/2, 5);
             player.power_state++;
+            this.sizeIcon.setAlpha(1);
+             this.currentHealth = 150;
             // When collecting the size power-up:
             this.sounds.upgrade_1.setVolume(0.1).setLoop(false).play();
 
             // When collecting the bullet power-up:
             this.sounds.upgrade_2.setVolume(0.001).setLoop(false).play();
+
+            
+            
+            // Bullet icon remains inactive until next stage
+            this.bulletIcon.setAlpha(0.3);
 
             // Multiply the current dimensions by a factor (e.g., 1.5x increase)
             this.tweens.add({
@@ -527,17 +1684,93 @@ class GameScene extends Phaser.Scene {
                 scaleX: this.player.scaleX * 1.5,
                 scaleY: this.player.scaleY * 1.5,
                 duration: 100,
-                ease: 'Power1'
+                ease: 'Power1',
+                onComplete: () => {
+                // ─── GROW VFX: emit a quick burst at the player's torso ───
+                this.vfx.createEmitter(
+                    'enemy',  // any particle texture you like (e.g. a glow or spark)
+                    this.player.x,
+                    this.player.y,
+                    0.01, 0,
+                    400
+                ).explode(20);
+             }
             });
-        } else if (player.power_state === PLAYER_STATE.BIG) {
+            // ── NEW: give 2 extra lives, clamp to max
+           
+                this.currentLives = Math.min(this.currentLives + 2, this.maxLives);
+                this.updateLivesDisplay();
+            
+        } 
+        
+        else if (player.power_state === PLAYER_STATE.BIG && this.currentLives >= 5 ) {
             this.powerUpText.text = "BULLET POWER UP";
             this.blinkEffect(this.powerUpText, 200, 5);
             player.power_state++;
+            this.bulletIcon.setAlpha(1);
+             player.setTexture('player_bullet');
             this.sounds.upgrade_2.setVolume(1).setLoop(false).play();
-            player.setTint(0xff00ff);
             this.input.keyboard.on('keydown-Z', this.shootBullet, this);
+           
+
+            this.currentLives = Math.min(this.currentLives + 1, this.maxLives);
+            this.updateLivesDisplay();
+        } 
+
+        // 3) BULLETS → SHIELD
+        else if (player.power_state === PLAYER_STATE.BULLETS) {
+            this.powerUpText.text = "SHIELD ACTIVATED";
+            this.blinkEffect(this.powerUpText, this.scale.width / 2, 5);
+
+            player.power_state = PLAYER_STATE.SHIELD;
+            this.shieldIcon.setAlpha(1);
             this.colorAnimation(true, this.player);
-        } else {
+            this.input.keyboard.on('keydown-Z', this.shootBullet, this);
+
+            this.currentLives = Math.min(this.currentLives + 1, this.maxLives);
+            this.updateLivesDisplay();
+        }
+
+        // 4) SHIELD → MISSILE
+        else if (player.power_state === PLAYER_STATE.SHIELD) {
+            this.powerUpText.text = "MISSILE POWER UP";
+            this.blinkEffect(this.powerUpText, this.scale.width / 2, 5);
+            this.missileCount = 5;
+            this.updateMissileCount();
+
+            player.power_state = PLAYER_STATE.MISSILE;
+
+            // Activate the missile icon, dim the shield icon
+            this.missileIcon.setAlpha(1);
+
+            // Bind Z to shoot missiles instead of bullets
+            this.input.keyboard.off('keydown-Z', this.shootBullet, this);
+            this.input.keyboard.on('keydown-Z', this.shootMissile, this);
+
+            // Give +1 life (clamp to 8)
+            this.currentLives = Math.min(this.currentLives + 1, this.maxLives);
+            this.updateLivesDisplay();
+        }
+
+        else if (player.power_state === PLAYER_STATE.MISSILE) {
+            if (this.missileCount === 0) {
+                this.updateMissileCount();
+                 this.input.keyboard.on('keydown-Z', this.shootBullet, this);
+                this.input.keyboard.off('keydown-Z', this.shootMissile, this);
+            } else {
+                // Add 5 missiles
+                this.missileCount += 5;
+                this.updateMissileCount()
+                 this.input.keyboard.off('keydown-Z', this.shootBullet, this);
+                this.input.keyboard.on('keydown-Z', this.shootMissile, this);
+                
+            }
+            this.powerUpText.text = "MISSILES +5";
+            this.blinkEffect(this.powerUpText, this.scale.width / 2, 5);
+        }
+        else {
+            this.currentLives++;
+            this.updateLivesDisplay(); 
             this.updateScore(10);
         }
     }
@@ -566,8 +1799,79 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+
+    enableMissiles(count) {
+         this.missileCount = count;
+        this.missileIcon.setAlpha(1);
+
+        // Update the missile count text
+        this.updateMissileCount();
+
+        // Rebind Z to shoot missiles instead of bullets
+        this.input.keyboard.off('keydown-Z', this.shootBullet, this);
+        this.input.keyboard.on('keydown-Z', this.shootMissile, this);
+    }
+
+    disableMissiles() {
+         this.missileIcon.setAlpha(0.3);
+
+        // Hide the missile count text when missiles are disabled
+        this.missileCountText.setText(0);
+
+        // Rebind Z to shoot bullets instead of missiles
+        this.input.keyboard.off('keydown-Z', this.shootMissile, this);
+        this.input.keyboard.on('keydown-Z', this.shootBullet, this);
+    }
+
+    updateMissileCount() {
+        this.missileCountText.setText(`${this.missileCount}`);
+    }
+
+    shootMissile() {
+
+         if (this.missileCount > 0) {
+        // Existing missile shooting logic...
+        this.missileCount -= 1;
+
+        this.updateMissileCount();
+
+            // 1) Get an inactive missile from the group
+            const xOffset = this.player.flipX ? -20 : +20;
+            const spawnX  = this.player.x + xOffset;
+            const spawnY  = this.player.y;
+
+            const missile = this.missiles.get(spawnX, spawnY, 'missile');
+            if (!missile) return; // no free missile available
+
+            missile.enableBody(true, spawnX, spawnY, true, true);
+
+            // 2) Activate & position it
+            missile.setActive(true);
+            missile.setVisible(true);
+            missile.body.allowGravity = false; // so it flies straight
+
+            // 3) Scale & rotation
+            missile.setScale(0.25);
+            missile.setAngle(this.player.flipX ? 180 : 0);
+
+            // 4) Launch velocity
+            const speed = 400;
+            missile.setVelocityX(this.player.flipX ? -speed : speed);
+
+            // 5) Automatically destroy after 2 seconds if it hasn’t already hit
+            this.time.delayedCall(2000, () => {
+                if (missile.active) missile.destroy();
+            });
+
+             if (this.missileCount === 0) {
+                this.disableMissiles();
+            }
+
+        }
+    }
+
     shootBullet() {
-        if (this.player.power_state === PLAYER_STATE.BULLETS) {
+        if (this.player.power_state >= 2) {
             this.sounds.shoot.setVolume(0.2).setLoop(false).play();
             let bullet = this.bullets.get(this.player.x, this.player.y);
             if (bullet) {
@@ -593,7 +1897,51 @@ class GameScene extends Phaser.Scene {
         this.blueEmitter = this.vfx.createEmitter('enemy', enemy.x, enemy.y, 0.01, 0, 600);
         this.blueEmitter.explode(300);
         enemy.destroy();
+        
+        bullet.setActive(false);
+        bullet.setVisible(false);
+        bullet.body.enable = false;
+
         this.updateScore(1);
+    }
+
+    updateBossLivesDisplay() {
+        for (let i = 0; i < this.bossMaxLives; i++) {
+            this.bossLivesArray[i].setVisible(i < this.bossCurrentLives);
+        }   
+    }
+
+    onBulletBossCollision(boss, bullet) {
+        bullet.destroy(); // Only destroy bullet
+        this.updateBossLivesDisplay();
+
+        this.bossCurrentLives--;
+
+       this.bossCurrentLives = Math.max(this.bossCurrentLives, 0); // Prevent negative lives
+        if (this.bossCurrentLives <= 0 && !this.bossDefeated) {
+            this.bossDefeated = true; // Set bossDefeated to true
+            this.onBossDefeated();   // Handle boss defeat
+        }
+    }
+
+    onMissileBossCollision(boss, missile) {
+        missile.destroy(); // Only destroy missile
+
+        this.bossCurrentLives -= 2;
+        this.updateBossLivesDisplay();
+
+       this.bossCurrentLives = Math.max(this.bossCurrentLives, 0); // Prevent negative lives
+        if (this.bossCurrentLives <= 0 && !this.bossDefeated) {
+            this.bossDefeated = true; // Set bossDefeated to true
+            this.onBossDefeated();   // Handle boss defeat
+        }
+        
+    }
+
+    // New function to handle level transition
+    transitionToNextLevel() {
+        console.log("Boss defeated! Transitioning to Level 2...");
+        this.scene.start('Level2'); // Replace 'Level2' with the actual key for your Level 2 scene
     }
 
     onPlayerEnemyCollision(player, enemy) {
@@ -627,51 +1975,112 @@ class GameScene extends Phaser.Scene {
                     });
                 }
             });
-        } else {
+        }  
+        else {
+             if (this.currentLives > 0) {
+            this.currentLives--;
+            this.livesArray[this.currentLives].setVisible(false);
+            this.cameras.main.shake(200);
+            enemy.destroy();
+             }
+            // 2) GAME OVER?
+            if (this.currentLives === 0) {
+                console.log("Game Over - No lives left");
+                player.setTint(0xff0000);
+                this.physics.pause();
+                this.cameras.main.shake(200);
+                this.sound.stopAll();
+                this.sounds.lose.setVolume(0.2).setLoop(false).play();
+                this.sounds.lose.on('complete', () => this.gameOver());
+                return;
+            }
             this.input.keyboard.off('keydown-SPACE', this.shootBullet, this);
-            if (player.power_state === PLAYER_STATE.BULLETS) {
+             if (player.power_state === PLAYER_STATE.MISSILE) {
+                player.power_state = PLAYER_STATE.SHIELD;
+
+                // Re‐activate shield VFX (if desired). If you want the shield glow to persist after downgrade:
+                this.colorAnimation(true, player);
+
+                // Update icons
+                this.missileIcon.setAlpha(0.3);
+
+                // Rebind Z to shoot bullets instead of missiles
+                this.input.keyboard.off('keydown-Z', this.shootMissile, this);
+                this.input.keyboard.on('keydown-Z', this.shootBullet, this);
+                
+                }
+
+                // 3) If in SHIELD → revert to BULLETS, destroy enemy, no life lost
+                if (player.power_state === PLAYER_STATE.SHIELD && this.currentLives < 6) {
+                 player.power_state = PLAYER_STATE.BULLETS;
+                this.colorAnimation(false, player); // remove shield glow
+                this.shieldIcon.setAlpha(0.3);
+                player.setTexture('player');
+               
+
+                // Ensure Z fires bullets
+                this.input.keyboard.off('keydown-Z', this.shootMissile, this);
+                this.input.keyboard.on('keydown-Z', this.shootBullet, this);      
+                }
+
+            if (player.power_state === PLAYER_STATE.BULLETS  && this.currentLives == 5) {
                 this.sounds.damage.setVolume(1).setLoop(false).play();
                 this.colorAnimation(false, this.player);
                 player.power_state--;
+                this.bulletIcon.setAlpha(0.3);
                 player.setAngularVelocity(-900);
                 this.time.delayedCall(500, () => {
                     player.setAngle(0);
                     player.setAngularVelocity(0);
                 });
-                this.cameras.main.shake(50);
-                enemy.destroy();
-            } else if (player.power_state === PLAYER_STATE.BIG) {
+              
+            } 
+           if (this.currentLives === 3 && player.power_state === PLAYER_STATE.BIG) {
                 this.sounds.damage.setVolume(1).setLoop(false).play();
                 player.power_state--;
+                 this.sizeIcon.setAlpha(0.3);
+                this.colorAnimation(false, this.player);
                 player.setAngularVelocity(-900);
                 this.time.delayedCall(500, () => {
                     player.setAngle(0);
                     player.setAngularVelocity(0);
                 });
                 this.tweens.add({
-                    targets: player,
-                    scaleY: player.scaleX - 0.03,
-                    scaleX: player.scaleY - 0.03,
-                    duration: 100,
+                    targets: this.player,
+                    scaleX: this.player.scaleX / 1.5,
+                    scaleY: this.player.scaleY / 1.5,
+                    duration: 200,
                     ease: 'Power1'
                 });
-                this.cameras.main.shake(100);
-                enemy.destroy();
-            } else {
-                console.log("lose");
-                player.setTint(0xff0000);
-                this.physics.pause();
-                this.cameras.main.shake(200);
-
-                this.sound.stopAll();
-                this.sounds.lose.setVolume(0.2).setLoop(false).play();
-
-                this.sounds.lose.on('complete', () => {
-                    this.gameOver();
-                });
-            }
+               
+            } 
+            
         }
     }
+
+    setupMobileScaling() {
+        if (!this.platforms) {
+            console.error('Platforms group is not initialized');
+            return;
+        }
+
+        if (!this.platforms.children || this.platforms.children.entries.length === 0) {
+            console.error('No platforms found in the group');
+            return;
+        }
+
+        // Iterate over children and apply scaling
+        this.platforms.children.each((platform) => {
+            if (platform) {
+                platform.setScale(1).refreshBody(); // Reduce size and refresh body
+            } else {
+                console.error('Platform object is undefined');
+            }
+    });
+
+    console.log('Mobile scaling applied to platforms');
+}
+
 
     createMobileButtons() {
         // Remove joystick and add left/right buttons on bottom left
@@ -731,7 +2140,7 @@ class GameScene extends Phaser.Scene {
     }
 
     updateScoreText() {
-        this.scoreText.setText("x " + this.score);
+        this.scoreText.setText(this.score);
     }
 
     gameOver() {
