@@ -17,10 +17,7 @@ class GameScene extends Phaser.Scene {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
 
-        this.load.image("platform", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Glass/s2+Glass+03.png");
-        this.load.image("arrow", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/arrow.png");
-        this.load.image("heart", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png");
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        
 
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";

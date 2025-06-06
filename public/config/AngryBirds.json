@@ -1,10 +1,17 @@
 {
     "description": "Aim and throw your character at targets with increasing difficulty to score the highest points possible.",
     "deviceOrientation": "landscape",
+    "libLoader" :{
+        "platform": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Glass/s2+Glass+03.png",
+        "arrow": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/arrow.png",
+        "heart":"https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png",
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+
+    },
     "imageLoader": {
-        "background": "public/assets/background_1.png",
-        "player": "public/assets/player_1.png",
-        "enemy": "public/assets/enemy_1.png"
+        "background": "background",
+        "player": "player",
+        "enemy": "enemy"
     },
     "instructions": "Instructions:1. Click, hold, and drag to aim. 2. Release to shoot. 3. Destroy all obstacles.4. You have 3 lives.",
     "orientationSizes": {
