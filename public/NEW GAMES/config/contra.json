@@ -3,23 +3,29 @@
     "description": "A run-and-gun platformer inspired by Contra's first level. Move, jump, and shoot to defeat enemies!",
     "deviceOrientation": "landscape",
     "imageLoader": {
-        "background": "public/assets/background_1.png",
-        "player": "public/assets/player_1.png",
-        "enemy": "public/assets/enemy_1.png",
+        "background": "background",
+        "player": "player",
+        "enemy": "enemy"
+        
+    },
+    "libLoader":{
         "bullEnemy": "public/assets/enemy_2.png",
         "bossEnemy": "public/assets/enemy_3.png",
         "playerBullet": "public/assets/asteroid.png",
         "enemyBullet": "public/assets/circle.png",
-        "platform": "public/assets/platform_1.png",
-        "platform1": "public/assets/platform_2.png",
-        "platform2": "public/assets/player_3.png",
-        "platform3": "public/assets/player_1.png",
-        "platform4": "public/assets/platform_1.png",
-        "platform5": "public/assets/player_3.png",
-        "platform7": "public/assets/platform_2.png",
+        "platform": "platform",
+        "platform1": "platform_1",
+        "platform2": "platform_1",
+        "platform3": "platform_1",
+        "platform4": "platform_1",
+        "platform5": "platform_1",
+        "platform7": "platform_1",
         "powerup_capsule": "public/assets/dollar.png",
         "powerup": "public/assets/key.jpg",
-        "powerup1": "public/assets/mango.png"
+        "powerup1": "public/assets/mango.png",
+        "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png",
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+
     },
     "instructions": "Instructions: Use arrow keys to move: Left/Right to run, Up + X to jump, Down + X to drop through platforms. Press Z to shoot. Defeat enemies and avoid their bullets. Watch out for charging enemies! Reach 6000 score to fight the Final Boss. I'm warning you, it's not that easy!",
     "deviceOrientationSizes": {
