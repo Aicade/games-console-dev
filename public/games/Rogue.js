@@ -16,8 +16,7 @@ class GameScene extends Phaser.Scene {
         console.log('Preload started');
         addEventListenersPhaser.bind(this)();
 
-        this.load.image("heart", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png");
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
+        
 
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
@@ -26,8 +25,10 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
 
-        this.load.image('plus', this.createPlusTexture());
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
@@ -39,6 +40,7 @@ class GameScene extends Phaser.Scene {
 
     create() {
         console.log('Create method started');
+        this.createPlusTexture()
         this.vfx = new VFXLibrary(this);
         this.isMobile = !this.sys.game.device.os.desktop;
         isMobile = !this.sys.game.device.os.desktop;

@@ -2,11 +2,16 @@
     "description": "A thrilling shooting and survival game.",
     "deviceOrientation": "landscape",
     "imageLoader": {
-      "background": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/clearoff.png?t=1743741485907",
-      "player": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/1743742149949.png?t=1743742159771",
-      "enemy": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/1743742565030.png?t=1743742710700",
-      "collectible": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/diamond1.png?t=1743743504633",
-      "projectile": "https://aicade-user-store.s3.amazonaws.com/1334528653/games/1EfhKOphiHv3PzOw/assets/images/newAsset_1.png?t=1743741208412"
+      "background": "background",
+      "player": "player",
+      "enemy": "enemy",
+      "collectible": "collectible",
+      "projectile": "projectile"
+    },
+    "libLoader":{
+      "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+      "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png"
+
     },
     "instructions": "Instructions:1. Use arrow keys OR joystick to move. 2. Collect power ups to upgrade weapons and regenerated health.",
     "orientationSizes": {
