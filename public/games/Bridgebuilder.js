@@ -418,5 +418,3 @@ const IDLE = 0;
 const WAITING = 1;
 const GROWING = 2;
 const WALKING = 3;
-
-const game = new Phaser.Game(config);
