@@ -6,15 +6,11 @@
         "player": "player",
         "projectile": "projectile"
     },
-    "libLoader": {
-        "pauseButton":"https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
-        "pillar": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png"
-    },
     "soundsLoader": {
-        "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/0i68mc_9a1f09d4-5dee-4c54-9dbd-2908c43add5a.mp3?t=1749322919620",
+        "background": "https://files.catbox.moe/0i68mc.mp3",
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
         "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
-        "score": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/mand0o_277ba623-b319-4a86-a70a-769fe9fe11fe.mp3?t=1749322962904"
+        "score": "https://files.catbox.moe/mand0o.mp3"
     },
     "instructions": "1. Tap to strech.",
     "orientationSizes": {
@@ -29,7 +25,5 @@
     },
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
-    "title": "Bridge Builder",
-    "rexJoystickUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js",
-    "rexButtonUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js"
+    "title": "Bridge Builder"
 }
