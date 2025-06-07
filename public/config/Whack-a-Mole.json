@@ -6,6 +6,9 @@
         "enemy": "enemy"
         
     },
+    "libLoader": {
+        "pauseButton":"https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
+    },
     "instructions": "Instructions: 1. Click the enemies to kill them. 2. Set the highest score in the given time.",
     "orientationSizes": {
         "landscape": {
@@ -24,5 +27,7 @@
         "spawn": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/pop.mp3",
         "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav"
     },
-    "title": "Whack a Mole"
+    "title": "Whack a Mole",
+    "rexJoystickUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js",
+    "rexButtonUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js"
   }

@@ -2,29 +2,6 @@
 const joystickEnabled = false;
 const buttonEnabled = false;
 
-// JOYSTICK DOCUMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/virtualjoystick/
-const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
-
-// BUTTON DOCMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/button/
-const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
-
-function gameScenePreload(scene) {
-    if (joystickEnabled) scene.load.plugin('rexvirtualjoystickplugin', rexJoystickUrl, true);
-    if (buttonEnabled) scene.load.plugin('rexbuttonplugin', rexButtonUrl, true);
-
-    for (const key in _CONFIG.imageLoader) {
-        scene.load.image(key, _CONFIG.imageLoader[key]);
-    }
-
-    for (const key in _CONFIG.soundsLoader) {
-        scene.load.audio(key, [_CONFIG.soundsLoader[key]]);
-    }
-
-    scene.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-    const fontName = 'pix';
-    const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
-    scene.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
-}
 
 // Game Scene
 class GameScene extends Phaser.Scene {
@@ -40,7 +17,26 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        gameScenePreload(this);
+       if (joystickEnabled && _CONFIG.rexJoystickUrl) {
+            this.load.plugin('rexvirtualjoystickplugin', _CONFIG.rexJoystickUrl, true);
+        }
+        if (buttonEnabled && _CONFIG.rexButtonUrl) {
+            this.load.plugin('rexbuttonplugin', _CONFIG.rexButtonUrl, true);
+        }
+
+    for (const key in _CONFIG.imageLoader) {
+        scene.load.image(key, _CONFIG.imageLoader[key]);
+    }
+
+    for (const key in _CONFIG.soundsLoader) {
+        scene.load.audio(key, [_CONFIG.soundsLoader[key]]);
+    }
+    for (const key in _CONFIG.libLoader) {
+        scene.load.image(key, _CONFIG.libLoader[key]);
+    }
+    const fontName = 'pix';
+    const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
+    scene.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
         displayProgressLoader.call(this);
         addEventListenersPhaser.bind(this)();
     }
