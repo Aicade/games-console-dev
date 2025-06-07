@@ -17,11 +17,11 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-        this.load.image("path","https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/texture-cobble-granite-pavement_839833-30880.png?t=1744297529374");
-        this.load.image("tower1", "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/tower%201.png?t=1744316977538");
-        this.load.image("tower2", "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/tower%202.png?t=1744316977583");
-        this.load.image("tower3", "https://aicade-user-store.s3.amazonaws.com/0306251268/games/dYMpo2kPtXDB3iSp/assets/images/tower%203.png?t=1744316977313");
+        
+        for(const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
+        
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
