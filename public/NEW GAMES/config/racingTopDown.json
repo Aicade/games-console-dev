@@ -1,20 +1,14 @@
 {
   "title": "Racing Rush",
-  "description": "Highway racing",
-  "instructions": "Dodge against the cars and complete the laps",
+  "description": "<p>Highway racing</p>",
+  "instructions": "Dodge against the cars",
   "deviceOrientation": "landscape",
   "imageLoader": {
-    "player": "player",
-    "enemy_1": "enemy_1",
-    "enemy_2": "enemy_2",
-    "enemy_3": "enemy_3"
-  },
-  "soundsLoader": {
-    "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-8.mp3",
-    "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
-    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
-    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
-    "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3"
+    "player_car": "player_car",
+    "enemy_car_1": "enemy_car_1",
+    "enemy_car_2": "enemy_car_2",
+    "enemy_car_3": "enemy_car_3"
+    
   },
   "libLoader": {
     "straightroad": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/straightroad.png?t=1748765805388",
@@ -22,10 +16,17 @@
     "roadcorner": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/roadcorner.png?t=1748942532071",
     "speedometer": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/speedometer.png?t=1749032964244",
     "tire": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/tire.png?t=1749040963040",
+    "play_button": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/play_button.png?t=1749048311610",
     "retrybutton": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/retrybutton.png?t=1749137974256",
     "start_tile": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/start_tile.png?t=1749138049117",
     "finish_tile": "https://aicade-user-store.s3.amazonaws.com/7126830044/games/dm09pWPYX71cUQvM/assets/images/finish_tile.png?t=1749138060992"
-    
+  },
+  "soundsLoader": {
+    "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-8.mp3",
+    "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
+    "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
+    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
+    "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3"
   },
   "deviceOrientationSizes": {
     "landscape": {

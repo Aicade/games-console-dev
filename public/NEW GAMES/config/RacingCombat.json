@@ -1,14 +1,14 @@
 {
-  "title": "Racing Combat",
+  "title": "Road of Fury - Desert Strike",
   "description": "A post-apocalyptic vehicular combat game where you battle through endless desert highways against enemy convoys and drones.",
   "instructions": "Controls: Arrow keys to move up/down, Spacebar to shoot. Collect power-ups and destroy enemies to survive!",
   "deviceOrientation": "landscape",
   "imageLoader": {
-    "background": "background",
-    "player": "player",
-    "enemy_1": "enemy_1",
-    "enemy": "enemy",
-    "enemy_2": "enemy_2",
+    "Background": "Background",
+    "Player": "Player",
+    "enemy_truck": "enemy_truck",
+    "enemy_bike": "enemy_bike",
+    "enemy_drone": "enemy_drone",
     "projectile": "projectile",
     "projectile_1": "projectile_1"
   },
