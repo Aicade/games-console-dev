@@ -26,26 +26,10 @@ class GameScene extends Phaser.Scene {
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-
-        this.load.image('pathTexture', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/assets/images/road%20texture.png?t=1743839407964');
-        this.load.image('heavyWeapon', 'https://play.rosebud.ai/assets/heavyWeapon.png?7M0N');
-        this.load.image('rapidWeapon', 'https://play.rosebud.ai/assets/rapidWeapon.png?NEDt');
-        this.load.image('superWeapon', 'https://play.rosebud.ai/assets/superWeapon.png?raYA');
-        this.load.image('heavyWeaponIcon', 'https://play.rosebud.ai/assets/heavyWeaponIcon.png?Li77');
-        this.load.image('rapidWeaponIcon', 'https://play.rosebud.ai/assets/rapidWeaponIcon.png?lX1z');
-        this.load.image('superWeaponIcon', 'https://play.rosebud.ai/assets/superWeaponIcon.png?7ik8');
-        this.load.image('enemy', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/assets/images/newAsset_6.png?t=1743618033935');
-        // this.load.image('enemy', 'https://play.rosebud.ai/assets/enemy.png?VY59');
-        this.load.image('heavyProjectile', 'https://play.rosebud.ai/assets/heavyProjectile.png?meyw');
-        this.load.image('rapidProjectile', 'https://play.rosebud.ai/assets/rapidProjectile.png?s5Mb');
-        this.load.image('superProjectile', 'https://play.rosebud.ai/assets/superProjectile.png?y2EC');
-        // this.load.image('playerBase', 'https://play.rosebud.ai/assets/playerBase.png?sdoI');
-        this.load.image('playerBase', 'https://aicade-user-store.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/assets/images/newAsset_5.png?t=1743677119761');
-        this.load.image('healthBarFrame', 'https://play.rosebud.ai/assets/healthBarFrame.png?OeMt');
-
-        this.load.image("ow", "https://aicade-user-store.s3.amazonaws.com/0306251268/games/3hUAYEeFzgiJvaRR/assets/images/newAsset_8.png?t=1743945853522");
-        this.load.image("skull", "https://aicade-user-store.s3.amazonaws.com/0306251268/games/5GVig3hxQHZ44k3Z/assets/images/skull.png?t=1744047475314");
+        
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
     
 
 
@@ -232,7 +216,7 @@ class GameScene extends Phaser.Scene {
 
         this.vfx.addCircleTexture('hitParticle', 0xff0000, 1, 10);
         // Player base
-        this.player = this.add.image(400, 550, 'playerBase').setScale(0.2).setDepth(1);
+        this.player = this.add.image(400, 550, 'enemy_1').setScale(0.2).setDepth(1);
         // Health bar with frame
         // this.add.image(400, 500, 'healthBarFrame').setScale(0.3).setDepth(1);
         // this.healthBar = this.add.rectangle(400, 500, 100, 10, 0x00ff00);
@@ -287,25 +271,25 @@ class GameScene extends Phaser.Scene {
 
     createWeapons() {
         const weaponConfigs = [{
-            texture: 'heavyWeapon',
-            icon: 'heavyWeaponIcon',
-            projectile: 'heavyProjectile',
+            texture: 'weapon_1',
+            icon: 'weapon_1_icon',
+            projectile: 'projectile_1',
             damage: 30,
             cooldown: 1000,
             name: 'Heavy',
             killThreshold: 5
         }, {
-            texture: 'rapidWeapon',
-            icon: 'rapidWeaponIcon',
-            projectile: 'rapidProjectile',
+            texture: 'weapon_2',
+            icon: 'weapon_2_icon',
+            projectile: 'projectile_2',
             damage: 15,
             cooldown: 500,
             name: 'Rapid',
             killThreshold: 0
         }, {
-            texture: 'superWeapon',
-            icon: 'superWeaponIcon',
-            projectile: 'superProjectile',
+            texture: 'weapon_3',
+            icon: 'weapon_3_icon',
+            projectile: 'projectile_3',
             damage: 45,
             cooldown: 2000,
             name: 'Super',
@@ -428,7 +412,7 @@ class GameScene extends Phaser.Scene {
 
     spawnEnemy() {
         const baseScale = Math.min(this.game.config.width / 800, this.game.config.height / 600);
-        const enemy = this.add.image(400, 0, 'enemy').setScale(0.3 * baseScale);
+        const enemy = this.add.image(400, 0, 'enemy_2').setScale(0.3 * baseScale);
         enemy.health = 50;
         enemy.setDepth(10);
         this.enemyGroup.add(enemy);
