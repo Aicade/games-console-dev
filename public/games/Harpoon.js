@@ -2,12 +2,6 @@
 const joystickEnabled = false;
 const buttonEnabled = false;
 
-// JOYSTICK DOCUMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/virtualjoystick/
-const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
-
-// BUTTON DOCMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/button/
-const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
-
 // Game Scene
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -22,8 +16,12 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
         addEventListenersPhaser.bind(this)();
 
-        if (joystickEnabled) this.load.plugin('rexvirtualjoystickplugin', rexJoystickUrl, true);
-        if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
+        if (joystickEnabled && _CONFIG.rexJoystickUrl) {
+            this.load.plugin('rexvirtualjoystickplugin', _CONFIG.rexJoystickUrl, true);
+        }
+        if (buttonEnabled && _CONFIG.rexButtonUrl) {
+            this.load.plugin('rexbuttonplugin', _CONFIG.rexButtonUrl, true);
+        }
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
         }
