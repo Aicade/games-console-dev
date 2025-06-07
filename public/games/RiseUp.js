@@ -1,12 +1,6 @@
-// Touuch Screen Controls
+// Touch Screen Controls
 const joystickEnabled = false;
 const buttonEnabled = false;
-
-// JOYSTICK DOCUMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/virtualjoystick/
-const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
-
-// BUTTON DOCMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/button/
-const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
 
 // Game Scene
 class GameScene extends Phaser.Scene {
@@ -14,91 +8,102 @@ class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.enemyBaseVelocityX = -100;
         this.isGameOver = false;
-
+        this.score = 0;
+        this.enemySpawnDelay = 2000;
+        this.timerDelay = 2000;
     }
 
     preload() {
-        this.score = 0;
-        this.enemySpawnDelay = 2000;
-
         addEventListenersPhaser.bind(this)();
 
-        if (joystickEnabled) this.load.plugin('rexvirtualjoystickplugin', rexJoystickUrl, true);
-        if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
-        for (const key in _CONFIG.imageLoader) {
-            this.load.image(key, _CONFIG.imageLoader[key]);
-          }
-        
-          for (const key in _CONFIG.soundsLoader) {
-            this.load.audio(key, [_CONFIG.soundsLoader[key]]);
-          }
+         if (joystickEnabled && _CONFIG.rexJoystickUrl) {
+            this.load.plugin('rexvirtualjoystickplugin', _CONFIG.rexJoystickUrl, true);
+        }
+        if (buttonEnabled && _CONFIG.rexButtonUrl) {
+            this.load.plugin('rexbuttonplugin', _CONFIG.rexButtonUrl, true);
+        }
 
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-        this.load.image("pillar", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png");
+        // Load images from config
+        if (typeof _CONFIG !== "undefined" && _CONFIG.imageLoader) {
+            for (const key in _CONFIG.imageLoader) {
+                this.load.image(key, _CONFIG.imageLoader[key]);
+            }
+        }
 
+        // Load sounds from config
+        if (typeof _CONFIG !== "undefined" && _CONFIG.soundsLoader) {
+            for (const key in _CONFIG.soundsLoader) {
+                this.load.audio(key, _CONFIG.soundsLoader[key]);
+            }
+        }
+
+        // Load bitmap font
         const fontName = 'pix';
-        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/"
+        const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
         this.load.bitmapFont('pixelfont', fontBaseURL + fontName + '.png', fontBaseURL + fontName + '.xml');
 
-        displayProgressLoader.call(this);
+        // Load libraries from config
+        if (typeof _CONFIG !== "undefined" && _CONFIG.libLoader) {
+            for (const key in _CONFIG.libLoader) {
+                this.load.image(key, _CONFIG.libLoader[key]);
+            }
+        }
 
+        displayProgressLoader.call(this);
     }
 
     create() {
         this.isGameOver = false;
         this.score = 0;
         this.enemySpawnDelay = 2000;
+        this.timerDelay = 2000;
 
+        // Sounds
         this.sounds = {};
-        for (const key in _CONFIG.soundsLoader) {
-        this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
+        if (typeof _CONFIG !== "undefined" && _CONFIG.soundsLoader) {
+            for (const key in _CONFIG.soundsLoader) {
+                this.sounds[key] = this.sound.add(key, { loop: false, volume: 0.5 });
+            }
         }
 
-        this.sounds.background.setVolume(0.75).setLoop(false).play()
+        if (this.sounds.background) {
+            this.sounds.background.setVolume(0.75).setLoop(false).play();
+        }
 
         this.vfx = new VFXLibrary(this);
 
         this.width = this.game.config.width;
         this.height = this.game.config.height;
-        this.bg = this.add.tileSprite(0, 0, this.width/2, this.height/2, 'background').setOrigin(0, 0);
+        this.bg = this.add.tileSprite(0, 0, this.width, this.height, 'background').setOrigin(0, 0);
         this.bgSpeed = 1.5;
         this.bg.setScrollFactor(0);
-        this.bg.displayHeight = this.game.config.height;
-        this.bg.displayWidth = this.game.config.width;
+        this.bg.displayHeight = this.height;
+        this.bg.displayWidth = this.width;
 
-        this.player = this.physics.add.sprite(50, this.sys.game.config.height - 50, 'player').setScale(.2).setDepth(5).setOrigin(0.5, 1);
-        this.player.body.setGravityY(100); // Adjust gravity strength as needed
+        this.player = this.physics.add.sprite(50, this.height - 50, 'player').setScale(.2).setDepth(5).setOrigin(0.5, 1);
+        this.player.body.setGravityY(100);
         this.player.setCollideWorldBounds(true);
-        var newBodyWidth = this.player.body.width * 0.5; // Decrease width by 20%
+        var newBodyWidth = this.player.body.width * 0.5;
         var newBodyHeight = this.player.body.height * 0.5;
         this.player.body.setSize(newBodyWidth, newBodyHeight);
 
         let bubble = this.add.graphics({ x: -100, y: 0, add: false });
-
-        // Define the bubble's properties
         const bubbleRadius = 50;
-        const bubbleColor = 0xEF6C8B; // A nice bubble color
-
-        // Draw the bubble
-        bubble.fillStyle(bubbleColor, 0.5); // Semi-transparent
+        const bubbleColor = 0xEF6C8B;
+        bubble.fillStyle(bubbleColor, 0.5);
         bubble.fillCircle(bubbleRadius, bubbleRadius, bubbleRadius);
         bubble.generateTexture('bubbles', 100, 100);
 
         // Enemies
         this.enemies = this.physics.add.group({
-            collideWorldBounds: false,
-            bounceY: 0.2,
-            bounceX: 0.2
+            collideWorldBounds: false
         });
         this.platforms = this.physics.add.group({
-            collideWorldBounds: true,
-            bounceY: 0.2,
-            bounceX: 0.2
+            collideWorldBounds: true
         });
         this.physics.add.collider(this.player, this.platforms);
 
         this.physics.add.collider(this.platforms, this.enemies, (platform, enemy) => {
-
             this.enemyVFXEffect(platform, enemy);
             this.scoreUpdate();
             platform.destroy();
@@ -114,21 +119,20 @@ class GameScene extends Phaser.Scene {
         });
 
         this.input.on('pointerdown', (pointer) => {
-            this.sounds.damage.setVolume(0.5).setLoop(false).play()
+            if (this.sounds.damage) this.sounds.damage.setVolume(0.5).setLoop(false).play();
             const platform = this.platforms.create(this.player.x, this.player.y - 120, 'platform').setScale(.18).setOrigin(0.5, 0);
             platform.body.setAllowGravity(true);
             this.player.setY(platform.y - 10);
         });
 
-
         // Add UI elements
         this.scoreText = this.add.bitmapText(this.width / 2, 100, 'pixelfont', '0', 128).setOrigin(0.5, 0.5);
-        this.scoreText.setDepth(11)
+        this.scoreText.setDepth(11);
 
         // Add input listeners
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
 
-        this.pauseButton = this.add.sprite(this.game.config.width - 60, 60, "pauseButton").setOrigin(0.5, 0.5);
+        this.pauseButton = this.add.sprite(this.width - 60, 60, "pauseButton").setOrigin(0.5, 0.5);
         this.pauseButton.setInteractive({ cursor: 'pointer' });
         this.pauseButton.setScale(3);
         this.pauseButton.on('pointerdown', () => this.pauseGame());
@@ -142,67 +146,51 @@ class GameScene extends Phaser.Scene {
                 radius: 50,
                 base: this.add.circle(0, 0, 80, 0x888888, 0.5),
                 thumb: this.add.circle(0, 0, 40, 0xcccccc, 0.5),
-                dir: '8dir',   // 'up&down'|0|'left&right'|1|'4dir'|2|'8dir'|3
-                // forceMin: 16,
+                dir: '8dir'
             });
             this.joystickKeys = this.joyStick.createCursorKeys();
         }
 
         if (buttonEnabled) {
-            this.buttonA = this.add.rectangle(this.width - 80, this.height - 100, 80, 80, 0xcccccc, 0.5)
+            this.buttonA = this.add.rectangle(this.width - 80, this.height - 100, 80, 80, 0xcccccc, 0.5);
             this.buttonA.button = this.plugins.get('rexbuttonplugin').add(this.buttonA, {
                 mode: 1,
                 clickInterval: 100,
             });
 
             this.buttonA.button.on('down', (button, gameObject) => {
-                console.log("buttonA clicked");
+                // Button A clicked
             });
         }
         this.input.keyboard.disableGlobalCapture();
-
     }
 
     enemyVFXEffect(bullet, enemy) {
-        this.sounds.collect.setVolume(1).setLoop(false).play()
-        // Tween for moving up
-        // this.tweens.add({
-        //     targets: enemy,
-        //     y: '-=1', // Moves up by 100 units
-        //     ease: 'Power1',
-        //     // angle: 360,
-        //     duration: 400, // Adjust duration as needed
-        //     onComplete: () => {
+        if (this.sounds.collect) this.sounds.collect.setVolume(1).setLoop(false).play();
         this.tweens.add({
             targets: enemy,
             alpha: 0,
-            // scaleY: 0,
             ease: 'Linear',
             duration: 500,
             onComplete: () => {
                 enemy.destroy();
             }
         });
-        //     }
-        // });
-        // enemy.destroy();
 
         let pointsText = this.add.bitmapText(enemy.x, enemy.y - 75, 'pixelfont', '+10', 45)
             .setOrigin(0.5, 0.5);
 
-
         this.tweens.add({
             targets: pointsText,
             y: pointsText.y - 50,
-            alpha: 0, // Fade out
-            ease: 'Linear', // Animation ease
+            alpha: 0,
+            ease: 'Linear',
             duration: 1000,
             onComplete: function () {
                 pointsText.destroy();
             }
         });
     }
-
 
     update(time, delta) {
         if (!this.isGameOver) {
@@ -219,10 +207,8 @@ class GameScene extends Phaser.Scene {
                     scale: { start: .2, end: 0 },
                     blendMode: 'MULTIPLY',
                     lifespan: 750,
-                    // tint: 0x93C54B
                 });
 
-                // emitter.setPosition(x, y);
                 emitter.explode(75);
                 this.physics.pause();
                 this.player.destroy();
@@ -232,7 +218,7 @@ class GameScene extends Phaser.Scene {
                     .setAngle(-15);
 
                 this.time.delayedCall(500, () => {
-                    this.sounds.lose.setVolume(1).setLoop(false).play()
+                    if (this.sounds.lose) this.sounds.lose.setVolume(1).setLoop(false).play();
                     gameOverText.setVisible(true);
                     this.tweens.add({
                         targets: gameOverText,
@@ -249,11 +235,10 @@ class GameScene extends Phaser.Scene {
                 });
             });
         }
-
     }
+
     spawnEnemies() {
         if (!this.isGameOver) {
-
             const formations = [[4, 1], [7, 1], [5, 2]];
             const formation = formations[Math.floor(Math.random() * formations.length)];
             const startX = this.sys.game.config.width - 40;
@@ -262,8 +247,8 @@ class GameScene extends Phaser.Scene {
             for (let y = 0; y < formation[1]; y++) {
                 for (let x = 0; x < formation[0]; x++) {
                     let enemy = this.enemies.create(startX + x * 40, randomY + y * 40, 'enemy').setScale(.15);
-                    var newBodyWidth = enemy.body.width * 0.3; // Decrease width by 20%
-                    var newBodyHeight = enemy.body.height * 0.5; // Decrease height by 20%
+                    var newBodyWidth = enemy.body.width * 0.3;
+                    var newBodyHeight = enemy.body.height * 0.5;
                     enemy.body.setSize(newBodyWidth, newBodyHeight);
                     enemy.setVelocityX(this.enemyBaseVelocityX);
                 }
@@ -279,11 +264,9 @@ class GameScene extends Phaser.Scene {
             this.timerDelay = Math.max(200, this.enemySpawnDelay - 200);
             this.enemySpawnDelay = this.timerDelay;
             this.spawnEnemyTimer.delay = this.timerDelay;
-            console.log("delayTime " + this.enemySpawnDelay);
-            console.log("VelocityX " + this.enemyBaseVelocityX);
+            // Removed console.log for production
         }
     }
-
 
     updateScore(points) {
         this.score += points;
@@ -323,7 +306,6 @@ function displayProgressLoader() {
             fill: '#ffffff'
         }
     }).setOrigin(0.5, 0.5);
-    loadingText.setOrigin(0.5, 0.5);
 
     const progressBar = this.add.graphics();
     this.load.on('progress', (value) => {
@@ -331,9 +313,7 @@ function displayProgressLoader() {
         progressBar.fillStyle(0x364afe, 1);
         progressBar.fillRect(x, y, width * value, height);
     });
-    this.load.on('fileprogress', function (file) {
-          
-    });
+    this.load.on('fileprogress', function (file) {});
     this.load.on('complete', function () {
         progressBar.destroy();
         progressBox.destroy();
@@ -344,25 +324,25 @@ function displayProgressLoader() {
 // Configuration object
 const config = {
     type: Phaser.AUTO,
-    width: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width,
-    height: _CONFIG.orientationSizes[_CONFIG.deviceOrientation].height,
+    width: typeof _CONFIG !== "undefined" ? _CONFIG.orientationSizes[_CONFIG.deviceOrientation].width : 1280,
+    height: typeof _CONFIG !== "undefined" ? _CONFIG.orientationSizes[_CONFIG.deviceOrientation].height : 720,
     scene: [GameScene],
     scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     pixelArt: true,
     physics: {
-      default: "arcade",
-      arcade: {
-        gravity: { y: 0 },
-        debug: false,
-      },
+        default: "arcade",
+        arcade: {
+            gravity: { y: 0 },
+            debug: false,
+        },
     },
     dataObject: {
-      name: _CONFIG.title,
-      description: _CONFIG.description,
-      instructions: _CONFIG.instructions,
+        name: typeof _CONFIG !== "undefined" ? _CONFIG.title : "",
+        description: typeof _CONFIG !== "undefined" ? _CONFIG.description : "",
+        instructions: typeof _CONFIG !== "undefined" ? _CONFIG.instructions : "",
     },
-    orientation: _CONFIG.deviceOrientation === "landscape" 
-  };
+    orientation: typeof _CONFIG !== "undefined" ? _CONFIG.deviceOrientation === "landscape" : true
+};

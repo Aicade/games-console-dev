@@ -7,6 +7,10 @@
         "platform": "platform",
         "enemy": "enemy"
     },
+    "libLoader": {
+        "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+        "pillar": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png"
+    },
     "soundsLoader": {
         "background": "background",
         "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
@@ -27,5 +31,7 @@
     },
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
-    "title": "Rise Above"
+    "title": "Rise Above",
+    "rexJoystickUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js",
+    "rexButtonUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js"
 }
