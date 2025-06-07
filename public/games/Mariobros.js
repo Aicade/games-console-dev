@@ -4,11 +4,7 @@ const buttonEnabled = true;
 const hideButtons = true;
 var isMobile = false;
 
-// JOYSTICK DOCUMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/virtualjoystick/
-const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
 
-// BUTTON DOCMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/button/
-const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
 
 
 /*
@@ -47,7 +43,7 @@ class GameScene extends Phaser.Scene {
 
     init() {
 
-        this.currentLevel = LEVEL.SECOND; // Start with Level 1
+        this.currentLevel = LEVEL.THIRD; // Start with Level 1
 
         this.cursors = null;
         this.player = null;
@@ -113,7 +109,7 @@ class GameScene extends Phaser.Scene {
             this.load.image(key, _CONFIG.imageLoader[key]);
         }
 
-        if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
+       
 
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
@@ -144,12 +140,11 @@ class GameScene extends Phaser.Scene {
             'assets/fonts/PressStart2P.fnt'
         );
         
-        // Load plugins if enabled
-        if (joystickEnabled) {
-            this.load.plugin('rexvirtualjoystickplugin', "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js", true);
+        if (joystickEnabled && _CONFIG.rexJoystickUrl) {
+            this.load.plugin('rexvirtualjoystickplugin', _CONFIG.rexJoystickUrl, true);
         }
-        if (buttonEnabled) {
-            this.load.plugin('rexbuttonplugin', "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js", true);
+        if (buttonEnabled && _CONFIG.rexButtonUrl) {
+            this.load.plugin('rexbuttonplugin', _CONFIG.rexButtonUrl, true);
         }
         
         // Attach additional event listeners and display the progress loader
@@ -169,6 +164,8 @@ class GameScene extends Phaser.Scene {
 
         this.sounds.background.setVolume(0.1).setLoop(true).play();
 
+      
+
         // Create a tileSprite that covers more vertical space so it repeats the background image
         this.bg = this.add.tileSprite(
             0,
@@ -183,7 +180,7 @@ class GameScene extends Phaser.Scene {
             this.game.config.height - 50, // Adjust this Y position to align with your ground
             this.finishPoint + 200,
             100, // Height of the bottom platform
-            'bottom_platform' // Using the correct key
+            'platform_ground' // Using the correct key
         ).setOrigin(0, 0)
         .setScrollFactor(1)
         .setDepth(2);
@@ -340,7 +337,7 @@ class GameScene extends Phaser.Scene {
                 .setDepth(11);
 
         // Coin icon
-                this.scoreImg = this.add.image(60, 180, 'collectible_1')
+                this.scoreImg = this.add.image(60, 180, 'coin')
                     .setDisplaySize(65, 65) // slightly smaller for clean look
                     .setScrollFactor(0)
                     .setDepth(11);
@@ -531,7 +528,7 @@ class GameScene extends Phaser.Scene {
 
             // ─── 5) Create missile group before its collider ──────────────────────────
             this.missiles = this.physics.add.group({
-                defaultKey: 'missile',
+                defaultKey: 'player_powerup',
                 maxSize: 10
             });
 
@@ -590,7 +587,7 @@ class GameScene extends Phaser.Scene {
             });
 
             // ─── (NEW) Rocket launcher sprite (hidden until MISSILE stage)
-            this.rocketLauncher = this.add.image(this.player.x, this.player.y, 'rocketLauncher')
+            this.rocketLauncher = this.add.image(this.player.x, this.player.y, 'player_powerup2')
                 .setDisplaySize(48, 48)
                 .setOrigin(0.5, 0.5)
                 .setScrollFactor(0)
@@ -616,13 +613,8 @@ class GameScene extends Phaser.Scene {
             this.changeboss(); // Pass enemy and boss to the function
        
      
-
+            
         this.cursors = this.input.keyboard.createCursorKeys();
-         isMobile = this.scale.isPortrait || this.scale.width <= 1280;
-
-            if (isMobile) {
-                this.setupMobileScaling();
-            }
 
     }
 
@@ -905,17 +897,17 @@ class GameScene extends Phaser.Scene {
         if (this.currentLevel === LEVEL.FIRST) {
             // Load Level 1 assets
             this.bg.setTexture("background");
-            this.bottom_platform.setTexture("bottom_platform");
+            this.bottom_platform.setTexture("platform_ground");
            
         } else if (this.currentLevel === LEVEL.SECOND) {
             // Load Level 2 assets
-            this.bg.setTexture("background2");
-            this.bottom_platform.setTexture("bottomPlatform2");
+            this.bg.setTexture("background_2");
+            this.bottom_platform.setTexture("platform_ground2");
             
         } else if (this.currentLevel === LEVEL.THIRD) {
             // Load Level 2 assets
-            this.bg.setTexture("background3");
-            this.bottom_platform.setTexture("bottomPlatform3");
+            this.bg.setTexture("background_3");
+            this.bottom_platform.setTexture("platform_ground3");
             // this.platforms.getChildren().forEach((platform) => platform.setTexture("platform2"));
         }
         
@@ -926,14 +918,14 @@ class GameScene extends Phaser.Scene {
 
     createBoss() {
         const bossDesiredHeight = this.game.config.height * 0.66;
-        const bossOriginal = this.textures.get('boss').getSourceImage();
+        const bossOriginal = this.textures.get('enemy_boss').getSourceImage();
         const bossScaleFactor = bossDesiredHeight / bossOriginal.height;
 
         // Create the boss sprite
         this.boss = this.physics.add.sprite(
             this.finishPoint,
             0, // We will adjust Y below
-            'boss'
+            'enemy_boss'
         );
 
         this.boss.setScale(bossScaleFactor);
@@ -1087,7 +1079,7 @@ class GameScene extends Phaser.Scene {
                 const fireball = this.bossFireballs.create(
                 this.boss.x + mouthOffsetX,
                 this.boss.y + mouthOffsetY,
-                'fireball'
+                'enemy_boss_powrup'
                 );
 
                 fireball.setScale(0.25); // smaller fireball
@@ -1308,10 +1300,10 @@ class GameScene extends Phaser.Scene {
             let mushroomProbability = Phaser.Math.Between(1, 10) % 5 === 0;
 
             if (coinProbability) {
-                platform.setTexture("platformGlow");
+                platform.setTexture("platform_1");
                 platform.coin = Phaser.Math.Between(1, 5);
             } else if (mushroomProbability) {
-                platform.setTexture("platformGlow");
+                platform.setTexture("platform_1");
                 platform.mushroom = 1;
             }
 
@@ -1400,7 +1392,7 @@ class GameScene extends Phaser.Scene {
                     // Revert brick texture back to normal platform when coins run out
                     brick.setTexture("platform");
                 }
-                let powerUp = this.powerUps.create(brick.x, brick.y - brick.displayHeight, 'collectible_1').setScale(0.2);
+                let powerUp = this.powerUps.create(brick.x, brick.y - brick.displayHeight, 'collectible_coin').setScale(0.2);
                 this.tweens.add({
                     targets: powerUp,
                     scaleY: 0.07,
@@ -1458,7 +1450,7 @@ class GameScene extends Phaser.Scene {
 
     // Helper function: Shoot lava ball
     shootLavaBall(enemy, target) {
-        const lavaBall = this.physics.add.sprite(enemy.x, enemy.y, 'lavaBall');
+        const lavaBall = this.physics.add.sprite(enemy.x, enemy.y, 'enemy_projectile2');
         lavaBall.setScale(0.2); // Reduce size
         lavaBall.setVelocityX(-300); // Adjust speed
         lavaBall.setBounce(1); // Allow bouncing off surfaces
@@ -1525,7 +1517,7 @@ class GameScene extends Phaser.Scene {
 
     // Helper function: Shoot snowball
     shootSnowBall(enemy, target) {
-        const snowBall = this.physics.add.sprite(enemy.x, enemy.y, 'snowBall');
+        const snowBall = this.physics.add.sprite(enemy.x, enemy.y, 'enemy_projectile1');
         snowBall.setScale(0.2); // Reduce size
         snowBall.setVelocityX(-300); // Adjust direction and speed
         snowBall.setCollideWorldBounds(true); // Prevent leaving the game area
@@ -2059,26 +2051,61 @@ class GameScene extends Phaser.Scene {
     }
 
     setupMobileScaling() {
-        if (!this.platforms) {
-            console.error('Platforms group is not initialized');
-            return;
-        }
+    // Adjust background scaling
+    this.background.setDisplaySize(this.scale.width, this.scale.height);
 
-        if (!this.platforms.children || this.platforms.children.entries.length === 0) {
-            console.error('No platforms found in the group');
-            return;
-        }
+    // Scale and position distance bar
+    if (this.distanceBar && this.distanceBarFill && this.distanceAvatar) {
+        this.distanceBar.setScale(0.8).setPosition(this.scale.width / 2, 30); // Top center
+        this.distanceBarFill.setScale(0.8);
+        this.distanceAvatar.setScale(0.8);
+    }
 
-        // Iterate over children and apply scaling
-        this.platforms.children.each((platform) => {
-            if (platform) {
-                platform.setScale(1).refreshBody(); // Reduce size and refresh body
-            } else {
-                console.error('Platform object is undefined');
-            }
-    });
+    // Scale and position icons and avatar
+    const iconSpacing = 50; // Space between icons
+    const avatarStartX = 20; // Start position for avatar
+    const avatarStartY = 30; // Position for icons and avatar group
 
-    console.log('Mobile scaling applied to platforms');
+    if (this.avatar) {
+        this.avatar.setScale(0.8).setPosition(avatarStartX, avatarStartY);
+    }
+
+    if (this.iconBullet) {
+        this.iconBullet.setScale(0.8).setPosition(avatarStartX + iconSpacing, avatarStartY);
+    }
+
+    if (this.iconShield) {
+        this.iconShield.setScale(0.8).setPosition(avatarStartX + iconSpacing * 2, avatarStartY);
+    }
+
+    if (this.iconMissile) {
+        this.iconMissile.setScale(0.8).setPosition(avatarStartX + iconSpacing * 3, avatarStartY);
+    }
+
+    // Scale and position coin and score
+    const scoreX = this.scale.width - 100; // Top right corner
+    const scoreY = 30;
+
+    if (this.coin) {
+        this.coin.setScale(0.8).setPosition(scoreX - 50, scoreY);
+    }
+
+    if (this.scoreText) {
+        this.scoreText.setFontSize(24).setPosition(scoreX, scoreY); // Adjust font size and position
+    }
+
+    // Scale and position hearts (health)
+    const heartSpacing = 30; // Space between hearts
+    const heartStartX = this.scale.width / 2 - 100; // Centered horizontally
+    const heartY = this.scale.height - 50; // Bottom center
+
+    if (this.bossLivesArray) {
+        this.bossLivesArray.forEach((heart, index) => {
+            heart.setDisplaySize(20, 20).setPosition(heartStartX + heartSpacing * index, heartY);
+        });
+    }
+
+    console.log('Mobile scaling applied successfully!');
 }
 
 
