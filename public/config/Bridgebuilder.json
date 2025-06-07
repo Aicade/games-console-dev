@@ -1,0 +1,29 @@
+{
+    "description": "Tap to create the bridges.",
+    "deviceOrientation": "auto",
+    "imageLoader": {
+        "background": "background",
+        "player": "player",
+        "projectile": "projectile"
+    },
+    "soundsLoader": {
+        "background": "https://files.catbox.moe/0i68mc.mp3",
+        "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
+        "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
+        "score": "https://files.catbox.moe/mand0o.mp3"
+    },
+    "instructions": "1. Tap to strech.",
+    "orientationSizes": {
+        "landscape": {
+            "height": 720,
+            "width": 1280
+        },
+        "portrait": {
+            "height": 1280,
+            "width": 720
+        }
+    },
+    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+    "phaserVersion": "3.80.1",
+    "title": "Bridge Builder"
+}
