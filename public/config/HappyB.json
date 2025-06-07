@@ -8,12 +8,12 @@
     "player": "player"
   },
   "soundsLoader": {
-    "background": "https://files.catbox.moe/cwap0h.mp3",
+    "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/cwap0h_454856bf-a3bb-4d69-864c-a4f4521daed4.mp3?t=1749324694429",
     "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
     "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
-    "celebration": "https://files.catbox.moe/6gj83m.mp3",
-    "powerUp": "https://files.catbox.moe/ygqrcb.mp3",
-    "cakeSplat": "https://files.catbox.moe/r1wdpr.mp3"
+    "celebration": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/6gj83m_a98d62e3-18ac-43e5-aa3b-144e4cc980be.mp3?t=1749324740788",
+    "powerUp": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/ygqrcb_58a36f7c-778c-4147-aa47-71b0045dbf33.mp3?t=1749324791264",
+    "cakeSplat": "hhttps://aicade-user-store.s3.amazonaws.com/GameAssets/music/r1wdpr_c727a52c-6847-4b9a-ad67-f48efbf67ef5.mp3?t=1749324835492"
   },
   "deviceOrientationSizes": {
     "landscape": {
