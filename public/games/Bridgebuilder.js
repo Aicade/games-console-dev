@@ -1,15 +1,10 @@
-// Device detection: mobile devices use portrait; desktop devices use landscape.
-function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-const deviceOrientation = isMobileDevice() ? "portrait" : "landscape";
+
 
 // Touch Screen Controls
 const joystickEnabled = false;
 const buttonEnabled = false;
 
-const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
-const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
+
 
 // Game Scene
 class GameScene extends Phaser.Scene {
@@ -21,16 +16,18 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
         addEventListenersPhaser.bind(this)();
 
-        if (joystickEnabled) this.load.plugin('rexvirtualjoystickplugin', rexJoystickUrl, true);
-        if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
+        if (joystickEnabled && _CONFIG.rexJoystickUrl) {
+            this.load.plugin('rexvirtualjoystickplugin', _CONFIG.rexJoystickUrl, true);
+        }
+        if (buttonEnabled && _CONFIG.rexButtonUrl) {
+            this.load.plugin('rexbuttonplugin', _CONFIG.rexButtonUrl, true);
+        }
         for (const key in _CONFIG.imageLoader) {
             this.load.image(key, _CONFIG.imageLoader[key]);
         }
         for (const key in _CONFIG.soundsLoader) {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-        this.load.image("pillar", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png");
 
         const fontName = 'pix';
         const fontBaseURL = "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/fonts/";
@@ -42,6 +39,7 @@ class GameScene extends Phaser.Scene {
     create() {
         // Stop any previously playing background music before starting a new instance.
         this.sound.stopByKey("background");
+        this.deviceOrientation = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? "portrait" : "landscape";
 
         this.score = 0;
         addEventListenersPhaser.bind(this)();
@@ -100,7 +98,7 @@ class GameScene extends Phaser.Scene {
     // In portrait, platform occupies full height at bottom.
     addPlatform(posX) {
         let yPos, displayHeight;
-        if (deviceOrientation === "landscape") {
+        if (this.deviceOrientation === "landscape") {
             yPos = this.game.config.height - (gameOptions.platformHeight * 0.5);
             displayHeight = gameOptions.platformHeight * 0.5;
         } else {
@@ -134,7 +132,7 @@ class GameScene extends Phaser.Scene {
 
     addPlayer() {
         let originalX, originalY, originalScale;
-        if (deviceOrientation === "landscape") {
+        if (this.deviceOrientation === "landscape") {
             originalX = this.platforms[this.mainPlatform].displayWidth - gameOptions.poleWidth;
             originalY = this.game.config.height - (gameOptions.platformHeight * 0.5);
             originalScale = 0.15;
@@ -152,7 +150,7 @@ class GameScene extends Phaser.Scene {
 
     addPole() {
         let poleX, poleY;
-        if (deviceOrientation === "landscape") {
+        if (this.deviceOrientation === "landscape") {
             poleX = this.platforms[this.mainPlatform].displayWidth - 60;
             poleY = this.game.config.height - (gameOptions.platformHeight * 0.5) + 20;
         } else {
@@ -399,7 +397,7 @@ const config = {
         description: _CONFIG.description,
         instructions: _CONFIG.instructions,
     },
-    orientation: deviceOrientation
+    orientation: this.deviceOrientation
 };
 
 let gameOptions = {
