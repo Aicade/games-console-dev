@@ -2,11 +2,12 @@
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
+        this.score = 0;
+        this.lives = 3;
     }
 
     preload() {
-        this.score = 0;
-        this.lives = 3;
+        
 
         addEventListenersPhaser.bind(this)();
 
