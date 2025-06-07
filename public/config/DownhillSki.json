@@ -1,31 +1,47 @@
 {
-    "description": "Tap to change direction.",
-    "deviceOrientation": "portrait",
-    "imageLoader": {
-        "background": "background",
-        "player": "player",
-        "enemy": "enemy"
-    },
-    "instructions": "Instructions: 1. Avoid enemies.",
-    "orientationSizes": {
-        "landscape": {
-            "height": 720,
-            "width": 1280
-        },
-        "portrait": {
-            "height": 1280,
-            "width": 720
-        }
-    },
-    "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
-    "phaserVersion": "3.80.1",
-    "soundsLoader": {
-        "background": "https://files.catbox.moe/ml23y5.mp3",
+  "title": "Alpine Rush",
+  "description": "Tap to change direction.",
+  "instructions": "Instructions: 1. Avoid enemies.",
+  "deviceOrientation": "portrait",
+  "imageLoader": {
+    "background": "background",
+    "player": "player",
+    "enemy": "enemy",
+    "collectible": "collectible",
+    "collectible_1": "collectible_1"
+  },
+  "soundsLoader": {
+    "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-2.mp3",
     "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
     "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
-    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
-    "coin": "https://files.catbox.moe/psj9yf.mp3",
-    "booster": "https://files.catbox.moe/4q2wx6.mp3"
+    "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3"
+  },
+  "deviceOrientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
     },
-    "title": "Down Hill Ski"
-  }
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
+  "phaserVersion": "3.80.1",
+  "orientationSizes": {
+    "landscape": {
+      "height": 720,
+      "width": 1280
+    },
+    "portrait": {
+      "height": 1280,
+      "width": 720
+    }
+  },
+  "libLoader": {
+    "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
+    "pillar": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png"
+  },
+  "rexJoystickUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js",
+    "rexButtonUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js"
+}

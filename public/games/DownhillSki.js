@@ -2,11 +2,6 @@
 const joystickEnabled = false;
 const buttonEnabled = false;
 
-// JOYSTICK DOCUMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/virtualjoystick/
-const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
-
-// BUTTON DOCMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/button/
-const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
 
 // Game Scene
 class GameScene extends Phaser.Scene {
@@ -28,16 +23,19 @@ class GameScene extends Phaser.Scene {
             this.load.audio(key, [_CONFIG.soundsLoader[key]]);
         }
 
+        for (const key in _CONFIG.libLoader) {
+            this.load.image(key, _CONFIG.libLoader[key]);
+        }
+
         addEventListenersPhaser.bind(this)();
 
-        if (joystickEnabled) this.load.plugin('rexvirtualjoystickplugin', rexJoystickUrl, true);
-        if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
+        if (joystickEnabled && _CONFIG.rexJoystickUrl) {
+            this.load.plugin('rexvirtualjoystickplugin', _CONFIG.rexJoystickUrl, true);
+        }
+        if (buttonEnabled && _CONFIG.rexButtonUrl) {
+            this.load.plugin('rexbuttonplugin', _CONFIG.rexButtonUrl, true);
+        }
 
-
-        this.load.image("pauseButton", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png");
-        this.load.image("pillar", "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png");
-        this.load.image("coin", "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/Cf5TXRack0ueJP5Y/history/iteration/xxIASQI4aDag.webp");
-        this.load.image("booster", "https://aicade-ui-assets.s3.amazonaws.com/0306251268/games/Cf5TXRack0ueJP5Y/history/iteration/IIWr7cpNu7kj.webp");
 
 
         const fontName = 'pix';
@@ -271,7 +269,7 @@ class GameScene extends Phaser.Scene {
     collectBooster(player, booster) { // Add collectBooster function <--- ADD THIS FUNCTION AFTER THE END OF THE `update` FUNCTION
         booster.destroy();
         // this.updateScore(10); // Or any other score increase
-        this.sounds.booster.play();
+        // this.sounds.booster.play();
         this.increasePlayerSpeedAndImmunity();
         this.increaseDistanceIncrement();
     }
@@ -320,7 +318,7 @@ class GameScene extends Phaser.Scene {
             let spawnX = Phaser.Math.Between(0, this.game.config.width);
             let velocityY = -(150 + this.gameLevel * 10);
 
-            var booster = this.boosters.create(spawnX, this.game.config.height + 50, 'booster');
+            var booster = this.boosters.create(spawnX, this.game.config.height + 50, 'collectible_1');
             booster._originalScale = 0.25;
             this.scaleAssetToOrientation(booster);
             booster.body.setSize(booster.width * 0.7, booster.height * 0.7);
@@ -335,7 +333,7 @@ class GameScene extends Phaser.Scene {
             let spawnX = Phaser.Math.Between(0, this.game.config.width);
             let velocityY = -(150 + this.gameLevel * 10);
 
-            var coin = this.coins.create(spawnX, this.game.config.height + 50, 'coin');
+            var coin = this.coins.create(spawnX, this.game.config.height + 50, 'collectible');
             coin._originalScale = 0.1;
             this.scaleAssetToOrientation(coin);
             coin.body.setSize(coin.width * 0.7, coin.height * 0.7);
@@ -346,7 +344,7 @@ class GameScene extends Phaser.Scene {
     collectCoin(player, coin) {
         coin.destroy();
         this.updateScore(1); // Adjust score value as needed
-        this.sounds.coin.play(); // Play coin collection sound
+        // this.sounds.coin.play(); // Play coin collection sound
         this.coinsCollected++; // Increment coin counter
         this.updateCoinCounterText();
     }
