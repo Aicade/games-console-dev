@@ -27,7 +27,7 @@
     "phaserVersion": "3.80.1",
     "soundsLoader": {
         "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-1.mp3",
-    "jump": "https://files.catbox.moe/y95spl.mp3",
+    "jump": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/y95spl_03a3f35f-7ef4-4422-8502-d888f35b2db9.mp3?t=17494105548733",
     "damage": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav",
     "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
     "countdown": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/countdown_1.mp3"
