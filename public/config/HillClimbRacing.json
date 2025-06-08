@@ -4,7 +4,8 @@
     "imageLoader": {
         "background": "background",
         "player": "player",
-        "collectible": "collectible"
+        "collectible": "collectible",
+        "collectible_coin": "collectible_coin"
     },
     "atlasLoader": {
     "brakePedal": {
@@ -17,8 +18,7 @@
     }
   },
   "libLoader":{
-    "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png",
-    "coin": "public/assets/dollar.png"
+    "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
   },    
     "instructions": "Instructions: 1.Tap to destory.",
     "deviceOrientationSizes": {

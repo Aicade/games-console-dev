@@ -140,7 +140,7 @@ class GameScene extends Phaser.Scene {
         this.fuelBarBorder.strokeRect(100 - 1, 50 - 20, 200 + 2, 40 + 2);
     
         // Coin Container
-        this.coinIcon = this.add.image(40, 120, 'coin')
+        this.coinIcon = this.add.image(40, 120, 'collectible_coin')
             .setScale(0.28)
             .setOrigin(0.5)
             .setScrollFactor(0);
@@ -691,7 +691,7 @@ class GameScene extends Phaser.Scene {
         let startX = this.player.x + this.width;
         const baseY = Phaser.Math.Between(200, 300);
         for (let i = 0; i < numberOfCoins; i++) {
-            let coin = this.matter.add.sprite(startX + (i * 50), baseY, 'coin').setScale(0.3);
+            let coin = this.matter.add.sprite(startX + (i * 50), baseY, 'collectible_coin').setScale(0.3);
             coin.setFriction(0.1);
             coin.setBounce(0);
             this.coinCollectibles.add(coin);
