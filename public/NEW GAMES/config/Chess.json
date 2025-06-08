@@ -37,18 +37,18 @@
     }
   },
   "libLoader": {
-    "white_pawn": "https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg",
-    "white_rook": "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg",
-    "white_knight": "https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg",
-    "white_bishop": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg",
-    "white_queen": "https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg",
-    "white_king": "https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg",
-    "black_pawn": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg",
-    "black_rook": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg",
-    "black_knight": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg",
-    "black_bishop": "https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg",
-    "black_queen": "https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg",
-    "black_king": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg",
+    "white_pawn": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/Chess_plt45%5B1%5D.png?t=1749412910170",
+    "white_rook": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/Chess_rlt45%5B1%5D.png?t=1749413080459",
+    "white_knight": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/Chess_nlt45%5B1%5D.png?t=1749413227535",
+    "white_bishop": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/Chess_blt45%5B1%5D.png?t=1749413279538",
+    "white_queen": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/Chess_qlt45%5B1%5D.png?t=1749413369757",
+    "white_king": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/white_king_1.png?t=1749413490490",
+    "black_pawn": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/black_pawn_1.png?t=1749413520618",
+    "black_rook": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/black_rook_1.png?t=1749413557559",
+    "black_knight": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/black_knight_1.png?t=1749413567750",
+    "black_bishop": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/black_bishop_1.png?t=1749413576304",
+    "black_queen": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/black_queen_1.png?t=1749413595479",
+    "black_king": "https://aicade-user-store.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/assets/images/black_king_1.png?t=1749413615431",
     "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
   }
 }
