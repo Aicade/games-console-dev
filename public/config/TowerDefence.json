@@ -5,17 +5,17 @@
   "deviceOrientation": "landscape",
   "imageLoader": {
     "player": "player",
-    "enemy_1": "enemy",
-    "enemy_2": "enemy",
-    "weapon_1": "red weapon",
-    "weapon_2": "green weapon",
-    "weapon_3": "blue weapon",
-    "weapon_1_icon": "red weapon icon",
-    "weapon_2_icon": "green weapon icon",
-    "weapon_3_icon": "blue weapon icon",
-    "projectile_1": "red projectile",
-    "projectile_2": "green projectile",
-    "projectile_3": "blue projectile"
+    "enemy_1": "enemy_1",
+    "enemy_2": "enemy_2",
+    "weapon_1": "weapon_1",
+    "weapon_2": "weapon_2",
+    "weapon_3": "weapon_3",
+    "weapon_1_icon": "weapon_1_icon",
+    "weapon_2_icon": "weapon_2_icon",
+    "weapon_3_icon": "weapon_3_icon",
+    "projectile_1": "projectile_1",
+    "projectile_2": "projectile_2",
+    "projectile_3": "projectile_3"
   },
   "soundsLoader": {
     "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/Treat%20Jew%20Better%20%28animated%29%20%20Parody%20of%20Shawn%20Mendes%20Treat%20You%20Better%20%20Rucka%20Rucka%20Ali_af5ca648-00ca-440a-9ab8-f6e69c0e4234.mp3?t=1743619156856",
