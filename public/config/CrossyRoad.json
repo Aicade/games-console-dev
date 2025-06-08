@@ -10,9 +10,9 @@
     "collectible": "collectible"
   },
   "soundsLoader": {
-    "bg": "https://files.catbox.moe/psj9yf.mp3",
-    "lose": "https://files.catbox.moe/skrenm.mp3",
-    "collect": "https://files.catbox.moe/psj9yf.mp3"
+    "bg": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/psj9yf%5B1%5D_f6d5690d-725d-4e0f-855f-52545fc2107a.mp3?t=1749413830506",
+    "lose": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/skrenm%5B1%5D_9a6c9421-ff6e-4e70-a77f-7ebbede3cc8e.mp3?t=1749413867668",
+    "collect": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/psj9yf%5B1%5D_c2db17d3-4fa5-4661-b0b0-972117dfe676.mp3?t=1749413923376"
   },
   "deviceOrientationSizes": {
     "landscape": {
