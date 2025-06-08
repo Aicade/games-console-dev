@@ -22,7 +22,7 @@
     "phaserUrl": "https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js",
     "phaserVersion": "3.80.1",
     "soundsLoader": {
-        "background": "https://files.catbox.moe/dpkq9l.mp3",
+        "background": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/dpkq9l%5B1%5D_397b4f42-1366-4f41-9b5d-cb2454649d98.mp3?t=1749414680503",
         "jump": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_2.mp3",
         "destroy": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/flap_1.wav",
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_1.mp3",
