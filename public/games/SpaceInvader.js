@@ -32,9 +32,9 @@ class GameScene extends Phaser.Scene {
     for (const key in _CONFIG.soundsLoader) {
       this.load.audio(key, [_CONFIG.soundsLoader[key]]);
     }
-    for (const key in _CONFIG.libLoader) {
-      this.load.image(key, _CONFIG.libLoader[key]);
-    }
+
+    this.load.image("pauseButton", _CONFIG.libLoader.pauseButton);
+    this.load.image("heart", _CONFIG.libLoader.heart);
 
     const fontName = "pix";
     const fontBaseURL =
