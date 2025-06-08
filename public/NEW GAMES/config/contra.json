@@ -5,24 +5,24 @@
     "imageLoader": {
         "background": "background",
         "player": "player",
-        "enemy": "enemy"
+        "enemy": "enemy",
+        "enemy_bull": "enemy_bull",
+        "enemy_boss": "enemy_boss",
+        "projectile_player": "projectile_player",
+        "projectile_enemy": "projectile_enemy",
+        "platform": "platform",
+        "platform_1": "platform_1",
+        "platform_2": "platform_2",
+        "platform_3": "platform_3",
+        "platform_4": "platform_4",
+        "platform_5": "platform_5",
+        "platform_7": "platform_7",
+        "collectible_capsule": "collectible_capsule",
+        "collectible": "collectible",
+        "collectible_1": "collectible_1"
         
     },
     "libLoader":{
-        "bullEnemy": "public/assets/enemy_2.png",
-        "bossEnemy": "public/assets/enemy_3.png",
-        "playerBullet": "public/assets/asteroid.png",
-        "enemyBullet": "public/assets/circle.png",
-        "platform": "platform",
-        "platform1": "platform_1",
-        "platform2": "platform_1",
-        "platform3": "platform_1",
-        "platform4": "platform_1",
-        "platform5": "platform_1",
-        "platform7": "platform_1",
-        "powerup_capsule": "public/assets/dollar.png",
-        "powerup": "public/assets/key.jpg",
-        "powerup1": "public/assets/mango.png",
         "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png",
         "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
 

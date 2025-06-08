@@ -72,7 +72,5 @@
     "iconmissile": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/iconmissile.png?t=1749198468980",
     "coin": "https://aicade-user-store.s3.amazonaws.com/1139835540/games/esRzduPty7rf6GMn/assets/images/coin.png?t=1749198469007"
   },
-  "mobile_portrait": false,
-  "rexJoystickUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js",
-    "rexButtonUrl": "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js"
+  "mobile_portrait": false
 }

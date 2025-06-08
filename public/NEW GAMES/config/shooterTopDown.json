@@ -13,6 +13,7 @@
     "enemy_2": "enemy_1"
   },
   "soundsLoader": {
+    "background":"https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-1.mp3",
     "sfx_powerup": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/item-pick-up-38258_44dffda3-8bf5-41bb-bfee-d1555406fc00.mp3?t=1748921942619",
     "sfx_click": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/pick-up-sfx-38516_e82cf833-bdaf-40ed-8811-04bef16762ac.mp3?t=1748921942701",
     "sfx_shoot_basic": "https://aicade-user-store.s3.amazonaws.com/GameAssets/music/edited_audio_28e936b6-fbfd-4c5b-b931-852b46940895.mp3?t=1748922688391",
@@ -52,7 +53,6 @@
     "wall_bush": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/wall_bush.png?t=1748670608576",
     "wall_lava": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/wall_lava.png?t=1748670618460",
     "pause": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/pause.png?t=1748689018091",
-    "Cover_image": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/Cover_image.png?t=1748689106622",
     "basic_gun": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/basic_gun.png?t=1748840546149",
     "shotgun": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/shotgun.png?t=1748840634329",
     "laser": "https://aicade-user-store.s3.amazonaws.com/5403911143/games/WaYu5zy6XSPl0LGV/assets/images/laser.png?t=1748840587604",

@@ -16,12 +16,12 @@ class GameScene extends Phaser.Scene {
             70: 610, 100: 580, 150: 533, 200: 480, 300: 380, 420: 260, 550: 130, 720: 0
         };
         this.platformImageKeys = {
-            70: 'platform1', 100: 'platform2', 150: 'platform3', 200: 'platform4',
-            300: 'platform5', 420: 'platform', 550: 'platform7', 720: null
+            70: 'platform_1', 100: 'platform_2', 150: 'platform_3', 200: 'platform_4',
+            300: 'platform_5', 420: 'platform', 550: 'platform_7', 720: null
         };
         this.platformDepths = {
-            'platform1': 1, 'platform2': 2, 'platform3': 3, 'platform4': 4,
-            'platform5': 5, 'platform': 6, 'platform7': 7
+            'platform_1': 1, 'platform_2': 2, 'platform_3': 3, 'platform_4': 4,
+            'platform_5': 5, 'platform': 6, 'platform_7': 7
         };
         this.isUpPressed = false;
         this.isDownPressed = false;
@@ -400,7 +400,7 @@ class GameScene extends Phaser.Scene {
 
         const bossX = this.cameras.main.scrollX + this.width + 200;
         const bossY = this.height / 2; // Center vertically
-        this.boss = this.physics.add.sprite(bossX, bossY, 'bossEnemy')
+        this.boss = this.physics.add.sprite(bossX, bossY, 'enemy_boss')
             .setScale(0.8) // Changed to 80% of original size
             .setDepth(8);
         this.boss.body.setSize(this.boss.width * 0.6, this.boss.height * 0.8);
@@ -425,8 +425,8 @@ class GameScene extends Phaser.Scene {
                 this.physics.world.gravity.y = 600;
 
                 const platformConfigs = [
-                    { y: 550, key: 'platform7', height: 130 },
-                    { y: 300, key: 'platform5', height: 380 },
+                    { y: 550, key: 'platform_7', height: 130 },
+                    { y: 300, key: 'platform_5', height: 380 },
                     { y: 420, key: 'platform', height: 260 }
                 ];
 
@@ -582,8 +582,8 @@ class GameScene extends Phaser.Scene {
     spawnAdditionalPlatforms() {
         const bossLeftEdge = this.boss.x - (this.boss.width * 0.8) / 2;
         const platformConfigs = [
-            { y: 200, key: 'platform4', height: 480 },
-            { y: 150, key: 'platform3', height: 533 }
+            { y: 200, key: 'platform_4', height: 480 },
+            { y: 150, key: 'platform_3', height: 533 }
         ];
 
         const newPlatforms = [];
@@ -647,7 +647,7 @@ class GameScene extends Phaser.Scene {
         for (let i = 0; i < count; i++) {
             const x = this.cameras.main.scrollX - 50;
             const y = this.platformLevels[7] - 20;
-            const bull = this.bullEnemies.create(x, y, 'bullEnemy').setScale(0.35).setDepth(8);
+            const bull = this.bullEnemies.create(x, y, 'enemy_bull').setScale(0.35).setDepth(8);
             bull.body.setSize(bull.width * 0.6, bull.height * 0.8);
             bull.body.setAllowGravity(true);
             bull.setFlipX(true);
@@ -679,7 +679,7 @@ class GameScene extends Phaser.Scene {
                     Phaser.Math.Angle.Between(bulletX, bulletY, this.player.x, this.player.y) - Phaser.Math.DegToRad(10)
                 ];
                 angles.forEach((angle, index) => {
-                    const bullet = this.enemyBullets.create(bulletX, bulletY, 'enemyBullet').setScale(0.5).setDepth(8);
+                    const bullet = this.enemyBullets.create(bulletX, bulletY, 'projectile_enemy').setScale(0.5).setDepth(8);
                     bullet.setVelocityX(Math.cos(angle) * bulletSpeed);
                     bullet.setVelocityY(Math.sin(angle) * bulletSpeed);
                     bullet.body.setAllowGravity(false);
@@ -689,7 +689,7 @@ class GameScene extends Phaser.Scene {
             } else if (isBoss) {
                 // Boss phase 0: Shoot 1 bullet from left side
                 const angle = Phaser.Math.Angle.Between(bulletX, bulletY, this.player.x, this.player.y);
-                const bullet = this.enemyBullets.create(bulletX, bulletY, 'enemyBullet').setScale(0.5).setDepth(8);
+                const bullet = this.enemyBullets.create(bulletX, bulletY, 'projectile_enemy').setScale(0.5).setDepth(8);
                 bullet.setVelocityX(Math.cos(angle) * bulletSpeed);
                 bullet.setVelocityY(Math.sin(angle) * bulletSpeed);
                 bullet.body.setAllowGravity(false);
@@ -701,7 +701,7 @@ class GameScene extends Phaser.Scene {
                 const yMin = enemy.y - height / 2;
                 const yMax = enemy.y + height / 2;
                 const bulletY = Phaser.Math.FloatBetween(yMin, yMax);
-                const bullet = this.enemyBullets.create(enemy.x, bulletY, 'enemyBullet').setScale(0.5).setDepth(8);
+                const bullet = this.enemyBullets.create(enemy.x, bulletY, 'projectile_enemy').setScale(0.5).setDepth(8);
                 const angle = Phaser.Math.Angle.Between(enemy.x, bulletY, this.player.x, this.player.y);
                 bullet.setVelocityX(Math.cos(angle) * bulletSpeed);
                 bullet.setVelocityY(Math.sin(angle) * bulletSpeed);
@@ -808,7 +808,7 @@ class GameScene extends Phaser.Scene {
         const bullet = this.playerBullets.create(
             this.player.x + (velocityX !== 0 ? (velocityX > 0 ? 20 : -20) : 0),
             this.player.y - 20 + (velocityY !== 0 ? (velocityY > 0 ? 20 : -20) : 0),
-            'playerBullet'
+            'projectile_player'
         ).setScale(0.1).setDepth(8);
 
         bullet.setVelocity(velocityX, velocityY);
@@ -819,7 +819,7 @@ class GameScene extends Phaser.Scene {
     spawnCapsule() {
         const x = this.cameras.main.scrollX + this.width + 50;
         const y = Phaser.Math.Between(100, 300);
-        const capsule = this.capsules.create(x, y, 'powerup_capsule').setScale(0.25).setDepth(8);
+        const capsule = this.capsules.create(x, y, 'collectible_capsule').setScale(0.25).setDepth(8);
         capsule.body.setAllowGravity(false);
         capsule.initialY = y;
         capsule.isHealthCapsule = false;
@@ -829,7 +829,7 @@ class GameScene extends Phaser.Scene {
     spawnHealthCapsule() {
         const x = this.cameras.main.scrollX + this.width + 50;
         const y = Phaser.Math.Between(100, 300);
-        const capsule = this.capsules.create(x, y, 'powerup_capsule').setScale(0.25).setDepth(8);
+        const capsule = this.capsules.create(x, y, 'collectible_capsule').setScale(0.25).setDepth(8);
         capsule.body.setAllowGravity(false);
         capsule.initialY = y;
         capsule.isHealthCapsule = true;
@@ -888,7 +888,7 @@ class GameScene extends Phaser.Scene {
             onComplete: () => {
                 explosion.destroy();
                 capsule.destroy();
-                const powerUpKey = capsule.isHealthCapsule ? 'powerup1' : 'powerup';
+                const powerUpKey = capsule.isHealthCapsule ? 'collectible_1' : 'collectible';
                 const powerup = this.powerups.create(capsule.x, capsule.y, powerUpKey).setScale(0.25).setDepth(8);
                 powerup.setVelocityY(-200);
                 powerup.body.setAllowGravity(true);
@@ -900,7 +900,7 @@ class GameScene extends Phaser.Scene {
         powerup.destroy();
         this.sounds.shoot.play();
 
-        if (powerup.texture.key === 'powerup1') {
+        if (powerup.texture.key === 'collectible_1') {
             this.lives++;
             const heartIndex = this.lives - 1;
             this.hearts[heartIndex] = this.add.image(50 + heartIndex * 35, 60, 'heart')
@@ -1142,7 +1142,7 @@ class GameScene extends Phaser.Scene {
 
         if (spawnBull) {
             const x = this.cameras.main.scrollX - 50;
-            const bull = this.bullEnemies.create(x, y, 'bullEnemy').setScale(0.35).setDepth(8);
+            const bull = this.bullEnemies.create(x, y, 'enemy_bull').setScale(0.35).setDepth(8);
             bull.body.setSize(bull.width * 0.6, bull.height * 0.8);
             bull.body.setAllowGravity(true);
             bull.setFlipX(true);

@@ -3,6 +3,11 @@ const joystickEnabled = true;
 const buttonEnabled = true;
 const hideButtons = true;
 var isMobile = false;
+// JOYSTICK DOCUMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/virtualjoystick/
+const rexJoystickUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js";
+
+// BUTTON DOCMENTATION: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/button/
+const rexButtonUrl = "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js";
 
 
 
@@ -140,12 +145,9 @@ class GameScene extends Phaser.Scene {
             'assets/fonts/PressStart2P.fnt'
         );
         
-        if (joystickEnabled && _CONFIG.rexJoystickUrl) {
-            this.load.plugin('rexvirtualjoystickplugin', _CONFIG.rexJoystickUrl, true);
-        }
-        if (buttonEnabled && _CONFIG.rexButtonUrl) {
-            this.load.plugin('rexbuttonplugin', _CONFIG.rexButtonUrl, true);
-        }
+        
+        if (joystickEnabled) this.load.plugin('rexvirtualjoystickplugin', rexJoystickUrl, true);
+        if (buttonEnabled) this.load.plugin('rexbuttonplugin', rexButtonUrl, true);
         
         // Attach additional event listeners and display the progress loader
         addEventListenersPhaser.bind(this)();
