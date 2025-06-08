@@ -12,7 +12,7 @@
         "pillar": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+01+Grey.png"
     },
     "soundsLoader": {
-        "background": "background",
+        "background": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/music/bgm-1.mp3",
         "move": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/jump_3.mp3",
         "collect": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/collect_1.mp3",
         "lose": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/sfx/lose_2.mp3",
