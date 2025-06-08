@@ -2,7 +2,7 @@
     "description": "Reaction game.",
     "deviceOrientation": "portrait",
     "libLoader":{
-        "basket": "basket",
+        "basket": "https://aicade-ui-assets.s3.amazonaws.com/6994335331/games/tQLPm1CblJ8ofOCI/history/iteration/YVHImmyWXPjU.webp",
         "block": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/textures/Bricks/s2+Brick+04+Plaster+Grey.png",
         "heart": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/heart.png",
         "pauseButton": "https://aicade-ui-assets.s3.amazonaws.com/GameAssets/icons/pause.png"
